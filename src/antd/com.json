@@ -1,0 +1,14 @@
+{
+  "title": "Antd@AI",
+  "namespace": "mybricks.basic-comlib.ai-antd",
+  "author": "CheMingjun",
+  "author_name": "CheMingjun",
+  "version": "1.0.0",
+  "description": "面向Antd的AI组件",
+  "icon": "./icon.svg",
+  "runtime": "./runtime.tsx",
+  "editors": "./editors/index.tsx",
+  "data": "./data.json",
+  "slots": [],
+  "docs": ""
+}

@@ -1,0 +1,14 @@
+{
+  "title": "Antd-图表@AI",
+  "namespace": "mybricks.basic-comlib.ai-antd-charts",
+  "author": "CheMingjun",
+  "author_name": "CheMingjun",
+  "version": "1.0.0",
+  "description": "面向Antd图表库的AI组件",
+  "icon": "./icon.svg",
+  "runtime": "./runtime.tsx",
+  "editors": "./editor.tsx",
+  "data": "./data.json",
+  "slots": [],
+  "docs": ""
+}
