@@ -1,6 +1,10 @@
 import React, {useEffect, useMemo} from 'react';
 import {polyfillRuntime} from './util'
 
+import { Button } from "antd";
+import { StyleProvider } from "@ant-design/cssinjs";
+
+
 polyfillRuntime();
 
 const ErrorStatus = ({title = '未知错误', children = null}: { title?: string, children?: any }) => (
@@ -184,6 +188,15 @@ export default ({env, data, inputs, outputs, slots, logger, id}) => {
       context: {React}
     }
   }, [slots])
+
+  // const container = document.querySelector("#_mybricks-geo-webview_")!.shadowRoot
+  const container = null
+
+  return (
+    <StyleProvider container={container!}>
+      <Button type="primary">hello</Button>
+    </StyleProvider>
+  )
 
   return (
     <>
