@@ -1,6 +1,7 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import { polyfillChartsRuntime } from './util'
 import { AIJsxRuntime } from './../utils/ai-code/render'
+import { copyToClipboard } from './../utils/ai-code'
 import ReactEChartsCore from 'echarts-for-react/lib/core';
 import { Data } from './types'
 
@@ -15,6 +16,19 @@ const LoadingStatus = ({ title = '加载中...' }) => {
 }
 
 const IdlePlaceholder = () => {
+
+  const copy = useCallback((text) => {
+    copyToClipboard(text).then(res => {
+      window?.antd?.message ? window?.antd?.message.success('复制提示词成功') : alert('复制提示词成功')
+    })
+  }, [])
+
+  const CopyIcon = useCallback(() => {
+    return (
+      <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5474"><path d="M720 192h-544A80.096 80.096 0 0 0 96 272v608C96 924.128 131.904 960 176 960h544c44.128 0 80-35.872 80-80v-608C800 227.904 764.128 192 720 192z m16 688c0 8.8-7.2 16-16 16h-544a16 16 0 0 1-16-16v-608a16 16 0 0 1 16-16h544a16 16 0 0 1 16 16v608z" p-id="5475" fill="#555555"></path><path d="M848 64h-544a32 32 0 0 0 0 64h544a16 16 0 0 1 16 16v608a32 32 0 1 0 64 0v-608C928 99.904 892.128 64 848 64z" p-id="5476" fill="#555555"></path><path d="M608 360H288a32 32 0 0 0 0 64h320a32 32 0 1 0 0-64zM608 520H288a32 32 0 1 0 0 64h320a32 32 0 1 0 0-64zM480 678.656H288a32 32 0 1 0 0 64h192a32 32 0 1 0 0-64z" p-id="5477" fill="#555555"></path></svg>
+    )
+  }, [])
+
   return (
     <div className={css.tip}>
       <div className={css.title}>AI 图表</div>
@@ -23,11 +37,11 @@ const IdlePlaceholder = () => {
         <strong>请通过右下角「对话框」提问生成组件</strong>
       </div>
       比如：
-      <div className={css.example}>
-        我想要一个杭州每个区的人口占比图
+      <div className={css.example} onClick={() => copy('我想要一个杭州各区的人口占比图')}>
+        - 我想要一个杭州各区的人口占比图 <CopyIcon />
       </div>
-      <div className={css.example}>
-        我想要绘制一个电商公司近5年的销售额曲线
+      <div className={css.example} onClick={() => copy('我想要绘制一个电商公司近5年的销售额曲线')}>
+        - 我想要绘制一个电商公司近5年的销售额曲线 <CopyIcon />
       </div>
     </div>
   )

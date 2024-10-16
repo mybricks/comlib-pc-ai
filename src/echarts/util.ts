@@ -9,7 +9,6 @@ export function uuid(pre = 'u_', len = 6) {
   return pre + rtn;
 }
 
-
 export async function polyfillChartsRuntime () {
   await loadExternalAssetsDeps([
     {

@@ -1,4 +1,4 @@
-export const getParamsType = (propsTypeName: string = 'any') =>  `
+export const getParamsType = (propsTypeName: string = 'any') => `
 declare interface Params {
   inputs: Record<string, Function>;
   outputs: Record<string, Function>;
@@ -39,6 +39,7 @@ export async function loadExternalAssetsDeps(deps: AssetsDep[]) {
 
     if (window[asset.name]) {
       loadPromises.push(Promise.resolve());
+      continue
     }
 
     for (const dep of asset.deps) {
@@ -67,4 +68,35 @@ export async function loadExternalAssetsDeps(deps: AssetsDep[]) {
   }
 
   await Promise.all(loadPromises);
+}
+
+/** 复制文本到粘贴板 */
+export function copyToClipboard(text) {
+  return new Promise((resolve, reject) => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(() => {
+        resolve('Text copied to clipboard successfully!');
+      }).catch((err) => {
+        reject('Could not copy text: ' + err);
+      });
+    } else {
+      // Fallback for browsers that do not support Clipboard API
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        if (successful) {
+          resolve('Text copied to clipboard successfully!');
+        } else {
+          reject('Copy command was unsuccessful');
+        }
+      } catch (err) {
+        document.body.removeChild(textArea);
+        reject('Oops, unable to copy: ' + err);
+      }
+    }
+  });
 }

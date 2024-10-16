@@ -107,11 +107,12 @@ export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, erro
   const ReactNode = useMemo(() => {
     if (errorInfo) return () => <ErrorTip title={errorInfo.title} desc={errorInfo.desc} />;
     if (renderCode) {
-      console.log(decodeURIComponent(renderCode))
       try {
         eval(decodeURIComponent(renderCode))
 
         let RT = window[`mbcrjsx_${id}`]
+
+        console.log(RT)
 
         if (!RT.default) {
           throw new Error('未导出组件定义')
