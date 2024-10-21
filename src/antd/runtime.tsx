@@ -52,6 +52,7 @@ export default ({env, data, inputs, outputs, slots, logger, id}) => {
     if ((env.edit || env.runtime?.debug) && env.canvas?.css) {
       cssApi = env.canvas.css
     }
+
     return cssApi
   }, [env])
 
@@ -65,7 +66,6 @@ export default ({env, data, inputs, outputs, slots, logger, id}) => {
   // 卸载 CSS 代码
   useEffect(() => {
     return () => {
-      // mbcrcss = mybricks_custom_render缩写
       appendCssApi.remove(`mbcrcss_${id}`)
     }
   }, [])
