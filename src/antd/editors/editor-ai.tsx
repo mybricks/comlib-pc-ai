@@ -55,7 +55,6 @@ export default {
             const renderCode = response.render
 
             proRender({id, data}, renderCode)
-            refresh?.()//强制刷新
           }
 
           if (response.style) {
