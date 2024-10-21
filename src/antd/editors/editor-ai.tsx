@@ -28,7 +28,7 @@ export default {
         `
     },
     execute({id, data, inputs, outputs, slots},
-            response: { render, style }, {refresh}) {
+            response: { render, style }, {refresh} = {}) {
       return new Promise((resolve, reject) => {
         if (response) {
           if (!(response.render || response.style)) {
@@ -40,7 +40,7 @@ export default {
             const renderCode = response.render
 
             proRender({id, data}, renderCode)
-            refresh()//强制刷新
+            refresh?.()//强制刷新
           }
 
           if (response.style) {

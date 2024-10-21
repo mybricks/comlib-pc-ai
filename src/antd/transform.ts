@@ -8,6 +8,19 @@ function supportLessCssModules(code) {
   return res
 }
 
+const transformImportPlugin = () => {
+  return {
+    visitor: {
+      ImportDeclaration(path) {
+        const { source } = path.node;
+        if (source.value === 'antd') {
+          source.value = "antd_5_21_4";
+        }
+      }
+    }
+  };
+};
+
 const transformTsx = async (code, context: { id: string }) => {
   return new Promise((resolve, reject) => {
     let transformCode
@@ -31,7 +44,8 @@ const transformTsx = async (code, context: { id: string }) => {
             {
               isTSX: true
             }
-          ]
+          ],
+          transformImportPlugin()
         ]
       }
       

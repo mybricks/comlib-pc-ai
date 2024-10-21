@@ -8,7 +8,46 @@
   ],
   "componentType": "PC",
   "externals": [
-
+    {
+      "name": "@ant-design/cssinjs",
+      "library": "antdCssinjs",
+      "urls": [
+        "public/antd/cssinjs.min.js"
+      ]
+    },
+    {
+      "name": "dayjs",
+      "library": "dayjs",
+      "version": "1.11.13",
+      "urls": [
+        "public/dayjs/dayjs@1.11.13.min.js",
+        "public/dayjs/locale/zh-cn.min.js"
+      ]
+    },
+    {
+      "name": "@ant-design/icons",
+      "library": "icons",
+      "urls": [
+        "public/ant-design-icons@4.7.0.min.js"
+      ]
+    },
+    {
+      "name": "antd",
+      "library": "antd_5_21_4",
+      "version": "5.21.4",
+      "urls": [
+        "public/antd/antd@5.21.4.min.js",
+        "public/antd/locale/zh_CN.js"
+      ]
+    },
+    {
+      "name": "echarts",
+      "library": "echarts",
+      "version": "5.5.1",
+      "urls": [
+        "public/echarts@5.5.1.min.js"
+      ]
+    }
   ],
   "tags": "react"
 }
