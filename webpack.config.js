@@ -27,7 +27,7 @@ module.exports = {
         root: 'ReactDOM'
       },
       moment: 'moment',
-      antd: 'antd',
+      // antd: 'antd',
       '@ant-design/icons': 'icons',
       '@ant-design/charts': 'Charts',
       'echarts': 'echarts'

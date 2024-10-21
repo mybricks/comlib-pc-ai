@@ -1,15 +1,20 @@
-import React, {useEffect, useMemo} from 'react';
+import React, {useEffect, useMemo, useRef} from 'react';
 import {polyfillRuntime} from './util'
+import { StyleProvider } from "@ant-design/cssinjs";
 
 polyfillRuntime();
 
-const ErrorStatus = ({title = '未知错误', children = null}: { title?: string, children?: any }) => (
-  <div style={{color: 'red'}}>
-    {title}
-    <br/>
-    {children}
-  </div>
-)
+const ErrorStatus = ({title = '未知错误', children = null, onError}) => {
+  onError(title)//向外抛出错误
+
+  return (
+    <div style={{color: 'red'}}>
+      {title}
+      <br/>
+      {children}
+    </div>
+  )
+}
 
 interface CssApi {
   set: (id: string, content: string) => void
@@ -17,6 +22,7 @@ interface CssApi {
 }
 
 export default ({env, data, inputs, outputs, slots, logger, id}) => {
+  const container = useRef((env.edit || env.runtime.debug) ? document.querySelector("#_mybricks-geo-webview_")!.shadowRoot : null);
   useMemo(() => {
     if (env.edit) {
       data._editors = void 0
@@ -84,6 +90,7 @@ export default ({env, data, inputs, outputs, slots, logger, id}) => {
     if (errorInfo) return errorInfo.tip;
     if (data._renderCode) {
       try {
+        console.log(decodeURIComponent(data._renderCode))
         eval(decodeURIComponent(data._renderCode))
 
         const rt = window[`mbcrjsx_${id}`]
@@ -103,29 +110,9 @@ export default ({env, data, inputs, outputs, slots, logger, id}) => {
   const scope = useMemo(() => {
     return {
       data,
-      // data: new Proxy({}, {
-      //   get(obj, key) {
-      //     //debugger
-      //
-      //     if (!data['_defined']) {
-      //       data['_defined'] = {}
-      //     }
-      //
-      //     return data['_defined'][key]
-      //   },
-      //   set(obj, key, value) {
-      //     if (!data['_defined']) {
-      //       data['_defined'] = {}
-      //     }
-      //
-      //     data['_defined'][key] = value
-      //     return true
-      //   }
-      // }),
       inputs: new Proxy({}, {
         get(_, id) {
           if (env.runtime) {
-
             return (fn) => {
               inputs[id]((value, relOutputs) => {
                 fn(value, new Proxy({}, {
@@ -135,22 +122,6 @@ export default ({env, data, inputs, outputs, slots, logger, id}) => {
                 }))
               })
             }
-
-            // const inputId = data.inputs.find((input) => input.id === id)?.id
-            //
-            // if (inputId) {
-            //   return (fn) => {
-            //     inputs[inputId]((value, relOutputs) => {
-            //       fn(value, new Proxy({}, {
-            //         get(_, key) {
-            //           const outputId = data.outputs.find((input) => input.id === key)?.key || ""
-            //           return relOutputs[outputId]
-            //         }
-            //       }))
-            //     })
-            //   }
-            // }
-
             return () => {
             }
           }
@@ -172,25 +143,21 @@ export default ({env, data, inputs, outputs, slots, logger, id}) => {
           }
         }
       }),
-      slots: new Proxy({}, {
-        get(obj, id) {
-          const slotId = data.slots.find((slot) => slot.id === id)?.id
-          if (slotId) {
-            return slots[slotId]
-          }
-        }
-      }),
+      slots,
       env,
       context: {React}
     }
   }, [slots])
 
+
   return (
     <>
       {typeof ReactNode === 'function' ? (
-        <ReactNode {...scope} />
+        <StyleProvider container={container.current!} hashPriority="high">
+          <ReactNode {...scope} />
+        </StyleProvider>
       ) : (
-        <ErrorStatus title={errorInfo?.title}>{ReactNode}</ErrorStatus>
+        <ErrorStatus title={errorInfo?.title} onError={onError}>{ReactNode}</ErrorStatus>
       )}
     </>
   )

@@ -14,12 +14,10 @@ const loadedLibs = {}
 export default function proRender({id, data}, renderCode) {
   const setRender = () => {
     transformTsx(renderCode, {id}).then(code => {
-      //debugger
-
       data._renderCode = code;
       data._jsxErr = ''
     }).catch(e => {
-      //debugger
+debugger
 
       data._jsxErr = e?.message ?? '未知错误'
     })
