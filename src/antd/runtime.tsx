@@ -158,7 +158,7 @@ export default ({env, data, inputs, outputs, slots, logger, id}) => {
   return (
     <>
       {typeof ReactNode === 'function' ? (
-        <StyleProvider container={container.current!}>
+        <StyleProvider container={container.current!} hashPriority="high">
           <ReactNode {...scope} />
         </StyleProvider>
       ) : (
