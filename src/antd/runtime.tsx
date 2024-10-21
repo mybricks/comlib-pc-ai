@@ -1,26 +1,26 @@
 import React, {useEffect, useMemo} from 'react';
 import {polyfillRuntime} from './util'
 
-import { Button } from "antd";
-import { StyleProvider } from "@ant-design/cssinjs";
-
-
 polyfillRuntime();
 
-const ErrorStatus = ({title = '未知错误', children = null}: { title?: string, children?: any }) => (
-  <div style={{color: 'red'}}>
-    {title}
-    <br/>
-    {children}
-  </div>
-)
+const ErrorStatus = ({title = '未知错误', children = null, onError}) => {
+  onError(title)//向外抛出错误
+
+  return (
+    <div style={{color: 'red'}}>
+      {title}
+      <br/>
+      {children}
+    </div>
+  )
+}
 
 interface CssApi {
   set: (id: string, content: string) => void
   remove: (id: string) => void
 }
 
-export default ({env, data, inputs, outputs, slots, logger, id}) => {
+export default ({env, data, inputs, outputs, slots, logger, id, onError}) => {
   useMemo(() => {
     if (env.edit) {
       data._editors = void 0
@@ -107,29 +107,9 @@ export default ({env, data, inputs, outputs, slots, logger, id}) => {
   const scope = useMemo(() => {
     return {
       data,
-      // data: new Proxy({}, {
-      //   get(obj, key) {
-      //     //debugger
-      //
-      //     if (!data['_defined']) {
-      //       data['_defined'] = {}
-      //     }
-      //
-      //     return data['_defined'][key]
-      //   },
-      //   set(obj, key, value) {
-      //     if (!data['_defined']) {
-      //       data['_defined'] = {}
-      //     }
-      //
-      //     data['_defined'][key] = value
-      //     return true
-      //   }
-      // }),
       inputs: new Proxy({}, {
         get(_, id) {
           if (env.runtime) {
-
             return (fn) => {
               inputs[id]((value, relOutputs) => {
                 fn(value, new Proxy({}, {
@@ -139,22 +119,6 @@ export default ({env, data, inputs, outputs, slots, logger, id}) => {
                 }))
               })
             }
-
-            // const inputId = data.inputs.find((input) => input.id === id)?.id
-            //
-            // if (inputId) {
-            //   return (fn) => {
-            //     inputs[inputId]((value, relOutputs) => {
-            //       fn(value, new Proxy({}, {
-            //         get(_, key) {
-            //           const outputId = data.outputs.find((input) => input.id === key)?.key || ""
-            //           return relOutputs[outputId]
-            //         }
-            //       }))
-            //     })
-            //   }
-            // }
-
             return () => {
             }
           }
@@ -189,21 +153,21 @@ export default ({env, data, inputs, outputs, slots, logger, id}) => {
     }
   }, [slots])
 
-  // const container = document.querySelector("#_mybricks-geo-webview_")!.shadowRoot
-  const container = null
+  const container = document.querySelector("#_mybricks-geo-webview_")!.shadowRoot
+  // const container = null
 
-  return (
-    <StyleProvider container={container!}>
-      <Button type="primary">hello</Button>
-    </StyleProvider>
-  )
+  // return (
+  //   <StyleProvider container={container!}>
+  //     <Button type="primary">hello</Button>
+  //   </StyleProvider>
+  // )
 
   return (
     <>
       {typeof ReactNode === 'function' ? (
         <ReactNode {...scope} />
       ) : (
-        <ErrorStatus title={errorInfo?.title}>{ReactNode}</ErrorStatus>
+        <ErrorStatus title={errorInfo?.title} onError={onError}>{ReactNode}</ErrorStatus>
       )}
     </>
   )

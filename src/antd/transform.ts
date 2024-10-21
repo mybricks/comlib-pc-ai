@@ -45,6 +45,8 @@ const transformTsx = async (code, context: { id: string }) => {
     } catch (error) {
       reject(error)
     }
+
+    //console.log(transformCode)
     
     return resolve(encodeURIComponent(transformCode))
   })

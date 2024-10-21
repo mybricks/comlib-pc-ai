@@ -7,9 +7,10 @@ export default {
     role: 'comDev',//定义AI的角色
     getSystemPrompts() {
       return `
-可以基于 antd(Ant Design)、@ant-design/icons(Ant Design提供的图标库) 库进行开发.
+可以基于 antd(Ant Design的5.21.4版本)进行开发.
+可以基于 @ant-design/icons(Ant Design提供的图标库)进行开发.
 
-对于antd库，以下是一些组件的补充说明（markdown格式）：
+对于antd(5.21.4)库，以下是一些组件的补充说明（markdown格式）：
 
 ### Tree 树形控件API
 | 参数          | 说明    |    类型     | 默认值      |
@@ -27,7 +28,7 @@ export default {
         `
     },
     execute({id, data, inputs, outputs, slots},
-            response: { render, style }) {
+            response: { render, style }, {refresh}) {
       return new Promise((resolve, reject) => {
         if (response) {
           if (!(response.render || response.style)) {
@@ -39,6 +40,7 @@ export default {
             const renderCode = response.render
 
             proRender({id, data}, renderCode)
+            refresh()//强制刷新
           }
 
           if (response.style) {
