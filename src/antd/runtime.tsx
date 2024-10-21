@@ -1,5 +1,6 @@
-import React, {useEffect, useMemo} from 'react';
+import React, {useEffect, useMemo, useRef} from 'react';
 import {polyfillRuntime} from './util'
+import { StyleProvider } from "@ant-design/cssinjs";
 
 polyfillRuntime();
 
@@ -20,7 +21,8 @@ interface CssApi {
   remove: (id: string) => void
 }
 
-export default ({env, data, inputs, outputs, slots, logger, id, onError}) => {
+export default ({env, data, inputs, outputs, slots, logger, id}) => {
+  const container = useRef((env.edit || env.runtime.debug) ? document.querySelector("#_mybricks-geo-webview_")!.shadowRoot : null);
   useMemo(() => {
     if (env.edit) {
       data._editors = void 0
@@ -153,19 +155,12 @@ export default ({env, data, inputs, outputs, slots, logger, id, onError}) => {
     }
   }, [slots])
 
-  const container = document.querySelector("#_mybricks-geo-webview_")!.shadowRoot
-  // const container = null
-
-  // return (
-  //   <StyleProvider container={container!}>
-  //     <Button type="primary">hello</Button>
-  //   </StyleProvider>
-  // )
-
   return (
     <>
       {typeof ReactNode === 'function' ? (
-        <ReactNode {...scope} />
+        <StyleProvider container={container.current!}>
+          <ReactNode {...scope} />
+        </StyleProvider>
       ) : (
         <ErrorStatus title={errorInfo?.title} onError={onError}>{ReactNode}</ErrorStatus>
       )}
