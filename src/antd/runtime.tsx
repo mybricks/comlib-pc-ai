@@ -21,7 +21,7 @@ interface CssApi {
   remove: (id: string) => void
 }
 
-export default ({env, data, inputs, outputs, slots, logger, id}) => {
+export default ({env, data, inputs, outputs, slots, logger, id, onError}) => {
   const container = useRef((env.edit || env.runtime.debug) ? document.querySelector("#_mybricks-geo-webview_")!.shadowRoot : null);
   useMemo(() => {
     if (env.edit) {
