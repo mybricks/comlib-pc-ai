@@ -9,17 +9,16 @@
   雷达图绘制类型，支持 'polygon' 和 'circle'
 - option.radar.indicator
   雷达图的指示器，用来指定雷达图中的多个变量（维度），如下示例。
-
-```javascript
-indicator: [
-  { name: '销售（sales）', max: 6500 },
-  { name: '管理（Administration）', max: 16000, color: 'red' }, // 标签设置为红色
-  { name: '信息技术（Information Techology）', max: 30000 },
-  { name: '客服（Customer Support）', max: 38000 },
-  { name: '研发（Development）', max: 52000 },
-  { name: '市场（Marketing）', max: 25000 },
-]
-```
+  ```javascript
+  indicator: [
+    { name: '销售（sales）', max: 6500 },
+    { name: '管理（Administration）', max: 16000, color: 'red' }, // 标签设置为红色
+    { name: '信息技术（Information Techology）', max: 30000 },
+    { name: '客服（Customer Support）', max: 38000 },
+    { name: '研发（Development）', max: 52000 },
+    { name: '市场（Marketing）', max: 25000 },
+  ]
+  ```
 
 ### 最佳实践-雷达图
 ```render
