@@ -19,8 +19,8 @@ const IdlePlaceholder = ({ title = 'AI 图表', examples = [] }) => {
   const copy = useCallback((text) => {
     copyToClipboard(text).then((res) => {
       window?.antd?.message
-        ? window?.antd?.message.success('复制提示词成功')
-        : alert('复制提示词成功')
+        ? window?.antd?.message.success('复制成功')
+        : alert('复制成功')
     })
   }, [])
 
