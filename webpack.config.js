@@ -1,4 +1,17 @@
 module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.md$/,
+        use: 'raw-loader'
+      }
+    ]
+  },
+  
+  // 其他配置项
+  resolve: {
+    extensions: ['.js', '.json', '.md']
+  },
   externals: [
     {
       react: {
