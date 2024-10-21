@@ -4,7 +4,11 @@
   "commitInfo": "init",
   "comAry": [
     "./src/antd/com.json",
-    "./src/echarts/com.json"
+    "./src/echarts/pie/com.json",
+    "./src/echarts/line/com.json",
+    "./src/echarts/column/com.json",
+    "./src/echarts/radar/com.json",
+    "./src/echarts/funnel/com.json"
   ],
   "componentType": "PC",
   "externals": [
