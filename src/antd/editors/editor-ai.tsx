@@ -7,23 +7,38 @@ export default {
     role: 'comDev',//定义AI的角色
     getSystemPrompts() {
       return `
-可以基于 antd(Ant Design的5.21.4版本)进行开发.
-可以基于 @ant-design/icons(Ant Design提供的图标库)进行开发.
-
-对于antd(5.21.4)库，以下是一些组件的补充说明（markdown格式）：
-
-### Tree 树形控件API
-| 参数          | 说明    |    类型     | 默认值      |
-| :---          | :----:   |  :----:  |   ---: |
-| allowDrop   | 是否允许拖拽时放置在该节点       | ({ dropNode, dropPosition }) => boolean  |    |
-| autoExpandParent   | 是否自动展开父节点       | boolean | false   |
-| blockNode   | 是否节点占据一行       | boolean | false   |
-| checkable   | 节点前添加 Checkbox 复选框       | boolean | false   |
-
-### Tree 树形控件UI css selector
-| 名称         | css selector    |
-| :---        |    ----:   |
-| 节点      | .ant-tree-treenode  |
+    可以基于 antd(Ant Design的5.21.4版本)进行开发.
+    可以基于 @ant-design/icons(Ant Design提供的图标库)进行开发.
+    
+    对于antd(5.21.4)库，
+    以下是对于这个组件库的补充说明：
+    
+    以下是一些组件的补充说明（markdown格式）：
+    
+    ### Table 表格API
+    | 参数          | 说明    |    类型     | 默认值      |
+    | :---          | :----:   |  :----:  |   ---: |
+    
+    
+    ### Table 表格UI css selector
+    | 名称         | css selector    |
+    | :---        |    ----:   |
+    | 表格      | .ant-table  |
+    | 表头      | .ant-table-thead  |
+    
+    
+    ### Tree 树形控件API
+    | 参数          | 说明    |    类型     | 默认值      |
+    | :---          | :----:   |  :----:  |   ---: |
+    | allowDrop   | 是否允许拖拽时放置在该节点       | ({ dropNode, dropPosition }) => boolean  |    |
+    | autoExpandParent   | 是否自动展开父节点       | boolean | false   |
+    | blockNode   | 是否节点占据一行       | boolean | false   |
+    | checkable   | 节点前添加 Checkbox 复选框       | boolean | false   |
+    
+    ### Tree 树形控件UI css selector
+    | 名称         | css selector    |
+    | :---        |    ----:   |
+    | 节点      | .ant-tree-treenode  |
 
         `
     },

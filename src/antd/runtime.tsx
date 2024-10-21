@@ -90,6 +90,7 @@ export default ({env, data, inputs, outputs, slots, logger, id}) => {
     if (errorInfo) return errorInfo.tip;
     if (data._renderCode) {
       try {
+        console.log(decodeURIComponent(data._renderCode))
         eval(decodeURIComponent(data._renderCode))
 
         const rt = window[`mbcrjsx_${id}`]
@@ -142,18 +143,12 @@ export default ({env, data, inputs, outputs, slots, logger, id}) => {
           }
         }
       }),
-      slots: new Proxy({}, {
-        get(obj, id) {
-          const slotId = data.slots.find((slot) => slot.id === id)?.id
-          if (slotId) {
-            return slots[slotId]
-          }
-        }
-      }),
+      slots,
       env,
       context: {React}
     }
   }, [slots])
+
 
   return (
     <>
