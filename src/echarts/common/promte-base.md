@@ -12,7 +12,46 @@ export default ({ data }) => {
     return {
       //...省略其它图表配置
     }
-  }, [data.dataSource])
+  }, [data.dataSource]) // 注意：如果useMemo用了数据模型data里的字段，记得添加到依赖项
+
+  return (
+    // 务必在外层添加一个dom结构，用于配置图表背景色等样式，宽高直接使用100%
+    <div className={css.chart} style={{ width: '100%', height: '100%' }}>
+      <ReactECharts
+        option={option}
+        style={{ width: '100%', height: '100%' }}
+      />
+    </div>
+  )
+}
+```
+
+## 使用文档：基础知识-动态数据
+
+```render
+import ReactECharts from 'echarts-for-react';
+import { useMemo } from 'react';
+import css from 'index.less';
+
+export default ({ data }) => {
+
+  // 声明输入项的接收函数
+  useMemo(() => {
+    // 通过input修改的数据务必通过修改data数据模型上的引用来实现
+    inputs['dataSource']?.((recevieData) => {
+      // 类型一：替换所有数据
+      data.dataSource = recevieData
+
+      // 类型二：添加数据
+      data.dataSource = data.dataSource.concat(recevieData)
+    })
+  }, [])
+
+  const option = useMemo(() => {
+    return {
+      //...省略其它图表配置
+    }
+  }, [data.dataSource]) // 注意：如果useMemo用了数据模型data里的字段，记得添加到依赖项
 
   return (
     // 务必在外层添加一个dom结构，用于配置图表背景色等样式，宽高直接使用100%
@@ -149,15 +188,44 @@ export default ({ data }) => {
 ## 使用文档-视觉映射 visialMap
 
 视觉映射组件，用于进行视觉编码
+
+关联属性：option.visialMap
+
 如果包含以下工给你需求，可以考虑使用视觉映射来完成
 - 对一个连续型的绘制图形分段进行不同颜色/样式的展示
 
-## 使用文档-标记的使用
+## 使用文档-系列series
+
+数据可视化是数据到视觉元素的映射过程（这个过程也可称为视觉编码，视觉元素也可称为视觉通道）。
+在Echarts中，我们常常通过将数据映射到系列（series）来完成图表的绘制。
+
+关联属性：option.series
+
+
+### 属性定义
+- option.series
+  - 描述：系列的定义
+  - 类型：Array<LineSerie | PieSerie>
+  - 
+由于 series 是一个包含各种不同类型的系列的数组，我们下面用 series[n] 来代码通用的系列，用series-line来表示具体某个类型的系列
+- option.series[n].type
+  - 描述：
+后文中如果出现 option.series-类型 的定义
+
+
+## 使用文档-系列中标记的使用
+
+关联属性：
+- option.series.[n].markPoint
+- option.series.[n].markArea
+- option.series.[n].markLine
 
 如果包含以下功能需求，可以考虑使用标记来完成
 - 需要绘制一条额外的提示/辅助线条，比如平均值参考线、极值参考线、最小值参考线等，可以支持在任意点中绘制一条直线以及展示文本
 - 需要绘制一个额外的提示/辅助区域，可以支持在任意区间绘制一个矩形用于辅助提示
 - 需要绘制一个额外的提示/标记点，可以强调任意一个已绘制的点
+
+注意：无论是 markPoint、markArea 还是 markLine，都必须配置在一个系列的内部使用。
 
 ### 最佳实践-使用 markArea 绘制辅助区
 
@@ -262,6 +330,19 @@ import ReactECharts from 'echarts-for-react'
 import { useMemo } from 'react'
 import css from 'index.less'
 
+// 字符串模板 模板变量有 {a}：系列名。{b}：数据名。{c}：数据值。{d}：百分比。
+type StringFormat = string
+
+type FunctionFormat = (params) => string
+
+interface MarkLineLabel {
+  show: boolean,
+  // 标签内容格式器，支持字符串模板和回调函数两种形式，字符串模板与回调函数返回的字符串均支持用 \n 换行
+  formatter: StringFormat | FunctionFormat
+  // 标签位置
+  position: 'start' | 'middle' | 'end' | 'insideStartTop' | 'insideStartBottom' | 'insideMiddleTop' | 'insideMiddleBottom' | 'insideEndTop' | 'insideEndBottom'
+}
+
 export default ({ data }) => {
   const option = useMemo(() => {
     return {
@@ -279,7 +360,11 @@ export default ({ data }) => {
               {
                 type: 'average', // type=average时是平均数
                 name: '平均值',
-                label: { formatter: '平均值：{c}' },
+                label: {
+                  show: true,
+                  formatter: '平均值：{c}',
+                  position: 'insideEndTop', 设置标签在线的结束点上方，不容易遮挡信息
+                } as MarkLineLabel,
               }, // 类型一：绘制一个平均值参考线，并且展示格式化其展示信息
               {
                 name: 'Y 轴值为 100 的水平线',

@@ -1,0 +1,13 @@
+{
+  "title": "桑基图@AI",
+  "namespace": "mybricks.ai-comlib.echarts-sankey",
+  "author": "CheMingjun",
+  "author_name": "CheMingjun",
+  "version": "1.0.0",
+  "icon": "./icon.svg",
+  "runtime": "./runtime.tsx",
+  "editors": "./editor.tsx",
+  "data": "./../data.json",
+  "slots": [],
+  "docs": ""
+}
