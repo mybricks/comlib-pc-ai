@@ -112,14 +112,15 @@ export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, erro
 
         let RT = window[`mbcrjsx_${id}`]
 
-        console.log(RT)
-
         if (!RT.default) {
           throw new Error('未导出组件定义')
         }
         RT = RT.default
+        // return (props) => {
+        //   return <ErrorBoundary><RT {...props}></RT></ErrorBoundary>
+        // };
         return (props) => {
-          return <ErrorBoundary><RT {...props}></RT></ErrorBoundary>
+          return <RT {...props}></RT>
         };
       } catch (error) {
         return () => <ErrorTip title={'获取组件定义失败'} desc={error?.toString?.()} />;
