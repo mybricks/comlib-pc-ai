@@ -90,7 +90,7 @@ export default ({env, data, inputs, outputs, slots, logger, id, onError}) => {
     if (errorInfo) return errorInfo.tip;
     if (data._renderCode) {
       try {
-        console.log(decodeURIComponent(data._renderCode))
+        //console.log(decodeURIComponent(data._renderCode))
         eval(decodeURIComponent(data._renderCode))
 
         const rt = window[`mbcrjsx_${id}`]
