@@ -1,9 +1,9 @@
-## 使用文档：关系图
+### 使用文档：关系图
 盒须图（Box Plot），也称为箱形图或箱线图，是一种用于展示数据分散情况的统计图。
 
 包含图表：盒须图、箱形图、箱线图
 
-### 最佳实践-盒须图
+#### 最佳实践-盒须图
 ```render
 import ReactECharts from 'echarts-for-react'
 import { useMemo } from 'react'

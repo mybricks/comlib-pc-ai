@@ -1,13 +1,13 @@
-## 使用文档：饼图
+### 使用文档：饼图
 包含图表：饼图、环形图、扇形图、南丁格尔图
 
-各类饼图的适用场景：
+适用场景：
 - 饼图：适合展示各种不同类型的分布和比例
 - 环形图：在饼图的基础上，还可以在中间展示一些额外数据，比如展示总数量，总人口等等信息
 - 南丁格尔图：在饼图的基础上，对每一个分类的值大小都能更清楚地看见
 
 
-### 最佳实践-南丁格尔图/玫瑰图
+#### 最佳实践-南丁格尔图/玫瑰图
 ```render
 import ReactECharts from 'echarts-for-react';
 import { useMemo } from 'react';
@@ -42,7 +42,7 @@ export default ({ data }) => {
 }
 ```
 
-### 最佳实践-环形图
+#### 最佳实践-环形图
 ```render
 import ReactECharts from 'echarts-for-react';
 import { useMemo } from 'react';
@@ -80,7 +80,7 @@ export default ({ data }) => {
 }
 ```
 
-### 最佳实践-饼图类的中间展示文本/元素
+#### 最佳实践-饼图类的中间展示文本/元素
 由于饼图这个类型中间内半径如果够大，一般会在中心展示一些总结性文本
 ```render
 import ReactECharts from 'echarts-for-react';

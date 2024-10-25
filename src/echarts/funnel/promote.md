@@ -1,10 +1,10 @@
-## 使用文档：漏斗图
+### 使用文档：漏斗图
 
 漏斗图通常用于展示数据的层级关系和变化趋势。由多个梯形或矩形层叠组成。
 
 包含图表：漏斗图
 
-### 最佳实践-漏斗图
+#### 最佳实践-漏斗图
 ```render
 import ReactECharts from 'echarts-for-react'
 import { useMemo } from 'react'

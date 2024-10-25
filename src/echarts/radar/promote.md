@@ -1,9 +1,9 @@
-## 使用文档：雷达图
+### 使用文档：雷达图
 雷达图主要用于表现多变量的数据，例如球员的各个属性分析
 
 包含图表：雷达图、圆形雷达图
 
-### 特有属性
+#### 特有属性
 - option.radar
   只适用于雷达图的坐标系配置
 - option.radar.shape 默认值=polygon
@@ -21,7 +21,7 @@
   ]
   ```
 
-### 最佳实践-雷达图
+#### 最佳实践-雷达图
 ```render
 import ReactECharts from 'echarts-for-react'
 import { useMemo } from 'react'

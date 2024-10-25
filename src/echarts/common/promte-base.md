@@ -1,7 +1,9 @@
-## 使用文档：基础知识-基本使用
+### 使用文档-通用代码结构
+场景：所有图表的基础框架。
+要点：
+- UI结构为外部套一个div，用于配置边框/背景色等CSS样式，其中宽高限制使用100%。
 
-### 最佳实践-基础代码结构
-
+#### 最佳实践
 ```render
 import ReactECharts from 'echarts-for-react';
 import { useMemo } from 'react';
@@ -12,10 +14,9 @@ export default ({ data }) => {
     return {
       //...省略其它图表配置
     }
-  }, [data.dataSource]) // 注意：如果useMemo用了数据模型data里的字段，记得添加到依赖项
+  }, [data.dataSource])
 
   return (
-    // 务必在外层添加一个dom结构，用于配置图表背景色等样式，宽高直接使用100%
     <div className={css.chart} style={{ width: '100%', height: '100%' }}>
       <ReactECharts
         option={option}
@@ -26,8 +27,12 @@ export default ({ data }) => {
 }
 ```
 
-## 使用文档：基础知识-动态数据
+### 使用文档-支持动态数据/动态配置项
+场景：图表需要支持通过输入项传入动态数据/配置，或者是通过编辑项传入的配置。
+要点：
+- 
 
+#### 最佳实践
 ```render
 import ReactECharts from 'echarts-for-react';
 import { useMemo } from 'react';
@@ -37,7 +42,7 @@ export default ({ data }) => {
 
   // 声明输入项的接收函数
   useMemo(() => {
-    // 通过input修改的数据务必通过修改data数据模型上的引用来实现
+    // 通过输入项修改的数据务必通过修改data数据模型上的引用来实现
     inputs['dataSource']?.((recevieData) => {
       // 类型一：替换所有数据
       data.dataSource = recevieData
@@ -50,11 +55,11 @@ export default ({ data }) => {
   const option = useMemo(() => {
     return {
       //...省略其它图表配置
+      title: data.title // 接收从编辑项传过来的标题
     }
-  }, [data.dataSource]) // 注意：如果useMemo用了数据模型data里的字段，记得添加到依赖项
+  }, [data.dataSource, data.title])
 
   return (
-    // 务必在外层添加一个dom结构，用于配置图表背景色等样式，宽高直接使用100%
     <div className={css.chart} style={{ width: '100%', height: '100%' }}>
       <ReactECharts
         option={option}
@@ -65,8 +70,10 @@ export default ({ data }) => {
 }
 ```
 
-## 使用文档：基础知识-图表事件
+### 使用文档-图报支持事件
+场景：图表需要通过监听事件向外部抛出数据
 
+#### 最佳实践
 ```render
 import ReactECharts from 'echarts-for-react';
 import { useMemo, useCallback } from 'react';
@@ -95,16 +102,17 @@ export default ({ data }) => {
       onChartReady={onChartReady}
       onEvents={{
         'click': onChartClick,
-        }}
+      }}
     />
   )
 }
 ```
 
-## 使用文档-颜色的使用
 
-### 最佳实践-使用 color 属性改变绘制图形的颜色
+### 使用文档-配置基础调色盘
+场景：配置图表的调色盘颜色列表。如果系列没有设置颜色，则会依次循环从该列表中取颜色作为系列颜色
 
+#### 最佳实践
 ```render
 import ReactECharts from 'echarts-for-react'
 import { useMemo } from 'react'
@@ -121,7 +129,7 @@ export default ({ data }) => {
       yAxis: {
         type: 'value',
       },
-      color: ['#5470C6', '#EE6666'], // 声明调色盘颜色列表。如果系列没有设置颜色，则会依次循环从该列表中取颜色作为系列颜色
+      color: ['#5470C6', '#EE6666'], // 声明调色盘颜色列表
       series: [
         {
           data: [150, 230, 224, 218, 135, 147, 260],
@@ -143,91 +151,39 @@ export default ({ data }) => {
 }
 ```
 
-### 最佳实践-使用渐变色
+### 使用文档-渐变色的配置
+场景：需要线性渐变和径向渐变的场景
 
-渐变色可以被使用在任意声明 color 的地方
-
-```render
-import ReactECharts from 'echarts-for-react'
-import { useMemo } from 'react'
-import css from 'index.less'
-
-// 渐变色声明
-const linearColor = new echarts.graphic.LinearGradient(0, 0, 0, 1, [ // 线性渐变，前四个参数分别是 x0, y0, x2, y2, 两个offset表示范围从 0 - 1
-  {
-    offset: 0,
-    color: 'rgb(128, 255, 165)'
-  },
-  {
-    offset: 1,
-    color: 'rgb(1, 191, 236)'
-  }
-])
-
-export default ({ data }) => {
-  const option = useMemo(() => {
-    return {
-      // 省略配置
-      series: [
-        {
-          type: '绘制类型',
-          color: linearColor // 图形使用渐变色绘制
-        },
-      ],
+```
+const color = [
+  new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+    {
+      offset: 0,
+      color: 'rgb(128, 255, 165)'
+    },
+    {
+      offset: 1,
+      color: 'rgb(1, 191, 236)'
     }
-  }, [data.dataSource])
-
-  return (
-    <div className={css.chart} style={{ width: '100%', height: '100%' }}>
-      <ReactECharts option={option} style={{ width: '100%', height: '100%' }} />
-    </div>
-  )
-}
+  ]), // 线性渐变，前四个参数分别是 x0, y0, x2, y2, 两个offset表示范围从 0 - 1
+  '#fac858' // 普通单色
+]
 ```
 
-## 使用文档-视觉映射 visialMap
-
-视觉映射组件，用于进行视觉编码
-
-关联属性：option.visialMap
-
-如果包含以下工给你需求，可以考虑使用视觉映射来完成
-- 对一个连续型的绘制图形分段进行不同颜色/样式的展示
-
-## 使用文档-系列series
-
-数据可视化是数据到视觉元素的映射过程（这个过程也可称为视觉编码，视觉元素也可称为视觉通道）。
-在Echarts中，我们常常通过将数据映射到系列（series）来完成图表的绘制。
-
-关联属性：option.series
-
-
-### 属性定义
-- option.series
-  - 描述：系列的定义
-  - 类型：Array<LineSerie | PieSerie>
-  - 
-由于 series 是一个包含各种不同类型的系列的数组，我们下面用 series[n] 来代码通用的系列，用series-line来表示具体某个类型的系列
-- option.series[n].type
-  - 描述：
-后文中如果出现 option.series-类型 的定义
-
-
-## 使用文档-系列中标记的使用
+### 使用文档-在部分系列中使用标记
+场景：在系列中绘制标记，比如遇到如下场景
+- 需要绘制一条额外的提示/辅助线条，比如平均值参考线、极值参考线、最小值参考线等，可以支持在任意点中绘制一条直线以及展示文本
+- 需要绘制一个额外的提示/辅助区域，可以支持在任意区间绘制一个矩形用于辅助提示
+- 需要绘制一个额外的提示/标记点，可以强调任意一个已绘制的点
 
 关联属性：
 - option.series.[n].markPoint
 - option.series.[n].markArea
 - option.series.[n].markLine
 
-如果包含以下功能需求，可以考虑使用标记来完成
-- 需要绘制一条额外的提示/辅助线条，比如平均值参考线、极值参考线、最小值参考线等，可以支持在任意点中绘制一条直线以及展示文本
-- 需要绘制一个额外的提示/辅助区域，可以支持在任意区间绘制一个矩形用于辅助提示
-- 需要绘制一个额外的提示/标记点，可以强调任意一个已绘制的点
-
 注意：无论是 markPoint、markArea 还是 markLine，都必须配置在一个系列的内部使用。
 
-### 最佳实践-使用 markArea 绘制辅助区
+#### 最佳实践-使用 markArea 绘制辅助区
 
 ```render
 import ReactECharts from 'echarts-for-react'
@@ -284,7 +240,7 @@ export default ({ data }) => {
 }
 ```
 
-### 最佳实践-使用 markPoint 绘制辅助点
+#### 最佳实践-使用 markPoint 绘制辅助点
 
 ```render
 import ReactECharts from 'echarts-for-react'
@@ -324,7 +280,7 @@ export default ({ data }) => {
 }
 ```
 
-### 最佳实践-使用 markLine 绘制辅助参考线
+#### 最佳实践-使用 markLine 绘制辅助参考线
 ```render
 import ReactECharts from 'echarts-for-react'
 import { useMemo } from 'react'
@@ -394,13 +350,13 @@ export default ({ data }) => {
 }
 ```
 
-## 使用文档-图形元素 graphic
+### 使用文档- 图形元素 graphic 的使用
 graphic 是原生图形元素组件。可以支持的图形元素包括：
 image, text, circle, sector, ring, polygon, polyline, rect, line, bezierCurve, arc, group。
 
 > 注意： 一般来说，我们优先使用标记来实现功能
 
-### 最佳实践-元素相对定位
+#### 最佳实践-元素相对定位
 
 ```render
 import ReactECharts from 'echarts-for-react'
