@@ -89,7 +89,7 @@ export default {
           }
 
           if (response.style) {
-            transformCss(response.style, data.cssLan, {id}).then(css => {
+            transformCss(response.style, 'less', {id}).then(css => {
               data._styleCode = css;
               data._cssErr = '';
             }).catch(e => {

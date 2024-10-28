@@ -1,9 +1,8 @@
 import {CSS_LANGUAGE} from './types'
 import {getParamsType} from './constants';
 
-function supportLessCssModules(code) {
-  let res
-  res = code.replace(`import css from 'index.less'`, 'const css = new Proxy({}, { get(target, key) { return key } })');
+function enhanceTsx(code) {
+  const res = code.replace(`import css from 'index.less'`, 'const css = new Proxy({}, { get(target, key) { return key } })')
 
   return res
 }
@@ -12,14 +11,14 @@ const transformImportPlugin = () => {
   return {
     visitor: {
       ImportDeclaration(path) {
-        const { source } = path.node;
+        const {source} = path.node;
         if (source.value === 'antd') {
           source.value = "antd_5_21_4";
         }
       }
     }
-  };
-};
+  }
+}
 
 const transformTsx = async (code, context: { id: string }) => {
   return new Promise((resolve, reject) => {
@@ -48,20 +47,30 @@ const transformTsx = async (code, context: { id: string }) => {
           transformImportPlugin()
         ]
       }
-      
+
       if (!window.Babel) {
         loadBabel()
         throw Error('当前环境 BaBel编译器 未准备好')
       } else {
-        transformCode = window.Babel.transform(supportLessCssModules(code), options).code
+        transformCode = window.Babel.transform(enhanceTsx(code), options).code
       }
-      
+
     } catch (error) {
       reject(error)
     }
 
     //console.log(transformCode)
-    
+
+
+    // transformCode = `
+    // const comRef = React.createRef()
+    //
+    // ` + transformCode
+    //
+    //
+    // console.log(transformCode)
+
+
     return resolve(encodeURIComponent(transformCode))
   })
 }
@@ -76,18 +85,19 @@ const genLibTypes = async (schema: Record<string, any>) => {
     format: false
   }).then((ts) => {
     return ts.replace('export ', '');
-  });
+  })
+
   return `
     ${propTypes}\n
     ${getParamsType('Props')}
-  `;
-};
+  `
+}
 
 const transformCss = async (code, type: CSS_LANGUAGE = CSS_LANGUAGE.Css, context: { id: string }): Promise<string> => {
   if (type === CSS_LANGUAGE.Css) {
     return Promise.resolve(encodeURIComponent(addIdScopeToCssRules(code.replace(/\s+/g, ' ').trim(), context.id)));
   }
-  
+
   if (type === CSS_LANGUAGE.Less) {
     return new Promise((resolve, reject) => {
       let res = ''
@@ -110,15 +120,15 @@ const transformCss = async (code, type: CSS_LANGUAGE = CSS_LANGUAGE.Css, context
         reject(error)
       }
       return resolve(encodeURIComponent(addIdScopeToCssRules(res.replace(/\s+/g, ' ').trim(), context.id)));
-    })
+    }) as any
   }
-  
+
   return Promise.reject(new Error(`不支持的样式代码语言 ${type}`))
 }
 
 function addIdScopeToCssRules(cssText, id) {
   const regex = /([^{]*)(\{[^}]*\})/g;
-  
+
   const prefixedCssText = cssText.replace(regex, (match, selectorGroup, ruleBody) => {
     const selectors = selectorGroup.split(',').map(selector => {
       selector = selector.trim();
@@ -127,10 +137,10 @@ function addIdScopeToCssRules(cssText, id) {
       }
       return selector;
     });
-    
+
     return `${selectors.join(', ')}${ruleBody}`;
   });
-  
+
   return prefixedCssText;
 }
 

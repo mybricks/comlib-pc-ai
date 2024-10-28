@@ -56,14 +56,12 @@ export default ({env, data, inputs, outputs, slots, logger, id, onError}) => {
     return cssApi
   }, [env])
 
-  // 注入 CSS 代码
   useMemo(() => {
     if (data._styleCode) {
       appendCssApi.set(`mbcrcss_${id}`, decodeURIComponent(data._styleCode))
     }
   }, [data._styleCode, appendCssApi])
 
-  // 卸载 CSS 代码
   useEffect(() => {
     return () => {
       appendCssApi.remove(`mbcrcss_${id}`)
