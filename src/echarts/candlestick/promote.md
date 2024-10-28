@@ -5,38 +5,27 @@ K线图，又称为蜡烛图，是一种用于展示金融市场价格变动的�
 
 
 #### 最佳实践-K线图
+要点：
+- 声明一个*type*为candlestick的系列。
 
 ```render
-import ReactECharts from 'echarts-for-react'
-import { useMemo } from 'react'
-import css from 'index.less'
-
-export default ({ data }) => {
-  const option = useMemo(() => {
-    return {
-      // 省略配置
-      xAxis: {
-        data: ['2017-10-24', '2017-10-25', '2017-10-26', '2017-10-27']
-      },
-      yAxis: {},
-      series: [
-        {
-          type: 'candlestick',
-          data: [
-            [20, 34, 10, 38],
-            [40, 35, 30, 50],
-            [31, 38, 33, 44],
-            [38, 15, 5, 42]
-          ]
-        }
+// 仅声明配置项代码
+option = {
+  // 省略配置
+  xAxis: {
+    data: ['2017-10-24', '2017-10-25', '2017-10-26', '2017-10-27']
+  },
+  yAxis: {},
+  series: [
+    {
+      type: 'candlestick',
+      data: [
+        [20, 34, 10, 38],
+        [40, 35, 30, 50],
+        [31, 38, 33, 44],
+        [38, 15, 5, 42]
       ]
     }
-  }, [data.dataSource])
-
-  return (
-    <div className={css.chart} style={{ width: '100%', height: '100%' }}>
-      <ReactECharts option={option} style={{ width: '100%', height: '100%' }} />
-    </div>
-  )
+  ]
 }
 ```
