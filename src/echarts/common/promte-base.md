@@ -31,7 +31,8 @@ export default ({ data }) => {
 ### 使用文档-支持动态数据/动态配置项
 场景：图表需要支持通过输入项传入动态数据/配置，或者是通过编辑项传入的配置。
 要点：
-- 
+- 使用*useMemo*接收各输入项传入的值，并将值赋值给响应式对象。
+- 在使用响应式对象的时候，如果在hook中使用了，必须要添加到依赖项中。
 
 #### 最佳实践
 ```render
@@ -58,7 +59,7 @@ export default ({ data }) => {
       //...省略其它图表配置
       title: data.title // 接收从编辑项传过来的标题
     }
-  }, [data.dataSource, data.title])
+  }, [data.dataSource, data.title]) // 将使用到的变量引用添加到hooks的依赖项中
 
   return (
     <div className={css.chart} style={{ width: '100%', height: '100%' }}>
@@ -71,10 +72,10 @@ export default ({ data }) => {
 }
 ```
 
-### 使用文档-图报支持事件
-场景：图表需要通过监听事件向外部抛出数据
+### 使用文档-图表支持事件
+场景：图表需要通过监听事件向外部抛出数据。
 
-#### 最佳实践
+#### 最佳实践-基本使用
 ```render
 import ReactECharts from 'echarts-for-react';
 import { useMemo, useCallback } from 'react';
@@ -109,6 +110,90 @@ export default ({ data }) => {
 }
 ```
 
+### 最佳实践-使用鼠标事件
+场景：在需要监听鼠标事件时，包括 'click'、 'dblclick'、 'mousedown'、 'mousemove'、 'mouseup'、 'mouseover'、 'mouseout'、 'globalout'、 'contextmenu' 事件，可以参考此案例。
+
+
+```render
+import ReactECharts from 'echarts-for-react';
+import { useMemo, useCallback } from 'react';
+import css from 'index.less';
+
+// 鼠标事件的参数
+type EventParams = {
+  // 当前点击的图形元素所属的组件名称，
+  // 其值如 'series'、'markLine'、'markPoint'、'timeLine' 等。
+  componentType: string;
+  // 系列类型。值可能为：'line'、'bar'、'pie' 等。当 componentType 为 'series' 时有意义。
+  seriesType: string;
+  // 系列在传入的 option.series 中的 index。当 componentType 为 'series' 时有意义。
+  seriesIndex: number;
+  // 系列名称。当 componentType 为 'series' 时有意义。
+  seriesName: string;
+  // 数据名，类目名
+  name: string;
+  // 数据在传入的 data 数组中的 index
+  dataIndex: number;
+  // 传入的原始数据项
+  data: Object;
+  // sankey、graph 等图表同时含有 nodeData 和 edgeData 两种 data，
+  // dataType 的值会是 'node' 或者 'edge'，表示当前点击在 node 还是 edge 上。
+  // 其他大部分图表中只有一种 data，dataType 无意义。
+  dataType: string;
+  // 传入的数据值
+  value: number | Array;
+  // 数据图形的颜色。当 componentType 为 'series' 时有意义。
+  color: string;
+};
+
+export default ({ data }) => {
+  const option = useMemo(() => {
+    return {
+      //...省略其它图表配置
+    }
+  }, [data.dataSource])
+
+  // 定义图表Ready的回调，常用来获取echarts实例
+  const onChartReady = useCallback((echarts) => {
+    console.log('echarts is ready', echarts);
+  }, [])
+
+  // 定义图表点击事件的回调
+  const onMouseClick = useCallback((params: EventParams) => {
+    // 区分鼠标点击到了哪里
+    if (params.componentType === 'markPoint') {
+      // 点击到了 markPoint 上
+      if (params.seriesIndex === 5) {
+        // 点击到了 index 为 5 的 series 的 markPoint 上。
+      }
+    } else if (params.componentType === 'series') {
+      if (params.seriesType === 'graph') {
+        if (params.dataType === 'edge') {
+          // 点击到了 graph 的 edge（边）上。
+        } else {
+          // 点击到了 graph 的 node（节点）上。
+        }
+      }
+    }
+  }, [])
+
+  // 定义图表contextmenu事件的回调
+  const onChartContextmenu = useCallback((params: EventParams) => {
+
+  }, [])
+
+  return (
+    <ReactECharts
+      option={option}
+      onChartReady={onChartReady}
+      onEvents={{
+        'click': onMouseClick,
+        'contextmenu': onChartContextmenu
+      }}
+    />
+  )
+}
+```
 
 ### 使用文档-配置基础调色盘
 场景：配置图表的调色盘颜色列表。如果系列没有设置颜色，则会依次循环从该列表中取颜色作为系列颜色
