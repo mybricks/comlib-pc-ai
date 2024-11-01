@@ -1,5 +1,5 @@
-import {transformCss} from "../transform";
-import proRender from "./proRender";
+import {transformLess} from "../transform";
+import {getComponentFromJSX, updateRender, updateStyle} from "../utils";
 
 export default {
   ':root': {
@@ -73,32 +73,47 @@ export default {
     | 节点      | .ant-tree-treenode  |
       `
     },
-    execute({id, data, inputs, outputs, slots},
-            response: { render, style }, {refresh} = {}) {
+    preview(response: { render, style }, edtCtx, libs: { mybricksSdk }) {
+      const {data} = edtCtx
+
       return new Promise((resolve, reject) => {
         if (response) {
-          if (!(response.render || response.style)) {
-            resolve()
-            return
-          }
-
-          if (response.render) {
-            const renderCode = response.render
-
-            proRender({id, data}, renderCode)
-          }
-
-          if (response.style) {
-            transformCss(response.style, 'less', {id}).then(css => {
-              data._styleCode = css;
-              data._cssErr = '';
-            }).catch(e => {
-              data._cssErr = e?.message ?? '未知错误'
+          const rtn = (com, css) => {
+            resolve({
+              com,
+              css
             })
           }
 
-          resolve()
+          Promise.all([
+            new Promise((resolve, reject) => {
+              getComponentFromJSX(response.render, libs).then(com => {
+                resolve(com)
+              })
+            }),
+            new Promise((resolve, reject) => {
+              transformLess(response.style).then(css => {
+                resolve(css)
+              })
+            })
+          ]).then(([com, css]) => {
+            rtn(com, css)
+          })
         }
+      })
+    },
+    execute({id, data, inputs, outputs, slots},
+            response: { render, style }, {refresh} = {}) {
+      return new Promise((resolve, reject) => {
+        if (response.render) {
+          updateRender({data}, response.render)
+        }
+
+        if (response.style) {
+          updateStyle({data}, response.style)
+        }
+
+        resolve()
       })
     }
   }
