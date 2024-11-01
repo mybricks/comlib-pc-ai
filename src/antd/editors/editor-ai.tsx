@@ -7,10 +7,13 @@ export default {
     role: 'comDev',//定义AI的角色
     getSystemPrompts() {
       return `
-    可以基于 antd(Ant Design的5.21.4版本)进行开发.
+    对于中后台类的需求，尽量采用 antd(Ant Design的5.21.4版本)进行开发.
     可以基于 @ant-design/icons(Ant Design提供的图标库)进行开发.
     
-    Ant Design组件库中，仅可以使用以下组件：
+    Ant Design组件库中，可以使用所有的antd中的组件，总体约定如下：
+    1、尽量使用中等尺寸的组件；
+    
+    以下是对部分组件的补充说明：
     
     ## Button 按钮
     ### 何时使用
@@ -42,7 +45,7 @@ export default {
       debugger
 
       return `
- 对于antd(5.21.4)库，
+ 尽量采用antd组件库进行开发，对于antd(5.21.4)库，
     以下是对于这个组件库的补充说明：
     
     以下是一些组件的补充说明（markdown格式）：
