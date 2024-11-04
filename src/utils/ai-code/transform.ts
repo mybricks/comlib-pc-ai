@@ -1,5 +1,5 @@
-import { CSS_LANGUAGE } from './types'
-import { getParamsType, requireScriptFromUrl } from './helper';
+import {CSS_LANGUAGE} from './types'
+import {getParamsType, requireScriptFromUrl} from './helper';
 
 function supportLessCssModules(code) {
   let res
@@ -24,7 +24,7 @@ const transformTsx = async (code, context: { id: string }) => {
         ],
         moduleId: `mbcrjsx_${context.id}`,
         plugins: [
-          ['proposal-decorators', { legacy: true }],
+          ['proposal-decorators', {legacy: true}],
           'proposal-class-properties',
           [
             'transform-typescript',
@@ -41,8 +41,11 @@ const transformTsx = async (code, context: { id: string }) => {
       } else {
         transformCode = window.Babel.transform(supportLessCssModules(code), options).code
       }
-
     } catch (error) {
+      console.warn(`当前代码：${code}`)
+
+      throw new Error(`JSX代码编译失败: ${error.message}`);
+
       reject(error)
     }
 
@@ -60,12 +63,12 @@ const genLibTypes = async (schema: Record<string, any>) => {
     format: false
   }).then((ts) => {
     return ts.replace('export ', '');
-  });
+  })
   return `
     ${propTypes}\n
     ${getParamsType('Props')}
-  `;
-};
+  `
+}
 
 const transformCss = async (code, type: CSS_LANGUAGE = CSS_LANGUAGE.Css, context: { id: string }): Promise<string> => {
   if (type === CSS_LANGUAGE.Css) {
@@ -81,20 +84,24 @@ const transformCss = async (code, type: CSS_LANGUAGE = CSS_LANGUAGE.Css, context
             if (error) {
               console.error(error)
               res = ''
-              throw new Error(`Less 代码编译失败: ${error.message}`);
+
+              console.warn(`当前代码：${code}`)
+
+              throw new Error(`Less代码编译失败: ${error.message}`);
             } else {
               res = result?.css
             }
           })
         } else {
-          loadLess(); // 重试下
+          loadLess() // 重试下
           throw new Error('当前环境无 Less 编译器，请联系应用负责人')
         }
       } catch (error) {
         reject(error)
       }
-      return resolve(encodeURIComponent(addIdScopeToCssRules(res.replace(/\s+/g, ' ').trim(), context.id)));
-    })
+
+      return resolve(encodeURIComponent(addIdScopeToCssRules(res.replace(/\s+/g, ' ').trim(), context.id)))
+    }) as any
   }
 
   return Promise.reject(new Error(`不支持的样式代码语言 ${type}`))
@@ -132,4 +139,4 @@ async function loadBabel() {
   await requireScriptFromUrl('https://f2.beckwai.com/udata/pkg/eshop/fangzhou/asset/babel/standalone/7.24.7/babel.min.js')
 }
 
-export { genLibTypes, transformCss, transformTsx, loadLess, loadBabel };
+export {genLibTypes, transformCss, transformTsx, loadLess, loadBabel};
