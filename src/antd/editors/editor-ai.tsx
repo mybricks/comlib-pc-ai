@@ -77,9 +77,7 @@ export default {
     | 节点      | .ant-tree-treenode  |
       `
     },
-    preview(response: { render, style }, edtCtx, libs: { mybricksSdk }) {
-      const {data} = edtCtx
-
+    preview(response: { id, render, style }, edtCtx, libs: { mybricksSdk }) {
       return new Promise((resolve, reject) => {
         if (response) {
           const rtn = (com, css) => {
@@ -97,7 +95,8 @@ export default {
             }),
             new Promise((resolve, reject) => {
               transformLess(response.style).then(css => {
-                resolve(css)
+                const myContent = css.replaceAll('__id__', response.id)//替换模版
+                resolve(myContent)
               })
             })
           ]).then(([com, css]) => {
@@ -116,7 +115,7 @@ export default {
         }
 
         if (response.style) {
-          updateStyle({data}, response.style)
+          updateStyle({id, data}, response.style)
         }
 
         resolve()

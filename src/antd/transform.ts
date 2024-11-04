@@ -1,5 +1,3 @@
-import {getParamsType} from './constants';
-
 export function transformTsx(code): Promise<string> {
   return new Promise((resolve, reject) => {
     let transformCode
@@ -36,7 +34,9 @@ export function transformTsx(code): Promise<string> {
       }
 
     } catch (error) {
-      reject(error)
+      console.warn(`当前代码：${code}`)
+
+      reject(`JSX代码编译失败: ${error.message}`)
     }
 
     return resolve(transformCode)
@@ -48,12 +48,15 @@ export function transformLess(code): Promise<string> {
     let res = ''
     try {
       if (window?.less) {
-        window.less.render(code, {}, (error, result) => {
+        const newCode = `#__id__ {${code}}`//#__id__ 为占位符
+        window.less.render(newCode, {}, (error, result) => {
           if (error) {
             console.error(error)
             res = ''
 
-            reject(`Less 代码编译失败: ${error.message}`)
+            console.warn(`当前代码：${newCode}`)
+
+            reject(`Less代码编译失败: ${error.message}`)
           } else {
             res = result?.css
           }
@@ -84,23 +87,23 @@ const transformImportPlugin = () => {
 }
 
 
-const genLibTypes = async (schema: Record<string, any>) => {
-  const SchemaToTypes = window.jstt;
-  if (!SchemaToTypes) return;
-  schema.title = 'Props';
-  const propTypes = await SchemaToTypes.compile(schema, '', {
-    bannerComment: '',
-    unknownAny: false,
-    format: false
-  }).then((ts) => {
-    return ts.replace('export ', '');
-  })
-
-  return `
-    ${propTypes}\n
-    ${getParamsType('Props')}
-  `
-}
+// const genLibTypes = async (schema: Record<string, any>) => {
+//   const SchemaToTypes = window.jstt;
+//   if (!SchemaToTypes) return;
+//   schema.title = 'Props';
+//   const propTypes = await SchemaToTypes.compile(schema, '', {
+//     bannerComment: '',
+//     unknownAny: false,
+//     format: false
+//   }).then((ts) => {
+//     return ts.replace('export ', '');
+//   })
+//
+//   return `
+//     ${propTypes}\n
+//     ${getParamsType('Props')}
+//   `
+// }
 
 function addIdScopeToCssRules(cssText, id) {
   const regex = /([^{]*)(\{[^}]*\})/g;
@@ -149,4 +152,4 @@ async function loadBabel() {
   await requireFromCdn('https://f2.beckwai.com/udata/pkg/eshop/fangzhou/asset/babel/standalone/7.24.7/babel.min.js')
 }
 
-export {genLibTypes, loadLess, loadBabel}
+export {loadLess, loadBabel}

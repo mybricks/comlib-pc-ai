@@ -2,7 +2,7 @@ import React, {useEffect, useMemo, useRef} from 'react';
 import {polyfillRuntime, runRender} from './utils'
 import {StyleProvider} from "@ant-design/cssinjs";
 
-polyfillRuntime();
+polyfillRuntime()
 
 const ErrorStatus = ({title = '未知错误', children = null, onError}) => {
   onError(title)//向外抛出错误
@@ -24,42 +24,28 @@ export default ({env, data, inputs, outputs, slots, logger, id, onError}) => {
     }
   }, [])
 
-  const appendCssApi = useMemo(() => {
-    let cssApi = {
-      set: (id: string, content: string) => {
-        const el = document.getElementById(id);
-        if (el) {
-          el.innerText = content
-          return
-        }
-        const styleEle = document.createElement('style')
-        styleEle.id = id;
-        styleEle.innerText = content
-        document.head.appendChild(styleEle);
+  const dynCss = useMemo(() => {
+    const cssAPI = env.canvas.css
+    return {
+      set(content) {
+        const myContent = content.replaceAll('__id__', id)//替换模版
+        cssAPI.set(id, myContent)
       },
-      remove: (id: string) => {
-        const el = document.getElementById(id);
-        if (el && el.parentElement) {
-          el.parentElement.removeChild(el)
-        }
+      remove() {
+        return cssAPI.remove(id)
       }
     }
-    if ((env.edit || env.runtime?.debug) && env.canvas?.css) {
-      cssApi = env.canvas.css
-    }
-
-    return cssApi
   }, [env])
 
   useMemo(() => {
     if (data._styleCode) {
-      appendCssApi.set(`mbcrcss_${id}`, decodeURIComponent(data._styleCode))
+      dynCss.set(decodeURIComponent(data._styleCode))
     }
-  }, [data._styleCode, appendCssApi])
+  }, [data._styleCode, dynCss])
 
   useEffect(() => {
     return () => {
-      appendCssApi.remove(`mbcrcss_${id}`)
+      dynCss.remove()
     }
   }, [])
 
@@ -85,7 +71,7 @@ export default ({env, data, inputs, outputs, slots, logger, id, onError}) => {
       try {
         const oriCode = decodeURIComponent(data._renderCode)
         const com = runRender(oriCode, {
-          'react':React,
+          'react': React,
           'antd': window['antd_5_21_4'],
           'mybricks': env.mybricksSdk
         })

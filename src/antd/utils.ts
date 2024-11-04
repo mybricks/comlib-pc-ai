@@ -109,7 +109,7 @@ export function updateRender({data}, renderCode) {
   })
 }
 
-export function updateStyle({data}, styleCode) {
+export function updateStyle({id, data}, styleCode) {
   transformLess(styleCode).then(css => {
     data._styleCode = encodeURIComponent(css)
     data._cssErr = '';
