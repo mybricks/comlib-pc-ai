@@ -1,4 +1,6 @@
-import { transformTsx, transformCss } from './../../utils/ai-code'
+// import { CSS_LANGUAGE } from '../types'
+// import { transformTsx, transformCss } from './../../utils/ai-code'
+import { transformLess, getComponentFromJSX, updateRender, updateStyle } from './../../utils/ai-code/transform-umd'
 export { default as getPromteForSingle } from './promte-for-single'
 export { default as getPromteForAll } from './promte-for-all'
 
@@ -20,6 +22,27 @@ export const getAIEditor = ({ systemPrompts = '' }) => ({
       getSystemPrompts() {
         return systemPrompts
       },
+      preview(response: { render, style }, edtCtx, libs: { mybricksSdk }) {
+        return new Promise((resolve, reject) => {
+          if (response) {
+            const rtn = (com, css) => {
+              resolve({
+                com,
+                css
+              })
+            }
+            Promise.all([
+              getComponentFromJSX(response.render, libs),
+              transformLess(response.style)
+            ]).then(([com, css]) => {
+              console.log(com, css)
+              rtn(com, css)
+            }).catch(e => {
+              reject(e)
+            })
+          }
+        })
+      },
       execute(
         { id, data, inputs, outputs, slots },
         response: { render; style }
@@ -32,27 +55,11 @@ export const getAIEditor = ({ systemPrompts = '' }) => ({
             }
 
             if (response.render) {
-              const renderCode = response.render
-
-              transformTsx(renderCode, { id })
-                .then((code) => {
-                  data._renderCode = code
-                  data._jsxErr = ''
-                })
-                .catch((e) => {
-                  data._jsxErr = e?.message ?? '未知错误'
-                })
+              updateRender({data}, response.render)
             }
-
+    
             if (response.style) {
-              transformCss(response.style, data.cssLan, { id })
-                .then((css) => {
-                  data._styleCode = css
-                  data._cssErr = ''
-                })
-                .catch((e) => {
-                  data._cssErr = e?.message ?? '未知错误'
-                })
+              updateStyle({data}, response.style)
             }
 
             resolve(true)

@@ -62,7 +62,7 @@ interface AIJsxProps {
   placeholder?: string | ReactElement
 }
 
-export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, errorInfo, placeholder = 'AI组件' } : AIJsxProps) => {
+export const AIJsxUmdRuntime = ({ id, env, styleCode, renderCode, renderProps, errorInfo, placeholder = 'AI组件' } : AIJsxProps) => {
   const appendCssApi = useMemo<CssApi>(() => {
     let cssApi = {
       set: (id: string, content: string) => {
@@ -136,4 +136,111 @@ export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, erro
   }
 
   return <ReactNode {...renderProps} />
+}
+
+export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, errorInfo, placeholder = 'AI组件' } : AIJsxProps) => {
+  const appendCssApi = useMemo<CssApi>(() => {
+    let cssApi = {
+      set: (id: string, content: string) => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.innerText = content
+          return
+        }
+        const styleEle = document.createElement('style')
+        styleEle.id = id;
+        styleEle.innerText = content
+        document.head.appendChild(styleEle);
+      },
+      remove: (id: string) => {
+        const el = document.getElementById(id);
+        if (el && el.parentElement) {
+          el.parentElement.removeChild(el)
+        }
+      }
+    }
+    if ((env.edit || env.runtime?.debug) && env.canvas?.css) {
+      cssApi = env.canvas.css
+    }
+    return cssApi
+  }, [env])
+
+  // 注入 CSS 代码
+  useMemo(() => {
+    if (styleCode) {
+      appendCssApi.set(`mbcrcss_${id}`, decodeURIComponent(styleCode))
+    }
+  }, [styleCode, appendCssApi])
+
+  // 卸载 CSS 代码
+  useEffect(() => {
+    return () => {
+      // mbcrcss = mybricks_custom_render缩写
+      appendCssApi.remove(`mbcrcss_${id}`)
+    }
+  }, [])
+
+  const ReactNode = useMemo(() => {
+    if (errorInfo) return () => <ErrorTip title={errorInfo.title} desc={errorInfo.desc} />;
+    if (renderCode) {
+      try {
+        const oriCode = decodeURIComponent(renderCode);
+
+        const Com = runRender(oriCode, {
+          'react':React,
+          'echarts-for-react': window['echartsForReact'],
+          'mybricks': env.mybricksSdk
+        })
+
+        return (props) => {
+          return <Com {...props}></Com>
+        };
+
+
+        // let RT = window[`mbcrjsx_${id}`]
+
+        // if (!RT.default) {
+        //   throw new Error('未导出组件定义')
+        // }
+        // RT = RT.default
+        // // return (props) => {
+        // //   return <ErrorBoundary><RT {...props}></RT></ErrorBoundary>
+        // // };
+        // return (props) => {
+        //   return <RT {...props}></RT>
+        // };
+      } catch (error) {
+        return () => <ErrorTip title={'获取组件定义失败'} desc={error?.toString?.()} />;
+      }
+    } else {
+      return
+    }
+  }, [renderCode, errorInfo])
+
+
+  if (typeof ReactNode !== 'function') {
+    return placeholder
+  }
+
+  return <ReactNode {...renderProps} />
+}
+
+function runRender(code, dependencies) {
+  const wrapCode = `
+          (function(exports,require){
+            ${code}
+          })
+        `
+
+  const exports = {
+    default: null
+  }
+
+  const require = (packageName) => {
+    return dependencies[packageName]
+  }
+
+  eval(wrapCode)(exports, require)
+
+  return exports.default
 }
