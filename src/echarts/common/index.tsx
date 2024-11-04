@@ -35,7 +35,6 @@ export const getAIEditor = ({ systemPrompts = '' }) => ({
               getComponentFromJSX(response.render, libs),
               transformLess(response.style)
             ]).then(([com, css]) => {
-              console.log(com, css)
               rtn(com, css)
             }).catch(e => {
               reject(e)

@@ -1,5 +1,5 @@
 
-import React, {useEffect, useMemo, useState, Component, ReactElement} from 'react';
+import React, {useEffect, useMemo, useState, Component, ReactElement, cloneElement} from 'react';
 import css from './index.less'
 
 
@@ -64,7 +64,19 @@ interface AIJsxProps {
 
 export const AIJsxUmdRuntime = ({ id, env, styleCode, renderCode, renderProps, errorInfo, placeholder = 'AI组件' } : AIJsxProps) => {
   const appendCssApi = useMemo<CssApi>(() => {
-    let cssApi = {
+    if ((env.edit || env.runtime?.debug) && env.canvas?.css) {
+      const cssAPI = env.canvas.css
+      return {
+        set(content) {
+          const myContent = content.replaceAll('__id__', id)//替换模版
+          cssAPI.set(id, myContent)
+        },
+        remove() {
+          return cssAPI.remove(id)
+        }
+      }
+    }
+    return {
       set: (id: string, content: string) => {
         const el = document.getElementById(id);
         if (el) {
@@ -73,7 +85,8 @@ export const AIJsxUmdRuntime = ({ id, env, styleCode, renderCode, renderProps, e
         }
         const styleEle = document.createElement('style')
         styleEle.id = id;
-        styleEle.innerText = content
+        const myContent = content.replaceAll('__id__', id)//替换模版
+        styleEle.innerText = myContent
         document.head.appendChild(styleEle);
       },
       remove: (id: string) => {
@@ -83,10 +96,6 @@ export const AIJsxUmdRuntime = ({ id, env, styleCode, renderCode, renderProps, e
         }
       }
     }
-    if ((env.edit || env.runtime?.debug) && env.canvas?.css) {
-      cssApi = env.canvas.css
-    }
-    return cssApi
   }, [env])
 
   // 注入 CSS 代码
@@ -120,7 +129,7 @@ export const AIJsxUmdRuntime = ({ id, env, styleCode, renderCode, renderProps, e
         //   return <ErrorBoundary><RT {...props}></RT></ErrorBoundary>
         // };
         return (props) => {
-          return <RT {...props}></RT>
+          return cloneElement(<RT {...props} key={Math.random()} />, {}, null)
         };
       } catch (error) {
         return () => <ErrorTip title={'获取组件定义失败'} desc={error?.toString?.()} />;
@@ -140,7 +149,19 @@ export const AIJsxUmdRuntime = ({ id, env, styleCode, renderCode, renderProps, e
 
 export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, errorInfo, placeholder = 'AI组件' } : AIJsxProps) => {
   const appendCssApi = useMemo<CssApi>(() => {
-    let cssApi = {
+    if ((env.edit || env.runtime?.debug) && env.canvas?.css) {
+      const cssAPI = env.canvas.css
+      return {
+        set(content) {
+          const myContent = content.replaceAll('__id__', id)//替换模版
+          cssAPI.set(id, myContent)
+        },
+        remove() {
+          return cssAPI.remove(id)
+        }
+      }
+    }
+    return {
       set: (id: string, content: string) => {
         const el = document.getElementById(id);
         if (el) {
@@ -149,7 +170,8 @@ export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, erro
         }
         const styleEle = document.createElement('style')
         styleEle.id = id;
-        styleEle.innerText = content
+        const myContent = content.replaceAll('__id__', id)//替换模版
+        styleEle.innerText = myContent
         document.head.appendChild(styleEle);
       },
       remove: (id: string) => {
@@ -159,10 +181,6 @@ export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, erro
         }
       }
     }
-    if ((env.edit || env.runtime?.debug) && env.canvas?.css) {
-      cssApi = env.canvas.css
-    }
-    return cssApi
   }, [env])
 
   // 注入 CSS 代码
@@ -187,14 +205,12 @@ export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, erro
         const oriCode = decodeURIComponent(renderCode);
 
         const Com = runRender(oriCode, {
-          'react':React,
+          'react': React,
           'echarts-for-react': window['echartsForReact'],
           'mybricks': env.mybricksSdk
         })
-
-        return (props) => {
-          return <Com {...props}></Com>
-        };
+        // TODO 没有key的话会用预览的高度
+        return (props) => cloneElement(<Com {...props} key={Math.random()} />, {}, null);
 
 
         // let RT = window[`mbcrjsx_${id}`]
