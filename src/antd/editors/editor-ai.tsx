@@ -7,11 +7,12 @@ export default {
     role: 'comDev',//定义AI的角色
     getSystemPrompts() {
       return `
-    对于中后台类的需求，尽量采用 antd(Ant Design的5.21.4版本)进行开发.
-    可以基于 @ant-design/icons(Ant Design提供的图标库)进行开发.
+    对于PC门户、后台管理系统等需求，首选基于 antd(Ant Design的5.21.4版本)进行开发，同时可以基于 @ant-design/icons(Ant Design提供的图标库)进行开发.
+    如果antd组件库中的组件不能满足需求，可以基于react、html进行开发。
     
     Ant Design组件库中，可以使用所有的antd中的组件，总体约定如下：
-    1、尽量使用中等尺寸的组件；
+    1、尽量使用中等尺寸（size=middle)；
+    2、尽量使用默认主题（theme=default)；
     
     以下是对部分组件的补充说明：
     
@@ -101,6 +102,8 @@ export default {
             })
           ]).then(([com, css]) => {
             rtn(com, css)
+          }).catch(e => {
+            reject(e)
           })
         }
       })

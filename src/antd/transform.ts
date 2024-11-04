@@ -30,7 +30,7 @@ export function transformTsx(code): Promise<string> {
 
       if (!window.Babel) {
         loadBabel()
-        throw Error('当前环境 BaBel编译器 未准备好')
+        reject('当前环境 BaBel编译器 未准备好')
       } else {
         transformCode = window.Babel.transform(code, options).code
       }
@@ -52,14 +52,15 @@ export function transformLess(code): Promise<string> {
           if (error) {
             console.error(error)
             res = ''
-            throw new Error(`Less 代码编译失败: ${error.message}`);
+
+            reject(`Less 代码编译失败: ${error.message}`)
           } else {
             res = result?.css
           }
         })
       } else {
         loadLess() // 重试
-        throw new Error('当前环境无 Less 编译器，请联系应用负责人')
+        reject('当前环境无 Less 编译器，请联系应用负责人')
       }
     } catch (error) {
       reject(error)
