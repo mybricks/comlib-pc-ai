@@ -372,19 +372,6 @@ import ReactECharts from 'echarts-for-react'
 import { useMemo } from 'react'
 import css from 'index.less'
 
-// 字符串模板 模板变量有 {a}：系列名。{b}：数据名。{c}：数据值。{d}：百分比。
-type StringFormat = string
-
-type FunctionFormat = (params) => string
-
-interface MarkLineLabel {
-  show: boolean,
-  // 标签内容格式器，支持字符串模板和回调函数两种形式，字符串模板与回调函数返回的字符串均支持用 \n 换行
-  formatter: StringFormat | FunctionFormat
-  // 标签位置
-  position: 'start' | 'middle' | 'end' | 'insideStartTop' | 'insideStartBottom' | 'insideMiddleTop' | 'insideMiddleBottom' | 'insideEndTop' | 'insideEndBottom'
-}
-
 export default ({ data }) => {
   const option = useMemo(() => {
     return {
@@ -406,7 +393,7 @@ export default ({ data }) => {
                   show: true,
                   formatter: '平均值：{c}',
                   position: 'insideEndTop', 设置标签在线的结束点上方，不容易遮挡信息
-                } as MarkLineLabel,
+                },
               }, // 类型一：绘制一个平均值参考线，并且展示格式化其展示信息
               {
                 name: 'Y 轴值为 100 的水平线',
@@ -436,7 +423,7 @@ export default ({ data }) => {
 }
 ```
 
-### 使用文档- 图形元素 graphic 的使用
+### 使用文档-图形元素 graphic 的使用
 graphic 是原生图形元素组件。可以支持的图形元素包括：
 image, text, circle, sector, ring, polygon, polyline, rect, line, bezierCurve, arc, group。
 
@@ -516,5 +503,75 @@ export default ({ data }) => {
   }, [data.dataSource])
 
   return <ReactECharts option={option} />
+}
+```
+
+
+### 使用文档-提示框组件 tooltip 的使用
+提示框组件 tooltip 一般用于鼠标悬浮/点击时展示对应图形的信息。
+
+#### 最佳实践-打开tooltip
+```render
+option = {
+  // 省略配置
+  tooltip: {} // 设置为空对象，默认开启
+}
+```
+
+#### 最佳实践-使用formatter来定制tooltip
+背景：支持使用formatter对提示框组件进行格式化/样式的定制。
+
+1. formatter为字符串模板形式
+模板变量有 {a}, {b}，{c}，{d}，{e}，分别表示系列名，数据名，数据值等。 在 trigger 为 'axis' 的时候，会有多个系列的数据，此时可以通过 {a0}, {a1}, {a2} 这种后面加索引的方式表示系列的索引。 不同图表类型下的 {a}，{b}，{c}，{d} 含义不一样。 其中变量{a}, {b}, {c}, {d}在不同图表类型下代表数据含义为：
+
+折线（区域）图、柱状（条形）图、K线图 : {a}（系列名称），{b}（类目值），{c}（数值）, {d}（无）
+
+散点图（气泡）图 : {a}（系列名称），{b}（数据名称），{c}（数值数组）, {d}（无）
+
+地图 : {a}（系列名称），{b}（区域名称），{c}（合并数值）, {d}（无）
+
+饼图、仪表盘、漏斗图: {a}（系列名称），{b}（数据项名称），{c}（数值）, {d}（百分比）
+
+```render
+option = {
+  // 省略配置
+  tooltip: {
+    show: true,
+    trigger: 'item', // 数据项图形触发
+    triggerOn: 'mousemove', // 仅在鼠标悬浮时展示
+    renderMode: 'html', // 使用html模式渲染，定制tooltip时建议使用此方式
+    formatter: '{a}<br />{b}: {c}'
+  }
+}
+```
+
+2. formatter为函数形式
+回调函数格式：
+```
+(params: Object|Array, ticket: string, callback: (ticket: string, html: string)) => string | HTMLElement | HTMLElement[]
+```
+支持返回 HTML 字符串或者创建的 DOM 实例。
+
+当trigger为item的时候，第一个参数 params 是 formatter 需要的数据集。格式如下：
+```
+{
+  componentType: 'series',
+  seriesIndex: number, // 系列在传入的 option.series 中的 index
+  seriesName: string, // 系列名称
+  name: string, // 数据名，类目名
+  data: Object, // 传入的原始数据项
+}
+```
+所以格式化可以这么配置
+```render
+option = {
+  // 省略配置
+  tooltip: {
+    show: true,
+    trigger: 'item', // 数据项图形触发
+    triggerOn: 'mousemove', // 仅在鼠标悬浮时展示
+    renderMode: 'html', // 使用html模式渲染，定制tooltip时建议使用此方式
+    formatter: (params) => `${params.name}<br />值: ${params.data.xxx}` // params.data为传入的原始数据项
+  }
 }
 ```
