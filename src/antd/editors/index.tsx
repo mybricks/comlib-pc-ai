@@ -6,10 +6,15 @@ loadLess()
 loadBabel()
 
 export default {
+  // '@init': (params) => {
+  //   const {style, data, id, input, output} = params;
+  //   style.width = 'fit-content';
+  //   style.height = 'auto';
+  // },
   '@init': (params) => {
-    const {style, data, id, input, output} = params;
-    style.width = 'fit-content';
-    style.height = 'auto';
+    const { style, data, id, input, output } = params
+    style.width = 480
+    style.height = 260
   },
   '@resize': {
     options: ['width', 'height']

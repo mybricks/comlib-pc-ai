@@ -59,7 +59,7 @@ const IdlePlaceholder = ({ title = 'Ant-Design 5', examples = [] }) => {
     <div className={css.tip}>
       <div className={css.title}>{title}</div>
       <div className={css.content}>
-        欢迎使用 MyBricks AI 图表组件，
+        欢迎使用 MyBricks AI Ant-Design 5组件，
         <strong>请通过右下角「对话框」提问生成组件</strong>
       </div>
       比如：
