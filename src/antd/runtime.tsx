@@ -1,6 +1,6 @@
 import React, {useEffect, useMemo, useRef} from 'react';
-import {polyfillRuntime} from './util'
-import { StyleProvider } from "@ant-design/cssinjs";
+import {polyfillRuntime, runRender} from './utils'
+import {StyleProvider} from "@ant-design/cssinjs";
 
 polyfillRuntime();
 
@@ -16,11 +16,6 @@ const ErrorStatus = ({title = '未知错误', children = null, onError}) => {
   )
 }
 
-interface CssApi {
-  set: (id: string, content: string) => void
-  remove: (id: string) => void
-}
-
 export default ({env, data, inputs, outputs, slots, logger, id, onError}) => {
   const container = useRef((env.edit || env.runtime.debug) ? document.querySelector("#_mybricks-geo-webview_")!.shadowRoot : null);
   useMemo(() => {
@@ -29,7 +24,7 @@ export default ({env, data, inputs, outputs, slots, logger, id, onError}) => {
     }
   }, [])
 
-  const appendCssApi = useMemo<CssApi>(() => {
+  const appendCssApi = useMemo(() => {
     let cssApi = {
       set: (id: string, content: string) => {
         const el = document.getElementById(id);
@@ -88,11 +83,14 @@ export default ({env, data, inputs, outputs, slots, logger, id, onError}) => {
     if (errorInfo) return errorInfo.tip;
     if (data._renderCode) {
       try {
-        //console.log(decodeURIComponent(data._renderCode))
-        eval(decodeURIComponent(data._renderCode))
+        const oriCode = decodeURIComponent(data._renderCode)
+        const com = runRender(oriCode, {
+          'react':React,
+          'antd': window['antd_5_21_4'],
+          'mybricks': env.mybricksSdk
+        })
 
-        const rt = window[`mbcrjsx_${id}`]
-        return rt?.default;
+        return com
       } catch (error) {
         return error?.toString()
       }
@@ -129,7 +127,7 @@ export default ({env, data, inputs, outputs, slots, logger, id, onError}) => {
       }),
       outputs: new Proxy({}, {
         get(obj, id) {
-          if (env.runtime) {/////TODO 继续完成其他部分
+          if (env.runtime) {
             const rtn = outputs[id]
 
             if (rtn) {
@@ -141,12 +139,25 @@ export default ({env, data, inputs, outputs, slots, logger, id, onError}) => {
           }
         }
       }),
-      slots,
+      slots: new Proxy({}, {
+        get(obj, id) {
+          const rtn = slots[id]
+
+          if (rtn) {
+            return rtn
+          } else {
+            return {
+              render() {
+
+              }
+            }
+          }
+        }
+      }),
       env,
       context: {React}
     }
   }, [slots])
-
 
   return (
     <>

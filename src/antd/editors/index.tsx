@@ -45,32 +45,32 @@ export default {
   },
   //'@ai': null,//取消外置AI
   '@ai': aiEditors,
-  '[data-ai-zone-name]': {
-    title({focusArea}) {
-      return focusArea.dataset['aiZoneName']
-    },
-    items: [
-      function () {
-
-      }
-      // {
-      //   title: '测试',
-      //   type: 'Text',
-      //   description: '卡片的标题内容',
-      //   options: {
-      //     locale: true
-      //   },
-      //   value: {
-      //     get({data}) {
-      //       return data.title;
-      //     },
-      //     set({data}, value: string) {
-      //       data.title = value;
-      //     }
-      //   }
-      // },
-    ]
-  },
+  // '[data-ai-zone-name]': {
+  //   title({focusArea}) {
+  //     return focusArea.dataset['aiZoneName']
+  //   },
+  //   items: [
+  //     function () {
+  //
+  //     }
+  //     // {
+  //     //   title: '测试',
+  //     //   type: 'Text',
+  //     //   description: '卡片的标题内容',
+  //     //   options: {
+  //     //     locale: true
+  //     //   },
+  //     //   value: {
+  //     //     get({data}) {
+  //     //       return data.title;
+  //     //     },
+  //     //     set({data}, value: string) {
+  //     //       data.title = value;
+  //     //     }
+  //     //   }
+  //     // },
+  //   ]
+  // },
   // '[data-ai-zone-name]'({data, env, id, input, output, focusArea}, ...catalog) {
   //   const zoneName = focusArea.dataset['aiZoneName']
   //   catalog[0].title = zoneName

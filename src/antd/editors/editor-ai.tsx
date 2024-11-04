@@ -1,5 +1,5 @@
-import {transformCss} from "../transform";
-import proRender from "./proRender";
+import {transformLess} from "../transform";
+import {getComponentFromJSX, updateRender, updateStyle} from "../utils";
 
 export default {
   ':root': {
@@ -7,10 +7,14 @@ export default {
     role: 'comDev',//定义AI的角色
     getSystemPrompts() {
       return `
-    可以基于 antd(Ant Design的5.21.4版本)进行开发.
-    可以基于 @ant-design/icons(Ant Design提供的图标库)进行开发.
+    对于PC门户、后台管理系统等需求，首选基于 antd(Ant Design的5.21.4版本)进行开发，同时可以基于 @ant-design/icons(Ant Design提供的图标库)进行开发.
+    如果antd组件库中的组件不能满足需求，可以基于react、html进行开发。
     
-    Ant Design组件库中，仅可以使用以下组件：
+    Ant Design组件库中，可以使用所有的antd中的组件，总体约定如下：
+    1、尽量使用中等尺寸（size=middle)；
+    2、尽量使用默认主题（theme=default)；
+    
+    以下是对部分组件的补充说明：
     
     ## Button 按钮
     ### 何时使用
@@ -42,7 +46,7 @@ export default {
       debugger
 
       return `
- 对于antd(5.21.4)库，
+ 尽量采用antd组件库进行开发，对于antd(5.21.4)库，
     以下是对于这个组件库的补充说明：
     
     以下是一些组件的补充说明（markdown格式）：
@@ -73,32 +77,49 @@ export default {
     | 节点      | .ant-tree-treenode  |
       `
     },
-    execute({id, data, inputs, outputs, slots},
-            response: { render, style }, {refresh} = {}) {
+    preview(response: { render, style }, edtCtx, libs: { mybricksSdk }) {
+      const {data} = edtCtx
+
       return new Promise((resolve, reject) => {
         if (response) {
-          if (!(response.render || response.style)) {
-            resolve()
-            return
-          }
-
-          if (response.render) {
-            const renderCode = response.render
-
-            proRender({id, data}, renderCode)
-          }
-
-          if (response.style) {
-            transformCss(response.style, 'less', {id}).then(css => {
-              data._styleCode = css;
-              data._cssErr = '';
-            }).catch(e => {
-              data._cssErr = e?.message ?? '未知错误'
+          const rtn = (com, css) => {
+            resolve({
+              com,
+              css
             })
           }
 
-          resolve()
+          Promise.all([
+            new Promise((resolve, reject) => {
+              getComponentFromJSX(response.render, libs).then(com => {
+                resolve(com)
+              })
+            }),
+            new Promise((resolve, reject) => {
+              transformLess(response.style).then(css => {
+                resolve(css)
+              })
+            })
+          ]).then(([com, css]) => {
+            rtn(com, css)
+          }).catch(e => {
+            reject(e)
+          })
         }
+      })
+    },
+    execute({id, data, inputs, outputs, slots},
+            response: { render, style }, {refresh} = {}) {
+      return new Promise((resolve, reject) => {
+        if (response.render) {
+          updateRender({data}, response.render)
+        }
+
+        if (response.style) {
+          updateStyle({data}, response.style)
+        }
+
+        resolve()
       })
     }
   }
