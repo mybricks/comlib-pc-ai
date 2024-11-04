@@ -135,7 +135,8 @@ export default ({env, data, inputs, outputs, slots, logger, id, onError}) => {
         const com = runRender(oriCode, {
           'react': React,
           'antd': window['antd_5_21_4'],
-          'mybricks': env.mybricksSdk
+          '@ant-design/icons': window['icons'],
+          'mybricks': env.mybricksSdk,
         })
 
         return com

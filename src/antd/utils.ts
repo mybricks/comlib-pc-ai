@@ -81,25 +81,25 @@ export function runRender(code, dependencies) {
 }
 
 export function updateRender({data}, renderCode) {
-  const importRegex = /import\s+((?:[\s\S]*?))\s+from(\s+)?['"]([^'"]+)['"]/g;
+  // const importRegex = /import\s+((?:[\s\S]*?))\s+from(\s+)?['"]([^'"]+)['"]/g;
 
-  const loadLibs = []
+  // const loadLibs = []
 
-  renderCode = renderCode.replace(importRegex, (match, vars, oo, npm) => {
-    const un = npm.toUpperCase()
-    if (un !== 'REACT' && un !== 'INDEX.LESS' && un !== 'ANTD') {
-      //debugger
-      const lib = LibsReg.find(lib => lib.title.toUpperCase() === un)
-      if (lib) {
-        loadLibs.push(lib)
-        return `const ${vars} = ${lib.moduleDef}`
-      } else {
+  // renderCode = renderCode.replace(importRegex, (match, vars, oo, npm) => {
+  //   const un = npm.toUpperCase()
+  //   if (un !== 'REACT' && un !== 'INDEX.LESS' && un !== 'ANTD') {
+  //     //debugger
+  //     const lib = LibsReg.find(lib => lib.title.toUpperCase() === un)
+  //     if (lib) {
+  //       loadLibs.push(lib)
+  //       return `const ${vars} = ${lib.moduleDef}`
+  //     } else {
 
-      }
-    }
+  //     }
+  //   }
 
-    return match
-  })
+  //   return match
+  // })
 
   transformTsx(renderCode).then(code => {
     data._renderCode = encodeURIComponent(code)
