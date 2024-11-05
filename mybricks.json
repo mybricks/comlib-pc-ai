@@ -4,9 +4,12 @@
   "commitInfo": "init",
   "comAry": [
     "./src/antd/com.json",
+    "./src/echarts/com.json",
     {
       "title": "ECharts图表",
+      "visible": false,
       "comAry": [
+        "./src/echarts/com.json",
         "./src/echarts/pie/com.json",
         "./src/echarts/line/com.json",
         "./src/echarts/column/com.json",

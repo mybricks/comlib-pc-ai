@@ -1,10 +1,10 @@
 {
-  "title": "图表@AI",
+  "title": "ECharts图表",
   "namespace": "mybricks.basic-comlib.ai-echarts",
   "author": "CheMingjun",
   "author_name": "CheMingjun",
-  "version": "1.0.0",
-  "description": "面向Echarts图表库的AI组件",
+  "version": "1.0.1",
+  "description": "面向ECharts图表库的AI组件",
   "icon": "./icon.svg",
   "runtime": "./runtime.tsx",
   "editors": "./editor.tsx",
