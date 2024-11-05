@@ -20,32 +20,33 @@ export function polyfillRuntime() {
 
 export function getComponentFromJSX(jsxCode, libs: { mybricksSdk }): Promise<Function> {
   return new Promise((resolve, reject) => {
-    const importRegex = /import\s+((?:[\s\S]*?))\s+from(\s+)?['"]([^'"]+)['"]/g;
+    // const importRegex = /import\s+((?:[\s\S]*?))\s+from(\s+)?['"]([^'"]+)['"]/g;
 
-    const loadLibs = []
+    // const loadLibs = []
 
-    const sourceCode = jsxCode.replace(importRegex, (match, vars, oo, npm) => {
-      const un = npm.toUpperCase()
-      if (un !== 'REACT' && un !== 'INDEX.LESS' && un !== 'ANTD') {
-        //debugger
-        const lib = LibsReg.find(lib => lib.title.toUpperCase() === un)
-        if (lib) {
-          loadLibs.push(lib)
-          return `const ${vars} = ${lib.moduleDef}`
-        } else {
+    // const sourceCode = jsxCode.replace(importRegex, (match, vars, oo, npm) => {
+    //   const un = npm.toUpperCase()
+    //   if (un !== 'REACT' && un !== 'INDEX.LESS' && un !== 'ANTD') {
+    //     //debugger
+    //     const lib = LibsReg.find(lib => lib.title.toUpperCase() === un)
+    //     if (lib) {
+    //       loadLibs.push(lib)
+    //       return `const ${vars} = ${lib.moduleDef}`
+    //     } else {
 
-        }
-      }
+    //     }
+    //   }
 
-      return match
-    })
+    //   return match
+    // })
 
-    transformTsx(sourceCode).then(code => {
+    transformTsx(jsxCode).then(code => {
       try {
         const rtn = runRender(code, {
             'react': React,
             'antd': window['antd_5_21_4'],
-            'mybricks': libs.mybricksSdk
+            '@ant-design/icons': window['icons'],
+            'mybricks': libs.mybricksSdk,
           }
         )
 
@@ -81,25 +82,25 @@ export function runRender(code, dependencies) {
 }
 
 export function updateRender({data}, renderCode) {
-  const importRegex = /import\s+((?:[\s\S]*?))\s+from(\s+)?['"]([^'"]+)['"]/g;
+  // const importRegex = /import\s+((?:[\s\S]*?))\s+from(\s+)?['"]([^'"]+)['"]/g;
 
-  const loadLibs = []
+  // const loadLibs = []
 
-  renderCode = renderCode.replace(importRegex, (match, vars, oo, npm) => {
-    const un = npm.toUpperCase()
-    if (un !== 'REACT' && un !== 'INDEX.LESS' && un !== 'ANTD') {
-      //debugger
-      const lib = LibsReg.find(lib => lib.title.toUpperCase() === un)
-      if (lib) {
-        loadLibs.push(lib)
-        return `const ${vars} = ${lib.moduleDef}`
-      } else {
+  // renderCode = renderCode.replace(importRegex, (match, vars, oo, npm) => {
+  //   const un = npm.toUpperCase()
+  //   if (un !== 'REACT' && un !== 'INDEX.LESS' && un !== 'ANTD') {
+  //     //debugger
+  //     const lib = LibsReg.find(lib => lib.title.toUpperCase() === un)
+  //     if (lib) {
+  //       loadLibs.push(lib)
+  //       return `const ${vars} = ${lib.moduleDef}`
+  //     } else {
 
-      }
-    }
+  //     }
+  //   }
 
-    return match
-  })
+  //   return match
+  // })
 
   transformTsx(renderCode).then(code => {
     data._renderCode = encodeURIComponent(code)
