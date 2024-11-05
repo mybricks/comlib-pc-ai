@@ -3,7 +3,7 @@
   "namespace": "mybricks.ai-comlib.echarts-scatter",
   "author": "CheMingjun",
   "author_name": "CheMingjun",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "icon": "./icon.svg",
   "runtime": "./runtime.tsx",
   "editors": "./editor.tsx",

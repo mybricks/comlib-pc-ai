@@ -129,7 +129,7 @@ export const AIJsxUmdRuntime = ({ id, env, styleCode, renderCode, renderProps, e
         //   return <ErrorBoundary><RT {...props}></RT></ErrorBoundary>
         // };
         return (props) => {
-          return cloneElement(<RT {...props} key={Math.random()} />, {}, null)
+          return cloneElement(<RT {...props} />, {}, null)
         };
       } catch (error) {
         return () => <ErrorTip title={'获取组件定义失败'} desc={error?.toString?.()} />;
@@ -152,7 +152,7 @@ export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, erro
     if ((env.edit || env.runtime?.debug) && env.canvas?.css) {
       const cssAPI = env.canvas.css
       return {
-        set(content) {
+        set(id: string, content: string) {
           const myContent = content.replaceAll('__id__', id)//替换模版
           cssAPI.set(id, myContent)
         },
@@ -210,7 +210,7 @@ export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, erro
           'mybricks': env.mybricksSdk
         })
         // TODO 没有key的话会用预览的高度
-        return (props) => cloneElement(<Com {...props} key={Math.random()} />, {}, null);
+        return (props) => cloneElement(<Com {...props} />, {}, null);
 
 
         // let RT = window[`mbcrjsx_${id}`]
