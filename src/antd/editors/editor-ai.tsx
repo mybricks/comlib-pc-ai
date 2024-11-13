@@ -7,7 +7,30 @@ export default {
     active: true,
     role: 'comDev',//定义AI的角色
     getSystemPrompts() {
-      return `
+      return {
+        langs:`HTML、CSS、Javascript、react`,
+        renderFileTemplate:`
+({env,data,inputs,outputs,slots})=>{
+  useMemo(()=>{
+    inputs['u_i6']((val)=>{//监听输入项
+      data.title = val
+    })
+  },[])
+  
+  return (
+    <div>
+      <div>
+        {data.logo}
+      </div>
+      <Button className={css.button} onClick={e=>{
+        outputs['o_03'](data.title)
+      }}>{data.title}</Button>
+      <div>{slots['s_u01'].render()}</div>
+    </div>
+  )
+}
+        `,
+        prompts:`
     优先基于 antd(Ant Design的5.21.4版本)进行开发，同时可以使用 @ant-design/icons(Ant Design提供的图标库).
     如果antd组件库中的组件不能满足需求，可以基于react、html进行开发。
     
@@ -16,6 +39,7 @@ export default {
     2、尽量使用默认主题（theme=default)；
     3、所有组件都可以使用className属性，可以自定义样式；
         `
+      }
     },
     loadKnowledge(items) {//加载知识库
       const rtn = []
