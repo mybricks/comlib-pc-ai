@@ -8,7 +8,7 @@ export default {
     role: 'comDev',//定义AI的角色
     getSystemPrompts() {
       return `
-    对于PC门户、后台管理系统等需求，首选基于 antd(Ant Design的5.21.4版本)进行开发，同时可以基于 @ant-design/icons(Ant Design提供的图标库)进行开发.
+    优先基于 antd(Ant Design的5.21.4版本)进行开发，同时可以使用 @ant-design/icons(Ant Design提供的图标库).
     如果antd组件库中的组件不能满足需求，可以基于react、html进行开发。
     
     Ant Design组件库中，可以使用所有的antd中的组件，注意以下方面：
