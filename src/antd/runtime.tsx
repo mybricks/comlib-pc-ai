@@ -2,24 +2,24 @@ import React, {useEffect, useMemo, useRef, useCallback} from 'react';
 import {polyfillRuntime, runRender} from './utils'
 import {StyleProvider} from "@ant-design/cssinjs";
 
-import { copyToClipboard } from "../utils/ai-code";
+import {copyToClipboard} from "../utils/ai-code";
 import css from "./runtime.less";
 
 polyfillRuntime()
 
-const ErrorStatus = ({title = '未知错误', children = null, onError}) => {
-  onError(title)//向外抛出错误
+const ErrorStatus = ({msg = '未知错误', children = null, onError}) => {
+  onError(msg)//向外抛出错误
 
   return (
     <div style={{color: 'red'}}>
-      {title}
+      {msg}
       <br/>
       {children}
     </div>
   )
 }
 
-const IdlePlaceholder = ({ title = 'Ant-Design 5', examples = [] }) => {
+const IdlePlaceholder = ({title = 'Ant-Design 5', examples = []}) => {
   const copy = useCallback((text) => {
     copyToClipboard(text).then((res) => {
       window?.antd?.message
@@ -70,7 +70,7 @@ const IdlePlaceholder = ({ title = 'Ant-Design 5', examples = [] }) => {
             key={example}
             onClick={() => copy(example)}
           >
-            - {example} <CopyIcon />
+            - {example} <CopyIcon/>
           </div>
         )
       })}
@@ -111,24 +111,11 @@ export default ({env, data, inputs, outputs, slots, logger, id, onError}) => {
     }
   }, [])
 
-  const errorInfo = useMemo(() => {
-    if (!!data._jsxErr) {
-      return {
-        title: 'JSX 编译失败',
-        tip: data._jsxErr
-      }
-    }
-
-    if (!!data._cssErr) {
-      return {
-        title: 'Less 编译失败',
-        tip: data._cssErr
-      }
-    }
-  }, [data._jsxErr, data._cssErr])
-
   const ReactNode = useMemo(() => {
-    if (errorInfo) return errorInfo.tip;
+    if (data._errorMsg) {
+      return data._errorMsg
+    }
+
     if (data._renderCode) {
       try {
         const oriCode = decodeURIComponent(data._renderCode)
@@ -154,7 +141,7 @@ export default ({env, data, inputs, outputs, slots, logger, id, onError}) => {
         )
       }
     }
-  }, [data._renderCode, errorInfo])
+  }, [data._renderCode, data._errorMsg])
 
   const scope = useMemo(() => {
     return {
@@ -212,15 +199,15 @@ export default ({env, data, inputs, outputs, slots, logger, id, onError}) => {
     }
   }, [slots])
 
-  return (
-    <>
-      {typeof ReactNode === 'function' ? (
-        <StyleProvider container={container.current!} hashPriority="high">
-          <ReactNode {...scope} />
-        </StyleProvider>
-      ) : (
-        <ErrorStatus title={errorInfo?.title} onError={onError}>{ReactNode}</ErrorStatus>
-      )}
-    </>
-  )
-};
+  if (typeof ReactNode === 'function') {
+    return (
+      <StyleProvider container={container.current!} hashPriority="high">
+        <ReactNode {...scope} />
+      </StyleProvider>
+    )
+  } else {
+    return (
+      <ErrorStatus msg={ReactNode} onError={onError}>{ReactNode}</ErrorStatus>
+    )
+  }
+}

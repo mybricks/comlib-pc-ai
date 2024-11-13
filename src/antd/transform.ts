@@ -34,7 +34,7 @@ export function transformTsx(code): Promise<string> {
       }
 
     } catch (error) {
-      console.warn(`当前代码：${code}`)
+      //console.warn(`当前代码：${code}`)
 
       reject(`JSX代码编译失败: ${error.message}`)
     }
@@ -66,7 +66,7 @@ export function transformLess(code): Promise<string> {
         reject('当前环境无 Less 编译器，请联系应用负责人')
       }
     } catch (error) {
-      reject(error)
+      reject(error.message)
     }
 
     return resolve(res)

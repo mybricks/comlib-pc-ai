@@ -104,17 +104,17 @@ export function updateRender({data}, renderCode) {
 
   transformTsx(renderCode).then(code => {
     data._renderCode = encodeURIComponent(code)
-    data._jsxErr = ''
-  }).catch(e => {
-    data._jsxErr = e?.message ?? '未知错误'
+    data._errorMsg = ''
+  }).catch(msg => {
+    data._errorMsg = msg
   })
 }
 
 export function updateStyle({id, data}, styleCode) {
   transformLess(styleCode).then(css => {
     data._styleCode = encodeURIComponent(css)
-    data._cssErr = '';
-  }).catch(e => {
-    data._cssErr = e?.message ?? '未知错误'
+    data._errorMsg = '';
+  }).catch(msg => {
+    data._errorMsg = msg
   })
 }
