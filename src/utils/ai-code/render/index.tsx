@@ -60,6 +60,8 @@ interface AIJsxProps {
   errorInfo?: ErrorInfo,
   /** 占位组件 */
   placeholder?: string | ReactElement
+  /**  依赖组件信息 */
+  dependencies?: Record<string, any>
 }
 
 export const AIJsxUmdRuntime = ({ id, env, styleCode, renderCode, renderProps, errorInfo, placeholder = 'AI组件' } : AIJsxProps) => {
@@ -147,7 +149,7 @@ export const AIJsxUmdRuntime = ({ id, env, styleCode, renderCode, renderProps, e
   return <ReactNode {...renderProps} />
 }
 
-export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, errorInfo, placeholder = 'AI组件' } : AIJsxProps) => {
+export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, errorInfo, placeholder = 'AI组件', dependencies = {} } : AIJsxProps) => {
   const appendCssApi = useMemo<CssApi>(() => {
     if ((env.edit || env.runtime?.debug) && env.canvas?.css) {
       const cssAPI = env.canvas.css
@@ -206,8 +208,8 @@ export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, erro
 
         const Com = runRender(oriCode, {
           'react': React,
-          'echarts-for-react': window['echartsForReact'],
-          'mybricks': env.mybricksSdk
+          'mybricks': env.mybricksSdk,
+          ...dependencies,
         })
         // TODO 没有key的话会用预览的高度
         return (props) => cloneElement(<Com {...props} />, {}, null);
@@ -231,7 +233,7 @@ export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, erro
     } else {
       return
     }
-  }, [renderCode, errorInfo])
+  }, [renderCode, errorInfo, dependencies])
 
 
   if (typeof ReactNode !== 'function') {
@@ -253,6 +255,7 @@ function runRender(code, dependencies) {
   }
 
   const require = (packageName) => {
+  console.log('dependencies', dependencies, packageName)
     return dependencies[packageName]
   }
 
