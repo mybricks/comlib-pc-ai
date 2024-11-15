@@ -15,27 +15,27 @@ export const genAIEditor = ({ prompts, langs = `HTML、CSS、Javascript、react`
       getSystemPrompts() {
         return {
           langs,
-          renderFileTemplate: `
-  ({env,data,inputs,outputs,slots})=>{
-    useMemo(()=>{
-      inputs['u_i6']((val)=>{//监听输入项
-        data.title = val
-      })
-    },[])
+  //         renderFileTemplate: `
+  // ({env,data,inputs,outputs,slots})=>{
+  //   useMemo(()=>{
+  //     inputs['u_i6']((val)=>{//监听输入项
+  //       data.title = val
+  //     })
+  //   },[])
     
-    return (
-      <div>
-        <div>
-          {data.logo}
-        </div>
-        <Button className={css.button} onClick={e=>{
-          outputs['o_03'](data.title)
-        }}>{data.title}</Button>
-        <div>{slots['s_u01'].render()}</div>
-      </div>
-    )
-  }
-          `,
+  //   return (
+  //     <div>
+  //       <div>
+  //         {data.logo}
+  //       </div>
+  //       <Button className={css.button} onClick={e=>{
+  //         outputs['o_03'](data.title)
+  //       }}>{data.title}</Button>
+  //       <div>{slots['s_u01'].render()}</div>
+  //     </div>
+  //   )
+  // }
+  //         `,
           prompts: prompts,
         }
       },
