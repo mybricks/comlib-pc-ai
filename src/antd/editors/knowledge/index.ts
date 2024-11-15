@@ -21,3 +21,11 @@ export const KnowledgesMap = {
   SELECT: Select,
   BREADCRUMB: Breadcrumb,
 }
+
+
+export default function getKnowledge(packageName: string, com: string) {
+  if (packageName === 'antd') {
+    const upperCom = com.toUpperCase()
+    return KnowledgesMap[upperCom] ?? ''
+  }
+}

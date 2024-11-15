@@ -6,13 +6,8 @@ loadLess()
 loadBabel()
 
 export default {
-  // '@init': (params) => {
-  //   const {style, data, id, input, output} = params;
-  //   style.width = 'fit-content';
-  //   style.height = 'auto';
-  // },
   '@init': (params) => {
-    const { style, data, id, input, output } = params
+    const {style, data, id, input, output} = params
     style.width = 480
     style.height = 260
   },
@@ -21,47 +16,4 @@ export default {
   },
   '@ai': aiEditors,
   ':slot': {},
-  // '@copy'({data}) {
-  //
-  //   data._styleCode
-  //
-  //   transformLess(styleCode, {id}).then(css => {
-  //     data._styleCode = encodeURIComponent(css)
-  //     data._cssErr = '';
-  //   }).catch(e => {
-  //     data._cssErr = e?.message ?? '未知错误'
-  //   })
-  //
-  //
-  //   debugger
-  // },
-  // '@toJSON': ({data}) => {
-  //   // 只保留运行时需要用的数据
-  //   const {code, css, inputs, outputs, slots, _defined, _cssErr, _jsxErr} = data
-  //   return {
-  //     data: {
-  //       code,
-  //       css,
-  //       inputs: inputs.map(({id}) => {
-  //         return {
-  //           id
-  //         }
-  //       }),
-  //       outputs: outputs.map(({id}) => {
-  //         return {
-  //           id
-  //         }
-  //       }),
-  //       slots: slots.map(({id}) => {
-  //         return {
-  //           id
-  //         }
-  //       }),
-  //       _defined,
-  //       _cssErr,
-  //       _jsxErr
-  //     }
-  //   }
-  // },
-
 }
