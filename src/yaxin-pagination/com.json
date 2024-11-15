@@ -1,0 +1,14 @@
+{
+  "title": "pagination",
+  "namespace": "mybricks.basic-comlib.ai-test-pagination",
+  "author": "CheMingjun",
+  "author_name": "CheMingjun",
+  "version": "1.0.0",
+  "description": "pagination",
+  "icon": "./icon.svg",
+  "runtime": "./runtime.tsx",
+  "editors": "./editor.tsx",
+  "data": "./data.json",
+  "slots": [],
+  "docs": ""
+}
