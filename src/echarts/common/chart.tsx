@@ -2,14 +2,10 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { polyfillChartsRuntime } from './../util'
 import { AIJsxRuntime } from './../../utils/ai-code/render'
 import { copyToClipboard } from './../../utils/ai-code'
-import ReactEChartsCore from 'echarts-for-react/lib/core'
+import echartsForReact from './../../utils/echarts-for-react'
 import { Data } from './../types'
 
 import css from './chart.less'
-
-window['echartsForReact'] = (props) => {
-  return <ReactEChartsCore {...props} echarts={window['echarts']} />
-}
 
 const LoadingStatus = ({ title = '加载中...' }) => {
   return <div className={css.tip}>{title}</div>
@@ -219,6 +215,7 @@ export default ({ title, examples }) =>
         renderProps={scope}
         errorInfo={errorInfo}
         placeholder={<IdlePlaceholder title={title} examples={examples} />}
+        dependencies={{ 'echarts-for-react': echartsForReact }}
       />
     )
   }

@@ -6,7 +6,9 @@ export { default as getPromteForAll } from './promte-for-all'
 
 export { default as getChartRuntime } from './chart'
 
-export const getAIEditor = ({ systemPrompts = '' }) => ({
+import echartsForReact from './../../utils/echarts-for-react'
+
+export const getAIEditor = ({ systemPrompts = '', loadKnowledge = (items) => '' }) => ({
   '@init': (params) => {
     const { style, data, id, input, output } = params
     style.width = 480
@@ -20,8 +22,33 @@ export const getAIEditor = ({ systemPrompts = '' }) => ({
       active: true,
       role: 'comDev', //定义AI的角色
       getSystemPrompts() {
-        return systemPrompts
+        return {
+          langs:`HTML、CSS、Javascript、react`,
+          renderFileTemplate:`
+  ({env,data,inputs,outputs,slots})=>{
+    useMemo(()=>{
+      inputs['u_i6']((val)=>{//监听输入项
+        data.title = val
+      })
+    },[])
+    
+    return (
+      <div>
+        <div>
+          {data.logo}
+        </div>
+        <Button className={css.button} onClick={e=>{
+          outputs['o_03'](data.title)
+        }}>{data.title}</Button>
+        <div>{slots['s_u01'].render()}</div>
+      </div>
+    )
+  }
+          `,
+          prompts: `${systemPrompts}`,
+        }
       },
+      loadKnowledge,
       preview(response: { render, style }, edtCtx, libs: { mybricksSdk }) {
         return new Promise((resolve, reject) => {
           if (response) {
@@ -32,7 +59,9 @@ export const getAIEditor = ({ systemPrompts = '' }) => ({
               })
             }
             Promise.all([
-              getComponentFromJSX(response.render, libs),
+              getComponentFromJSX(response.render, libs, {
+                'echarts-for-react': echartsForReact
+              }),
               transformLess(response.style)
             ]).then(([com, css]) => {
               rtn(com, css)

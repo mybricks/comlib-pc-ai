@@ -1,36 +1,15 @@
 import { CSS_LANGUAGE } from './types'
 
-export function getComponentFromJSX(jsxCode, libs: { mybricksSdk }): Promise<Function> {
+export function getComponentFromJSX(jsxCode, libs: { mybricksSdk }, dependencies = {}): Promise<Function> {
   return new Promise((resolve, reject) => {
-    // const importRegex = /import\s+((?:[\s\S]*?))\s+from(\s+)?['"]([^'"]+)['"]/g;
-
-    // const loadLibs = []
-
-    // const sourceCode = jsxCode.replace(importRegex, (match, vars, oo, npm) => {
-    //   const un = npm.toUpperCase()
-    //   if (un !== 'REACT' && un !== 'INDEX.LESS' && un !== 'ANTD') {
-    //     //debugger
-    //     const lib = LibsReg.find(lib => lib.title.toUpperCase() === un)
-    //     if (lib) {
-    //       loadLibs.push(lib)
-    //       return `const ${vars} = ${lib.moduleDef}`
-    //     } else {
-
-    //     }
-    //   }
-
-    //   return match
-    // })
-
     transformTsx(jsxCode).then(code => {
       try {
         const rtn = runRender(code, {
             'react': window['react'],
-            'echarts-for-react': window['echartsForReact'],
-            'mybricks': libs.mybricksSdk
+            'mybricks': libs.mybricksSdk,
+            ...dependencies,
           }
         )
-
         resolve(rtn)
       } catch (ex) {
         reject(ex)
@@ -90,6 +69,11 @@ export function transformLess(code): Promise<string> {
     let res = ''
     try {
       if (window?.less) {
+
+        if (!code || code.length === 0) {
+          return resolve('')
+        }
+
         window.less.render(code, {}, (error, result) => {
           if (error) {
             console.error(error)

@@ -1,6 +1,7 @@
 import React, {useEffect, useMemo, useRef, useCallback} from 'react';
 import {polyfillRuntime, runRender} from './utils'
 import {StyleProvider} from "@ant-design/cssinjs";
+import echartsForReact from './../utils/echarts-for-react'
 
 import {copyToClipboard} from "../utils/ai-code";
 import css from "./runtime.less";
@@ -122,6 +123,7 @@ export default ({env, data, inputs, outputs, slots, logger, id, onError}) => {
         const com = runRender(oriCode, {
           'react': React,
           'antd': window['antd_5_21_4'],
+          'echarts-for-react': echartsForReact,
           '@ant-design/icons': window['icons'],
           'mybricks': env.mybricksSdk,
         })
