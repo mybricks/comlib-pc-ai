@@ -255,7 +255,6 @@ function runRender(code, dependencies) {
   }
 
   const require = (packageName) => {
-  console.log('dependencies', dependencies, packageName)
     return dependencies[packageName]
   }
 

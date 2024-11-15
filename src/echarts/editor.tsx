@@ -1,7 +1,5 @@
 import { getAIEditor, getPromteForAll } from './common'
 
-import summary, { basePrompt } from './common/prompt-summary'
-
 const systemPrompts = `
 ${require('./line/promote.md').default}
 ${require('./column/promote.md').default}
@@ -25,7 +23,7 @@ export const promtForAll = getPromteForAll({ promte: systemPrompts })
 const KnowledgeMap = {
   Pie: require('./pie/promote.md').default,
   Line: require('./line/promote.md').default,
-  Column: require('./column/promote.md').default,
+  Bar: require('./column/promote.md').default,
   Boxplot: require('./boxplot/promote.md').default,
   Candlestick: require('./candlestick/promote.md').default,
   Funnel: require('./funnel/promote.md').default,
@@ -39,7 +37,9 @@ const KnowledgeMap = {
   Treemap: require('./treemap/promote.md').default
 }
 
-const loadKnowledge = (items) => {
+export const prompts = require('./common/prompt-summary.md').default;
+
+export const loadKnowledge = (items) => {
   const rtn: any = []
   let libPush = false
   items.forEach(lib => {
@@ -48,7 +48,7 @@ const loadKnowledge = (items) => {
         rtn.push({
           from: lib.from,
           item: 'base',
-          knowledge: basePrompt.replace(/import ReactECharts from 'echarts-for-react'/g, `import { 图表占位 } from 'echarts-for-react'`).replace(/ReactECharts/g, '图表占位'),
+          knowledge: require('./common/promte-base.md').default.replace(/import ReactECharts from 'echarts-for-react'/g, `import { 图表占位 } from 'echarts-for-react'`).replace(/ReactECharts/g, '图表占位'),
         })
         libPush = true;
       }
@@ -65,4 +65,4 @@ const loadKnowledge = (items) => {
   return rtn
 }
 
-export default getAIEditor({ systemPrompts: summary(), loadKnowledge })
+export default getAIEditor({ systemPrompts: prompts, loadKnowledge })

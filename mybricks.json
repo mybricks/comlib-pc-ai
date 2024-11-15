@@ -3,6 +3,7 @@
   "content": "",
   "commitInfo": "init",
   "comAry": [
+    "./src/mix/com.json",
     "./src/antd/com.json",
     "./src/echarts/com.json",
     {

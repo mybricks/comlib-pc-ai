@@ -7,8 +7,9 @@ import Table from './Table.md'
 import Input from './Input.md'
 import InputNumer from './InputNumer.md'
 import Select from './Select.md'
+import Breadcrumb from './Breadcrumb.md'
 
-const Knowledges = {
+export const KnowledgesMap = {
   BUTTON: Button,
   GRID: Grid,
   ROW: Row,
@@ -18,12 +19,5 @@ const Knowledges = {
   INPUT: Input,
   INPUTNUMBER: InputNumer,
   SELECT: Select,
-}
-
-
-export default function getKnowledge(packageName: string, com: string) {
-  if (packageName === 'antd') {
-    const upperCom = com.toUpperCase()
-    return Knowledges[upperCom] ?? ''
-  }
+  BREADCRUMB: Breadcrumb,
 }

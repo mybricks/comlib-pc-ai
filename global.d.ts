@@ -3,6 +3,10 @@ declare module '*.less' {
   export default classes;
 }
 
+declare module '*.md' {
+  const content: string;
+  export default content;
+}
 interface T_Props {
   outputs: {
     [keyname: string]: (...param: any) => void

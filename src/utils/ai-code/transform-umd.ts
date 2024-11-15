@@ -1,11 +1,13 @@
 import { CSS_LANGUAGE } from './types'
+import React from 'react'
 
 export function getComponentFromJSX(jsxCode, libs: { mybricksSdk }, dependencies = {}): Promise<Function> {
   return new Promise((resolve, reject) => {
     transformTsx(jsxCode).then(code => {
       try {
         const rtn = runRender(code, {
-            'react': window['react'],
+            'react': React,
+            '@ant-design/icons': window['icons'],
             'mybricks': libs.mybricksSdk,
             ...dependencies,
           }
