@@ -43,10 +43,10 @@ export const loadKnowledge = (items) => {
   const rtn: any = []
   let libPush = false
   items.forEach(lib => {
-    if (lib.from === 'echarts-for-react') {
+    if (lib.lib === 'echarts-for-react') {
       if (!libPush) {
         rtn.push({
-          from: lib.from,
+          lib: lib.lib,
           item: 'base',
           knowledge: require('./common/promte-base.md').default.replace(/import ReactECharts from 'echarts-for-react'/g, `import { 图表占位 } from 'echarts-for-react'`).replace(/ReactECharts/g, '图表占位'),
         })
@@ -54,7 +54,7 @@ export const loadKnowledge = (items) => {
       }
       if (KnowledgeMap[lib.item]) {
         rtn.push({
-          from: lib.from,
+          lib: lib.lib,
           item: lib.item,
           knowledge: KnowledgeMap[lib.item],
         })

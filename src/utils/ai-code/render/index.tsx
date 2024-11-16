@@ -188,7 +188,7 @@ export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, erro
   // 注入 CSS 代码
   useMemo(() => {
     if (styleCode) {
-      appendCssApi.set(`mbcrcss_${id}`, decodeURIComponent(styleCode))
+      appendCssApi.set(`${id}`, decodeURIComponent(styleCode))
     }
   }, [styleCode, appendCssApi])
 
@@ -196,7 +196,7 @@ export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, erro
   useEffect(() => {
     return () => {
       // mbcrcss = mybricks_custom_render缩写
-      appendCssApi.remove(`mbcrcss_${id}`)
+      appendCssApi.remove(`${id}`)
     }
   }, [])
 

@@ -9,13 +9,13 @@ export const prompts = require('./prompt-summary.md').default;
 export const loadKnowledge = (items) => {
   const rtn: any = []
   items.forEach(now => {
-    if (!now.from.match(/react/)) {
-      if (now.from === 'antd') {
+    if (!now.lib.match(/react/)) {
+      if (now.lib === 'antd') {
         const upperCom = now.item.toUpperCase()
         const knowledge = KnowledgesMap[upperCom] ?? '';
         if (knowledge) {
           rtn.push({
-            from: now.from,
+            lib: now.lib,
             item: now.item,
             knowledge
           })
