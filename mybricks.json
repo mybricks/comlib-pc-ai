@@ -4,8 +4,14 @@
   "commitInfo": "init",
   "comAry": [
     "./src/mix/com.json",
-    "./src/antd/com.json",
-    "./src/echarts/com.json",
+    {
+      "title": "组件库",
+      "visible": false,
+      "comAry": [
+        "./src/antd/com.json",
+        "./src/echarts/com.json"
+      ]
+    },
     {
       "title": "ECharts图表",
       "visible": false,
