@@ -1,27 +1,15 @@
-import Button from './Button.md'
-import Grid from './Grid.md'
-import Row from './Row.md'
-import Col from './Col.md'
-import Form from './Form.md'
-import Table from './Table.md'
-import Input from './Input.md'
-import InputNumer from './InputNumer.md'
-import Select from './Select.md'
-import Breadcrumb from './Breadcrumb.md'
+/** 动态获取文件夹下所有的.md 文件 */
+const requireModule = require.context('./../knowledge', false, /\.md$/);
+const modules = requireModule.keys().reduce((modules, modulePath) => {
+  // 获取模块名
+  const moduleName = modulePath.replace(/^\.\/(.*)\.\w+$/, '\$1');
+  // 导入模块，并设置为大写字母
+  modules[moduleName.toUpperCase()] = requireModule(modulePath).default;
+  return modules;
+}, {});
 
-export const KnowledgesMap = {
-  BUTTON: Button,
-  GRID: Grid,
-  ROW: Row,
-  COL: Col,
-  FORM: Form,
-  TABLE: Table,
-  INPUT: Input,
-  INPUTNUMBER: InputNumer,
-  SELECT: Select,
-  BREADCRUMB: Breadcrumb,
-}
-
+/** antd 所有知识库 Map */
+export const KnowledgesMap = modules
 
 export default function getKnowledge(packageName: string, com: string) {
   if (packageName === 'antd') {

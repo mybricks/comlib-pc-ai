@@ -7,6 +7,20 @@ declare module '*.md' {
   const content: string;
   export default content;
 }
+
+declare namespace NodeJS {
+  interface Require {
+    context(
+      directory: string,
+      useSubdirectories?: boolean,
+      regExp?: RegExp
+    ): {
+      keys: () => string[];
+      (id: string): any;
+    };
+  }
+}
+
 interface T_Props {
   outputs: {
     [keyname: string]: (...param: any) => void
