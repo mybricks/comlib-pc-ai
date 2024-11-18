@@ -8,6 +8,7 @@ export function getComponentFromJSX(jsxCode, libs: { mybricksSdk }, dependencies
         const rtn = runRender(code, {
             'react': React,
             '@ant-design/icons': window['icons'],
+            'dayjs': window['dayjs'] ?? window['moment'],
             'mybricks': libs.mybricksSdk,
             ...dependencies,
           }

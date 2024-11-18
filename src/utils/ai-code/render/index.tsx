@@ -209,6 +209,7 @@ export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, erro
         const Com = runRender(oriCode, {
           'react': React,
           'mybricks': env.mybricksSdk,
+          'dayjs': window['dayjs'] ?? window['moment'],
           ...dependencies,
         })
         // TODO 没有key的话会用预览的高度
