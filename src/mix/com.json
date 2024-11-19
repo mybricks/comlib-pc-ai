@@ -1,8 +1,8 @@
 {
   "title": "Antd5-Echars",
   "namespace": "mybricks.basic-comlib.ai-mix",
-  "author": "CheMingjun",
-  "author_name": "CheMingjun",
+  "author": "MyBricks Team",
+  "author_name": "MyBricks Team",
   "version": "1.0.4",
   "description": "AI组件",
   "icon": "./icon.svg",
