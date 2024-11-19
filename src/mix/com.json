@@ -3,7 +3,7 @@
   "namespace": "mybricks.basic-comlib.ai-mix",
   "author": "CheMingjun",
   "author_name": "CheMingjun",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "AI组件",
   "icon": "./icon.svg",
   "runtime": "./runtime.tsx",

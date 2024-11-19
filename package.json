@@ -1,6 +1,6 @@
 {
   "name": "@mybricks/comlib-ai-pc",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "description": "PC-AI组件库",
   "main": "index.js",
   "scripts": {

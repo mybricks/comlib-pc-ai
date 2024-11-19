@@ -3,7 +3,36 @@
   "content": "",
   "commitInfo": "init",
   "comAry": [
-    "./src/mix/com.json"
+    "./src/mix/com.json",
+    {
+      "title": "组件库",
+      "visible": false,
+      "comAry": [
+        "./src/antd/com.json",
+        "./src/echarts/com.json"
+      ]
+    },
+    {
+      "title": "ECharts图表",
+      "visible": false,
+      "comAry": [
+        "./src/echarts/com.json",
+        "./src/echarts/pie/com.json",
+        "./src/echarts/line/com.json",
+        "./src/echarts/column/com.json",
+        "./src/echarts/radar/com.json",
+        "./src/echarts/funnel/com.json",
+        "./src/echarts/scatter/com.json",
+        "./src/echarts/sunburst/com.json",
+        "./src/echarts/heatmap/com.json",
+        "./src/echarts/gauge/com.json",
+        "./src/echarts/tree/com.json",
+        "./src/echarts/treemap/com.json",
+        "./src/echarts/sankey/com.json",
+        "./src/echarts/boxplot/com.json",
+        "./src/echarts/candlestick/com.json"
+      ]
+    }
   ],
   "componentType": "PC",
   "externals": [
