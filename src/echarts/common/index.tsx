@@ -6,6 +6,8 @@ export { default as getPromteForAll } from './promte-for-all'
 
 export { default as getChartRuntime } from './chart'
 
+export { ECHARTS_KNOWLEDGES_MAP } from "./../../mix/knowledges";
+
 import echartsForReact from './../../utils/echarts-for-react'
 
 export const getAIEditor = ({ systemPrompts = '', loadKnowledge = (items) => '' }) => ({
@@ -24,27 +26,6 @@ export const getAIEditor = ({ systemPrompts = '', loadKnowledge = (items) => '' 
       getSystemPrompts() {
         return {
           langs:`HTML、CSS、Javascript、react`,
-  //         renderFileTemplate:`
-  // ({env,data,inputs,outputs,slots})=>{
-  //   useMemo(()=>{
-  //     inputs['u_i6']((val)=>{//监听输入项
-  //       data.title = val
-  //     })
-  //   },[])
-    
-  //   return (
-  //     <div>
-  //       <div>
-  //         {data.logo}
-  //       </div>
-  //       <Button className={css.button} onClick={e=>{
-  //         outputs['o_03'](data.title)
-  //       }}>{data.title}</Button>
-  //       <div>{slots['s_u01'].render()}</div>
-  //     </div>
-  //   )
-  // }
-  //         `,
           prompts: `${systemPrompts}`,
         }
       },

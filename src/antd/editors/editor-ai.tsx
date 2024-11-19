@@ -1,32 +1,8 @@
 import {transformLess} from "../transform";
 import {getComponentFromJSX, updateRender, updateStyle} from "../utils";
-import { KnowledgesMap } from "./knowledge";
 
-/** 带摘要的文档，也导出给混合组件使用 */
-export const prompts = require('./prompt-summary.md').default;
-
-/** 导出给混合组件使用 */
-export const loadKnowledge = (items) => {
-  const rtn: any = []
-  items.forEach(now => {
-    const library = now.from || now.lib;
-    if (!library.match(/react/)) {
-      if (library === 'antd') {
-        const upperCom = now.item.toUpperCase()
-        const knowledge = KnowledgesMap[upperCom] ?? '';
-        if (knowledge) {
-          rtn.push({
-            lib: library,
-            item: now.item,
-            knowledge
-          })
-        }
-      }
-    }
-  })
-
-  return rtn
-}
+import { ANTD_KNOWLEDGES_MAP } from "./../../mix/knowledges";
+import prompts from './../../mix/prompts/antd-summary.md'
 
 
 export default {
@@ -48,7 +24,27 @@ export default {
     //     `,
       }
     },
-    loadKnowledge,
+    loadKnowledge: (items) => {
+      const rtn: any = []
+      items.forEach(now => {
+        const library = now.from || now.lib;
+        if (!library.match(/react/)) {
+          if (library === 'antd') {
+            const upperCom = now.item.toUpperCase()
+            const knowledge = ANTD_KNOWLEDGES_MAP[upperCom] ?? '';
+            if (knowledge) {
+              rtn.push({
+                lib: library,
+                item: now.item,
+                knowledge
+              })
+            }
+          }
+        }
+      })
+    
+      return rtn
+    },
     preview(response: { id, render, style }, edtCtx, libs: { mybricksSdk }) {
       return new Promise((resolve, reject) => {
         if (response) {

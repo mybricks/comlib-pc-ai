@@ -1,41 +1,23 @@
-import { getAIEditor, getPromteForAll } from './common'
+import { getAIEditor, getPromteForAll, ECHARTS_KNOWLEDGES_MAP } from './common'
 
 const systemPrompts = `
-${require('./line/promote.md').default}
-${require('./column/promote.md').default}
-${require('./pie/promote.md').default}
-${require('./radar/promote.md').default}
-${require('./funnel/promote.md').default}
-${require('./scatter/promote.md').default}
-${require('./sunburst/promote.md').default}
-${require('./heatmap/promote.md').default}
-${require('./gauge/promote.md').default}
-${require('./tree/promote.md').default}
-${require('./treemap/promote.md').default}
-${require('./sankey/promote.md').default}
-${require('./boxplot/promote.md').default}
-${require('./candlestick/promote.md').default}
+${ECHARTS_KNOWLEDGES_MAP.line}
+${ECHARTS_KNOWLEDGES_MAP.column}
+${ECHARTS_KNOWLEDGES_MAP.pie}
+${ECHARTS_KNOWLEDGES_MAP.radar}
+${ECHARTS_KNOWLEDGES_MAP.funnel}
+${ECHARTS_KNOWLEDGES_MAP.scatter}
+${ECHARTS_KNOWLEDGES_MAP.sunburst}
+${ECHARTS_KNOWLEDGES_MAP.heatmap}
+${ECHARTS_KNOWLEDGES_MAP.gauge}
+${ECHARTS_KNOWLEDGES_MAP.tree}
+${ECHARTS_KNOWLEDGES_MAP.treemap}
+${ECHARTS_KNOWLEDGES_MAP.sankey}
+${ECHARTS_KNOWLEDGES_MAP.boxplot}
+${ECHARTS_KNOWLEDGES_MAP.candlestick}
 `
 
 export const promtForAll = getPromteForAll({ promte: systemPrompts })
-
-
-const KnowledgeMap = {
-  Pie: require('./pie/promote.md').default,
-  Line: require('./line/promote.md').default,
-  Bar: require('./column/promote.md').default,
-  Boxplot: require('./boxplot/promote.md').default,
-  Candlestick: require('./candlestick/promote.md').default,
-  Funnel: require('./funnel/promote.md').default,
-  Gauge: require('./gauge/promote.md').default,
-  Heatmap: require('./heatmap/promote.md').default,
-  Radar: require('./radar/promote.md').default,
-  Sankey: require('./sankey/promote.md').default,
-  Scatter: require('./scatter/promote.md').default,
-  Sunburst: require('./sunburst/promote.md').default,
-  Tree: require('./tree/promote.md').default,
-  Treemap: require('./treemap/promote.md').default
-}
 
 export const prompts = require('./common/prompt-summary.md').default;
 
@@ -49,15 +31,16 @@ export const loadKnowledge = (items) => {
         rtn.push({
           lib: library,
           item: 'base',
-          knowledge: require('./common/promte-base.md').default.replace(/import ReactECharts from 'echarts-for-react'/g, `import { 图表占位 } from 'echarts-for-react'`).replace(/ReactECharts/g, '图表占位'),
+          knowledge: ECHARTS_KNOWLEDGES_MAP.base.replace(/import ReactECharts from 'echarts-for-react'/g, `import { 图表占位 } from 'echarts-for-react'`).replace(/ReactECharts/g, '图表占位'),
         })
         libPush = true;
       }
-      if (KnowledgeMap[lib.item]) {
+      const knowledge = ECHARTS_KNOWLEDGES_MAP[lib.item.toLowerCase()]
+      if (knowledge) {
         rtn.push({
           lib: library,
           item: lib.item,
-          knowledge: KnowledgeMap[lib.item],
+          knowledge,
         })
       }
     }
