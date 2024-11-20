@@ -50,23 +50,34 @@
 
 适用于 `onRow` `onHeaderRow` `onCell` `onHeaderCell`。
 
-```jsx
-<Table
-  onRow={(record) => {
-    return {
-      onClick: (event) => {}, // 点击行
-      onDoubleClick: (event) => {},
-      onContextMenu: (event) => {},
-      onMouseEnter: (event) => {}, // 鼠标移入行
-      onMouseLeave: (event) => {},
-    };
-  }}
-  onHeaderRow={(columns, index) => {
-    return {
-      onClick: () => {}, // 点击表头行
-    };
-  }}
-/>
+```render
+imoprt react from 'react';
+import { Table } from 'antd';
+import { comRef } from 'mybricks';
+
+export default comRef(({ data }) => {
+  return (
+    <Table
+      onRow={(record) => {
+        return {
+          onClick: (event) => {}, // 点击行
+          onDoubleClick: (event) => {},
+          onContextMenu: (event) => {},
+          onMouseEnter: (event) => {}, // 鼠标移入行
+          onMouseLeave: (event) => {},
+        };
+      }}
+      onHeaderRow={(columns, index) => {
+        return {
+          onClick: () => {}, // 点击表头行
+        };
+      }}
+    />
+  );
+}, {
+  type: 'main',
+  title: 'Table中onRow的使用',
+});
 ```
 
 ### Column
@@ -192,43 +203,3 @@
 | key      | React 需要的 key，建议设置 | string                      | -      |
 | text     | 选择项显示的文字           | ReactNode                   | -      |
 | onSelect | 选择项点击回调             | function(changeableRowKeys) | -      |
-
-## 在 TypeScript 中使用
-
-```tsx
-import React from 'react';
-import { Table } from 'antd';
-import type { TableColumnsType } from 'antd';
-
-interface User {
-  key: number;
-  name: string;
-}
-
-const columns: TableColumnsType<User> = [
-  {
-    key: 'name',
-    title: 'Name',
-    dataIndex: 'name',
-  },
-];
-
-const data: User[] = [
-  {
-    key: 0,
-    name: 'Jack',
-  },
-];
-
-const Demo: React.FC = () => (
-  <>
-    <Table<User> columns={columns} dataSource={data} />
-    {/* 使用 JSX 风格的 API */}
-    <Table<User> dataSource={data}>
-      <Table.Column<User> key="name" title="Name" dataIndex="name" />
-    </Table>
-  </>
-);
-
-export default Demo;
-```

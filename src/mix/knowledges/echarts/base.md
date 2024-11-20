@@ -3,14 +3,16 @@
 要点：
 - UI结构为外部套一个div，用于配置边框/背景色等CSS样式，其中宽高限制使用100%。
 - 在UI结构中，尽可能不再添加 dom 元素，如有文案和图形需求可以优先使用*graphic*。
+- 添加*comRef*的引用和使用。
 
 #### 最佳实践
 ```render
 import ReactECharts from 'echarts-for-react';
 import { useMemo } from 'react';
+import { comRef } from 'mybricks';
 import css from 'index.less';
 
-export default ({ data }) => {
+export default comRef(({ data }) => {
   const option = useMemo(() => {
     return {
       //...省略其它图表配置
@@ -25,7 +27,10 @@ export default ({ data }) => {
       />
     </div>
   )
-}
+}, {
+  type: 'main',
+  title: '图表的基础使用',
+})
 ```
 
 ### 使用文档-支持动态数据/动态配置项

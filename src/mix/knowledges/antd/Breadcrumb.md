@@ -31,7 +31,7 @@
 
 ### SeparatorType
 
-```ts
+```typescript
 const item = {
   type: 'separator', // Must have
   separator: '/',

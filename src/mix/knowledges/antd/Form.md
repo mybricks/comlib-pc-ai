@@ -36,32 +36,6 @@
 
 > 支持原生 form 除 `onSubmit` 外的所有属性。
 
-### validateMessages
-
-Form 为验证提供了[默认的错误提示信息](https://github.com/ant-design/ant-design/blob/6234509d18bac1ac60fbb3f92a5b2c6a6361295a/components/locale/en_US.ts#L88-L134)，你可以通过配置 `validateMessages` 属性，修改对应的提示模板。一种常见的使用方式，是配置国际化提示信息：
-
-```jsx
-const validateMessages = {
-  required: "'${name}' 是必选字段",
-  // ...
-};
-
-<Form validateMessages={validateMessages} />;
-```
-
-此外，[ConfigProvider](/components/config-provider-cn) 也提供了全局化配置方案，允许统一配置错误提示模板：
-
-```jsx
-const validateMessages = {
-  required: "'${name}' 是必选字段",
-  // ...
-};
-
-<ConfigProvider form={{ validateMessages }}>
-  <Form />
-</ConfigProvider>;
-```
-
 ## Form.Item
 
 表单字段组件，用于数据双向绑定、校验、布局等。
@@ -115,66 +89,44 @@ const validateMessages = {
 
 `({ status: ValidateStatus, errors: ReactNode, warnings: ReactNode }) => Record<ValidateStatus, ReactNode>`
 
-### shouldUpdate
-
-Form 通过增量更新方式，只更新被修改的字段相关组件以达到性能优化目的。大部分场景下，你只需要编写代码或者与 [`dependencies`](#dependencies) 属性配合校验即可。而在某些特定场景，例如修改某个字段值后出现新的字段选项、或者纯粹希望表单任意变化都对某一个区域进行渲染。你可以通过 `shouldUpdate` 修改 Form.Item 的更新逻辑。
-
-当 `shouldUpdate` 为 `true` 时，Form 的任意变化都会使该 Form.Item 重新渲染。这对于自定义渲染一些区域十分有帮助，要注意 Form.Item 里包裹的子组件必须由函数返回，否则 `shouldUpdate` 不会起作用：
-
-相关issue：[#34500](https://github.com/ant-design/ant-design/issues/34500)
-
-```jsx
-<Form.Item shouldUpdate>
-  {() => {
-    return <pre>{JSON.stringify(form.getFieldsValue(), null, 2)}</pre>;
-  }}
-</Form.Item>
-```
-
-你可以参考[示例](#form-demo-inline-login)查看具体使用场景。
-
-当 `shouldUpdate` 为方法时，表单的每次数值更新都会调用该方法，提供原先的值与当前的值以供你比较是否需要更新。这对于是否根据值来渲染额外字段十分有帮助：
-
-```jsx
-<Form.Item shouldUpdate={(prevValues, curValues) => prevValues.additional !== curValues.additional}>
-  {() => {
-    return (
-      <Form.Item name="other">
-        <Input />
-      </Form.Item>
-    );
-  }}
-</Form.Item>
-```
-
-你可以参考[示例](#form-demo-control-hooks)查看具体使用场景。
 
 ### messageVariables
 
 你可以通过 `messageVariables` 修改 Form.Item 的默认验证信息。
 
-```jsx
-<Form>
-  <Form.Item
-    messageVariables={{ another: 'good' }}
-    label="user"
-    rules={[{ required: true, message: '${another} is required' }]}
-  >
-    <Input />
-  </Form.Item>
-  <Form.Item
-    messageVariables={{ label: 'good' }}
-    label={<span>user</span>}
-    rules={[{ required: true, message: '${label} is required' }]}
-  >
-    <Input />
-  </Form.Item>
-</Form>
+```render
+imoprt react from 'react';
+import { Form } from 'antd';
+import { comRef } from 'mybricks';
+
+export default comRef(({ data }) => {
+  return (
+    <Form>
+      <Form.Item
+        messageVariables={{ another: 'good' }}
+        label="user"
+        rules={[{ required: true, message: '${another} is required' }]}
+      >
+        <Input />
+      </Form.Item>
+      <Form.Item
+        messageVariables={{ label: 'good' }}
+        label={<span>user</span>}
+        rules={[{ required: true, message: '${label} is required' }]}
+      >
+        <Input />
+      </Form.Item>
+    </Form>
+  );
+}, {
+  type: 'main',
+  title: 'messageVariables的使用',
+});
 ```
 
 自 `5.20.2` 起，当你希望不要转译 `${}` 时，你可以通过 `\\${}` 来略过：
 
-```jsx
+```typescript
 { required: true, message: '${label} is convert, \\${label} is not convert' }
 
 // good is convert, ${label} is not convert
@@ -191,16 +143,30 @@ Form 通过增量更新方式，只更新被修改的字段相关组件以达到
 | name | 字段名，支持数组。List 本身也是字段，因而 `getFieldsValue()` 默认会返回 List 下所有值，你可以通过[参数](#getfieldsvalue)改变这一行为 | [NamePath](#namepath) | - |  |
 | rules | 校验规则，仅支持自定义规则。需要配合 [ErrorList](#formerrorlist) 一同使用。 | { validator, message }\[] | - | 4.7.0 |
 
-```tsx
-<Form.List>
-  {(fields) =>
-    fields.map((field) => (
-      <Form.Item {...field}>
-        <Input />
-      </Form.Item>
-    ))
-  }
-</Form.List>
+
+```render
+imoprt react from 'react';
+import { Form } from 'antd';
+import { comRef } from 'mybricks';
+
+export default comRef(({ data }) => {
+  return (
+    <Form>
+      <Form.List>
+        {(fields) =>
+          fields.map((field) => (
+            <Form.Item {...field}>
+              <Input />
+            </Form.Item>
+          ))
+        }
+      </Form.List>
+    </Form>
+  );
+}, {
+  type: 'main',
+  title: 'Form组件中列表的使用',
+});
 ```
 
 注意：Form.List 下的字段不应该配置 `initialValue`，你始终应该通过 Form.List 的 `initialValue` 或者 Form 的 `initialValues` 来配置。
@@ -232,17 +198,28 @@ Form.List 渲染表单相关操作函数。
 | onFormChange | 子表单字段更新时触发 | function(formName: string, info: { changedFields, forms }) | - |
 | onFormFinish | 子表单提交时触发 | function(formName: string, info: { values, forms }) | - |
 
-```jsx
-<Form.Provider
-  onFormFinish={(name) => {
-    if (name === 'form1') {
-      // Do something...
-    }
-  }}
->
-  <Form name="form1">...</Form>
-  <Form name="form2">...</Form>
-</Form.Provider>
+```render
+imoprt react from 'react';
+import { Form } from 'antd';
+import { comRef } from 'mybricks';
+
+export default comRef(({ data }) => {
+  return (
+    <Form.Provider
+      onFormFinish={(name) => {
+        if (name === 'form1') {
+          // Do something...
+        }
+      }}
+    >
+      <Form name="form1">...</Form>
+      <Form name="form2">...</Form>
+    </Form.Provider>
+  );
+}, {
+  type: 'main',
+  title: 'Form中Provider的使用',
+});
 ```
 
 ### FormInstance
@@ -267,7 +244,7 @@ Form.List 渲染表单相关操作函数。
 
 #### validateFields
 
-```tsx
+```typescript
 export interface ValidateConfig {
   // 5.5.0 新增。仅校验内容而不会将错误信息展示到 UI 上。
   validateOnly?: boolean;
@@ -277,36 +254,6 @@ export interface ValidateConfig {
   // 使用 `dirty` 可以很方便的仅校验用户操作过和被校验过的字段。
   dirty?: boolean;
 }
-```
-
-返回示例：
-
-```jsx
-validateFields()
-  .then((values) => {
-    /*
-  values:
-    {
-      username: 'username',
-      password: 'password',
-    }
-  */
-  })
-  .catch((errorInfo) => {
-    /*
-    errorInfo:
-      {
-        values: {
-          username: 'username',
-          password: 'password',
-        },
-        errorFields: [
-          { name: ['password'], errors: ['Please input your Password!'] },
-        ],
-        outOfDate: false,
-      }
-    */
-  });
 ```
 
 ## Hooks
@@ -323,14 +270,19 @@ validateFields()
 
 `4.20.0` 新增，获取当前上下文正在使用的 Form 实例，常见于封装子组件消费无需透传 Form 实例：
 
-```tsx
+
+```render
+imoprt react from 'react';
+import { Form } from 'antd';
+import { comRef } from 'mybricks';
+
 const Sub = () => {
   const form = Form.useFormInstance();
 
   return <Button onClick={() => form.setFieldsValue({})} />;
 };
 
-export default () => {
+export default comRef(({ data }) => {
   const [form] = Form.useForm();
 
   return (
@@ -338,7 +290,10 @@ export default () => {
       <Sub />
     </Form>
   );
-};
+}, {
+  type: 'main',
+  title: 'Form中useFormInstance的使用',
+});
 ```
 
 ### Form.useWatch
@@ -349,8 +304,12 @@ export default () => {
 
 用于直接获取 form 中字段对应的值。通过该 Hooks 可以与诸如 `useSWR` 进行联动从而降低维护成本：
 
-```tsx
-const Demo = () => {
+```render
+imoprt react from 'react';
+import { Form } from 'antd';
+import { comRef } from 'mybricks';
+
+export default comRef(({ data }) => {
   const [form] = Form.useForm();
   const userName = Form.useWatch('username', form);
 
@@ -363,15 +322,22 @@ const Demo = () => {
       </Form.Item>
     </Form>
   );
-};
+}, {
+  type: 'main',
+  title: 'Form中useWatch的使用',
+});
 ```
 
 如果你的组件被包裹在 `Form.Item` 内部，你可以省略第二个参数，`Form.useWatch` 会自动找到上层最近的 `FormInstance`。
 
 `useWatch` 默认只监听在 Form 中注册的字段，如果需要监听非注册字段，可以通过配置 `preserve` 进行监听：
 
-```tsx
-const Demo = () => {
+```render
+imoprt react from 'react';
+import { Form } from 'antd';
+import { comRef } from 'mybricks';
+
+export default comRef(({ data }) => {
   const [form] = Form.useForm();
 
   const age = Form.useWatch('age', { form, preserve: true });
@@ -387,7 +353,10 @@ const Demo = () => {
       </Form>
     </div>
   );
-};
+}, {
+  type: 'main',
+  title: 'Form中useWatch的preserve使用',
+});
 ```
 
 ### Form.Item.useStatus
@@ -396,7 +365,11 @@ const Demo = () => {
 
 `4.22.0` 新增，可用于获取当前 Form.Item 的校验状态，如果上层没有 Form.Item，`status` 将会返回 `undefined`。`5.4.0` 新增 `errors` 和 `warnings`，可用于获取当前 Form.Item 的错误信息和警告信息：
 
-```tsx
+```render
+imoprt react from 'react';
+import { Form } from 'antd';
+import { comRef } from 'mybricks';
+
 const CustomInput = ({ value, onChange }) => {
   const { status, errors } = Form.Item.useStatus();
   return (
@@ -409,13 +382,18 @@ const CustomInput = ({ value, onChange }) => {
   );
 };
 
-export default () => (
-  <Form>
-    <Form.Item name="username">
-      <CustomInput />
-    </Form.Item>
-  </Form>
-);
+export default comRef(({ data }) => {
+  return (
+    <Form>
+      <Form.Item name="username">
+        <CustomInput />
+      </Form.Item>
+    </Form>
+  )
+}, {
+  type: 'main',
+  title: 'Form中useStatus的使用',
+});
 ```
 
 #### 与其他获取数据的方式的区别
@@ -440,7 +418,7 @@ Form 仅会对变更的 Field 进行刷新，从而避免完整的组件刷新�
 
 当 `nameList` 为数组时，返回规定路径的值。需要注意的是，`nameList` 为嵌套数组。例如你需要某路径值应该如下：
 
-```tsx
+```typescript
 // 单个路径
 form.getFieldsValue([['user', 'age']]);
 
@@ -459,7 +437,7 @@ form.getFieldsValue([
 
 用于过滤一些字段值，`meta` 会返回字段相关信息。例如可以用来获取仅被用户修改过的值等等。
 
-```tsx
+```typescript
 type FilterFunc = (meta: { touched: boolean; validating: boolean }) => boolean;
 ```
 
@@ -478,7 +456,7 @@ type FilterFunc = (meta: { touched: boolean; validating: boolean }) => boolean;
 
 Rule 支持接收 object 进行配置，也支持 function 来动态获取 form 的数据：
 
-```tsx
+```typescript
 type Rule = RuleConfig | ((form: FormInstance) => RuleConfig);
 ```
 

@@ -4,10 +4,6 @@
 
 通用属性参考：[通用属性](/docs/react/common-props)
 
-```jsx
-<Card title="卡片标题">卡片内容</Card>
-```
-
 | 参数 | 说明 | 类型 | 默认值 | 版本 |
 | --- | --- | --- | --- | --- |
 | actions | 卡片操作组，位置在卡片底部 | Array&lt;ReactNode> | - |  |

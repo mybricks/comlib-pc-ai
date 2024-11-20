@@ -195,22 +195,6 @@ export type FormatType =
 
 参考 FAQ [为什么时间类组件的国际化 locale 设置不生效？](/docs/react/faq#为什么时间类组件的国际化-locale-设置不生效)。
 
-### 如何修改周的起始日？
-
-请使用正确的[语言包](/docs/react/i18n-cn)（[#5605](https://github.com/ant-design/ant-design/issues/5605)），或者修改 dayjs 的 `locale` 配置：<https://codesandbox.io/s/dayjs-day-of-week-x9tuj2?file=/demo.tsx>
-
-```js
-import dayjs from 'dayjs';
-
-import 'dayjs/locale/zh-cn';
-
-import updateLocale from 'dayjs/plugin/updateLocale';
-
-dayjs.extend(updateLocale);
-dayjs.updateLocale('zh-cn', {
-  weekStart: 0,
-});
-```
 
 ### 为何使用 `panelRender` 时，原来面板无法切换？
 
@@ -226,6 +210,7 @@ dayjs.updateLocale('zh-cn', {
 ```render
 imoprt react from 'react';
 import { DatePicker } from 'antd';
+import { comRef } from 'mybricks';
 import dayjs from 'dayjs';
 
 export default comRef(({ data }) => {
@@ -254,6 +239,7 @@ export default comRef(({ data }) => {
 ```render
 imoprt react from 'react';
 import { DatePicker } from 'antd';
+import { comRef } from 'mybricks';
 import dayjs from 'dayjs';
 
 export default comRef(({ data }) => {
