@@ -8,7 +8,6 @@
   "icon": "./icon.svg",
   "runtime": "./runtime.tsx",
   "editors": "./editors.tsx",
-  "data": "./data.json",
   "slots": [],
   "docs": ""
 }

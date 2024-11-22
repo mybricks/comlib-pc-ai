@@ -163,6 +163,7 @@ export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, erro
         }
       }
     }
+
     return {
       set: (id: string, content: string) => {
         const el = document.getElementById(id);
