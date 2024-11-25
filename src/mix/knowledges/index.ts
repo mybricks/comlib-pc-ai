@@ -21,4 +21,3 @@ export const ECHARTS_KNOWLEDGES_MAP: Record<string, string> = (function () {
     return modules
   }, {})
 })()
-

@@ -37,11 +37,19 @@ export default {
         if (library === 'echarts-for-react') {
           const knowledge = ECHARTS_KNOWLEDGES_MAP[now.item.toLowerCase()]
 
+          if (typeof ECHARTS_KNOWLEDGES_MAP['base']?.docs === 'string') {
+            // @ts-ignore
+            ECHARTS_KNOWLEDGES_MAP['base']?.docs = ECHARTS_KNOWLEDGES_MAP['base']?.docs.replace(/import ReactECharts from 'echarts-for-react'/g, `import { 图表占位 } from 'echarts-for-react'`).replace(/ReactECharts/g, '图表占位')
+          }
+          if (typeof ECHARTS_KNOWLEDGES_MAP['base'] === 'string') {
+            ECHARTS_KNOWLEDGES_MAP['base'] = ECHARTS_KNOWLEDGES_MAP['base'].replace(/import ReactECharts from 'echarts-for-react'/g, `import { 图表占位 } from 'echarts-for-react'`).replace(/ReactECharts/g, '图表占位')
+          }
+
           // echarts 需要一份 base 的文档
           rtn.push({
             lib: library,
-            item: 'base',
-            knowledge: ECHARTS_KNOWLEDGES_MAP['base'].replace(/import ReactECharts from 'echarts-for-react'/g, `import { 图表占位 } from 'echarts-for-react'`).replace(/ReactECharts/g, '图表占位'),
+            item: '基础知识',
+            knowledge: ECHARTS_KNOWLEDGES_MAP['base'],
           })
 
           if (knowledge) {
