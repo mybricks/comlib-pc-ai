@@ -10,6 +10,26 @@ export default {
           options: ['background', 'font'],
         }
       ]
+    },
+    '.ant-table-thead': {
+      title: '表头',
+      items: [
+        {
+          title: '样式',
+          type: 'style',
+          options: ['background'],
+        }
+      ]
+    },
+    '.ant-table-thead .ant-table-cell': {
+      title: '列',
+      items: [
+        {
+          title: '样式',
+          type: 'style',
+          options: ['background', 'font'],
+        }
+      ]
     }
   },
   docs: `

@@ -1,4 +1,3 @@
-
 import React, {useEffect, useMemo, useState, Component, ReactElement, cloneElement} from 'react';
 import css from './index.less'
 
@@ -62,91 +61,6 @@ interface AIJsxProps {
   placeholder?: string | ReactElement
   /**  依赖组件信息 */
   dependencies?: Record<string, any>
-}
-
-export const AIJsxUmdRuntime = ({ id, env, styleCode, renderCode, renderProps, errorInfo, placeholder = 'AI组件' } : AIJsxProps) => {
-  const appendCssApi = useMemo<CssApi>(() => {
-    if ((env.edit || env.runtime?.debug) && env.canvas?.css) {
-      const cssAPI = env.canvas.css
-      return {
-        set(content) {
-          const myContent = content.replaceAll('__id__', id)//替换模版
-          cssAPI.set(id, myContent)
-        },
-        remove() {
-          return cssAPI.remove(id)
-        }
-      }
-    }
-    return {
-      set: (id: string, content: string) => {
-        const el = document.getElementById(id);
-        if (el) {
-          el.innerText = content
-          return
-        }
-        const styleEle = document.createElement('style')
-        styleEle.id = id;
-        const myContent = content.replaceAll('__id__', id)//替换模版
-        styleEle.innerText = myContent
-        document.head.appendChild(styleEle);
-      },
-      remove: (id: string) => {
-        const el = document.getElementById(id);
-        if (el && el.parentElement) {
-          el.parentElement.removeChild(el)
-        }
-      }
-    }
-  }, [env])
-
-  // 注入 CSS 代码
-  useMemo(() => {
-    if (styleCode) {
-      appendCssApi.set(`mbcrcss_${id}`, decodeURIComponent(styleCode))
-    }
-  }, [styleCode, appendCssApi])
-
-  // 卸载 CSS 代码
-  useEffect(() => {
-    return () => {
-      // mbcrcss = mybricks_custom_render缩写
-      appendCssApi.remove(`mbcrcss_${id}`)
-    }
-  }, [])
-
-  const ReactNode = useMemo(() => {
-    if (errorInfo) return () => <ErrorTip title={errorInfo.title} desc={errorInfo.desc} />;
-    if (renderCode) {
-      try {
-        eval(decodeURIComponent(renderCode))
-
-        let RT = window[`mbcrjsx_${id}`]
-
-        if (!RT.default) {
-          throw new Error('未导出组件定义')
-        }
-        RT = RT.default
-        // return (props) => {
-        //   return <ErrorBoundary><RT {...props}></RT></ErrorBoundary>
-        // };
-        return (props) => {
-          return cloneElement(<RT {...props} />, {}, null)
-        };
-      } catch (error) {
-        return () => <ErrorTip title={'获取组件定义失败'} desc={error?.toString?.()} />;
-      }
-    } else {
-      return
-    }
-  }, [renderCode, errorInfo])
-
-
-  if (typeof ReactNode !== 'function') {
-    return placeholder
-  }
-
-  return <ReactNode {...renderProps} />
 }
 
 export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, errorInfo, placeholder = 'AI组件', dependencies = {} } : AIJsxProps) => {
