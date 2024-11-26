@@ -1,7 +1,7 @@
 export default {
   description: `步骤条`,
   editors: {
-    '.ant-steps': {
+    ':root': {
       title: '步骤条',
       items: [
         {

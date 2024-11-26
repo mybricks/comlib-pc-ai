@@ -1,7 +1,7 @@
 export default {
   description: `表单组件`,
   editors: {
-    '.ant-form': {
+    ':root': {
       title: '表单',
       com:'Form',
       items: [

@@ -1,7 +1,7 @@
 export default {
   description: `表格组件`,
   editors: {
-    '.ant-table': {
+    ':root': {
       title: '表格',
       items: [
         {

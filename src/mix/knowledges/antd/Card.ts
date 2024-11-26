@@ -1,7 +1,7 @@
 export default {
   description: `卡片`,
   editors: {
-    '.ant-card': {
+    ':root': {
       title: '卡片',
       items: [
         {

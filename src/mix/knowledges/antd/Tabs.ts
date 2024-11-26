@@ -1,7 +1,7 @@
 export default {
   description: `标签页`,
   editors: {
-    '.ant-switch': {
+    ':root': {
       title: '标签页',
       items: [
         {
