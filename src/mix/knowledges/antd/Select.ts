@@ -1,7 +1,7 @@
 export default {
   description: `下拉选择器`,
   editors: {
-    '.ant-select': {
+    '.ant-select-selector': {
       title: '下拉选择器',
       items: [
         {

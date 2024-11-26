@@ -1,28 +1,28 @@
 export default {
   description: `表单组件`,
   editors: {
-    ':root': {
-      title: '表单',
-      com:'Form',
-      items: [
-        {
-          title: '样式',
-          type: 'style',
-          options: ['background', 'font'],
-        }
-      ]
-    },
-    '.ant-form-item': {
-      title: '表单项',
-      com:'Form.Item',
-      items: [
-        {
-          title: '样式',
-          type: 'style',
-          options: ['background', 'font'],
-        }
-      ]
-    }
+    // ':root': {
+    //   title: '表单',
+    //   com:'Form',
+    //   items: [
+    //     {
+    //       title: '样式',
+    //       type: 'style',
+    //       options: ['background', 'font'],
+    //     }
+    //   ]
+    // },
+    // '.ant-form-item': {
+    //   title: '表单项',
+    //   com:'Form.Item',
+    //   items: [
+    //     {
+    //       title: '样式',
+    //       type: 'style',
+    //       options: ['background', 'font'],
+    //     }
+    //   ]
+    // }
   },
   docs: `
 通用属性参考：[通用属性](/docs/react/common-props)

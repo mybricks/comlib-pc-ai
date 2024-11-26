@@ -1,16 +1,6 @@
 export default {
   description: `单选框`,
   editors: {
-    '.ant-radio-group': {
-      title: '单选框',
-      items: [
-        {
-          title: '样式',
-          type: 'style',
-          options: ['background'],
-        }
-      ]
-    },
     '.ant-radio-wrapper': {
       title: '选项',
       items: [
@@ -21,6 +11,16 @@ export default {
         }
       ]
     },
+    '.ant-radio-button-wrapper': {
+      title: '按钮式选项',
+      items: [
+        {
+          title: '样式',
+          type: 'style',
+          options: ['font', 'background', 'border', 'padding'],
+        }
+      ]
+    }
   },
   docs: require('./Radio.md').default
 }

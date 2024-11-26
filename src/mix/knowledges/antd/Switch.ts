@@ -1,7 +1,7 @@
 export default {
   description: `开关`,
   editors: {
-    '.ant-switch': {
+    ':root': {
       title: '开关',
       items: [
         {

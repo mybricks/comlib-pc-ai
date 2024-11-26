@@ -11,6 +11,26 @@ export default {
         }
       ]
     },
+    '.ant-collapse-header': {
+      title: '头部区域',
+      items: [
+        {
+          title: '样式',
+          type: 'style',
+          options: ['font', 'background', 'padding'],
+        }
+      ]
+    },
+    '.ant-collapse-content-box': {
+      title: '内容区域',
+      items: [
+        {
+          title: '样式',
+          type: 'style',
+          options: ['font', 'background', 'padding'],
+        }
+      ]
+    }
   },
   docs: require('./Collapse.md').default
 }

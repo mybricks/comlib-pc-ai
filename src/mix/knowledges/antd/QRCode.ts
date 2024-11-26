@@ -1,13 +1,13 @@
 export default {
   description: `二维码`,
   editors: {
-    '.ant-qrcode': {
+    ':root': {
       title: '二维码',
       items: [
         {
           title: '样式',
           type: 'style',
-          options: ['font', 'background', 'border'],
+          options: ['background', 'border', 'padding'],
         }
       ]
     },

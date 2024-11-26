@@ -1,13 +1,13 @@
 export default {
   description: `时间选择器`,
   editors: {
-    '.ant-picker': {
+    ':root': {
       title: '时间选择器',
       items: [
         {
           title: '样式',
           type: 'style',
-          options: ['background', 'border'],
+          options: ['background', 'border', 'padding'],
         }
       ]
     },

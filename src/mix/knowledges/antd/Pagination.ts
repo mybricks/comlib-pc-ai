@@ -7,10 +7,30 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['font', 'background'],
+          options: ['font'],
         }
       ]
     },
+    '.ant-pagination-item.ant-pagination-item-active a': {
+      title: '当前页码',
+      items: [
+        {
+          title: '样式',
+          type: 'style',
+          options: ['font', 'background', 'border'],
+        }
+      ]
+    },
+    '.ant-pagination-item:not(.ant-pagination-item-active) a': {
+      title: '页码',
+      items: [
+        {
+          title: '样式',
+          type: 'style',
+          options: ['font', 'background', 'border'],
+        }
+      ]
+    }
   },
   docs: require('./Pagination.md').default
 }

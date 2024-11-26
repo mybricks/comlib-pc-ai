@@ -1,13 +1,13 @@
 export default {
   description: `表格组件`,
   editors: {
-    ':root': {
+    '.ant-table': {
       title: '表格',
       items: [
         {
           title: '样式',
           type: 'style',
-          options: ['background', 'font'],
+          options: ['background', 'font', 'border'],
         }
       ]
     },

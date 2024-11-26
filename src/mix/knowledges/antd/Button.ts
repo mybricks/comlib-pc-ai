@@ -7,7 +7,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['background', 'font'],
+          options: ['background', 'font', 'border'],
         }
       ]
     }

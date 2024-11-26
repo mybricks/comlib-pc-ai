@@ -1,7 +1,7 @@
 export default {
   description: `头像`,
   editors: {
-    '.ant-avatar': {
+    ':root': {
       title: '头像',
       items: [
         {
@@ -12,5 +12,5 @@ export default {
       ]
     }
   },
-  docs: require('./Avator.md').default
+  docs: require('./Avatar.md').default
 }

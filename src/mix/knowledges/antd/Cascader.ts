@@ -1,13 +1,13 @@
 export default {
   description: `级联选择器`,
   editors: {
-    ':root': {
+    '.ant-select-selector': {
       title: '级联选择器',
       items: [
         {
           title: '样式',
           type: 'style',
-          options: ['font', 'background', 'border'],
+          options: ['background', 'border'],
         }
       ]
     },

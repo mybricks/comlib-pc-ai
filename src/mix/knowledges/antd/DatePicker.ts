@@ -1,16 +1,26 @@
 export default {
-  description: `折叠面板`,
+  description: `日期选择器`,
   editors: {
     ':root': {
-      title: '折叠面板',
+      title: '日期选择器',
       items: [
         {
           title: '样式',
           type: 'style',
-          options: ['font', 'background', 'border'],
+          options: ['background', 'border', 'padding'],
         }
       ]
     },
+    '.anticon-calendar': {
+      title: '图标',
+      items: [
+        {
+          title: '样式',
+          type: 'style',
+          options: ['font'],
+        }
+      ]
+    }
   },
   docs: require('./DatePicker.md').default
 }
