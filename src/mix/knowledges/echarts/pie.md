@@ -12,7 +12,7 @@
 - 声明一个*type*为pie的系列。
 - 将*series-pie.roseType*设置为radius，开启玫瑰图效果展示。
 
-```render
+```jsx file="runtime.jsx"
 // 仅声明配置项代码
 option = {
   // 省略配置
@@ -35,7 +35,7 @@ option = {
 - 声明一个*type*为pie的系列。
 - 配置环图的半径，将*series-pie.radius*设置['40%', '70%']，配置成数组时第一项是内半径，第二项是外半径。
 
-```render
+```jsx file="runtime.jsx"
 // 仅声明配置项代码
 option = {
   // 省略配置
@@ -63,7 +63,7 @@ option = {
 - 添加一个*graphic*用于展示文本，将图形元素设置为水平垂直居中，并且展示总数量。
 - 中心文案推荐精简一点，因为空间不够大，或者进行换行。
 
-```render
+```jsx file="runtime.jsx"
 // 仅声明配置项代码
 option = {
   // 省略配置

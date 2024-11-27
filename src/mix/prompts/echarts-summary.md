@@ -28,11 +28,11 @@ echarts-for-react是一个基于React的echarts封装库，可以更方便地在
 
 ## echarts-for-react示例
 - 使用玫瑰图，发现类型为Pie
-```render
+```jsx file="runtime.jsx"
 import { Pie } from 'echarts-for-react'
 ```
 - 使用面积图，发现类型为Line
-```render
+```jsx file="runtime.jsx"
 import { Line } from 'echarts-for-react'
 ```
 

@@ -33,7 +33,7 @@
     ```
 - 配置*series-treemap.roam*为false，默认关闭缩放和移动功能。
 
-```render
+```jsx file="runtime.jsx"
 // 仅声明配置项代码
 option = {
   // 省略配置

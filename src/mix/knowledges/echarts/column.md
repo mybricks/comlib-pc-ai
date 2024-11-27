@@ -13,7 +13,7 @@
 - 声明一个*type*为bar的系列。
 - 一般把*tooltip.trigger*设置为axis，鼠标悬浮时，用十字准星来展示具体数据的提示效果。
 
-```render
+```jsx file="runtime.jsx"
 // 仅声明配置项代码
 option = {
   // 省略配置
@@ -41,7 +41,7 @@ option = {
 - 将系列的*showBackground*设置为true，展示柱子的背景。
 - 将系列的*label*配置项配置好，用于展示标签提示。
 
-```render
+```jsx file="runtime.jsx"
 // 仅声明配置项代码
 option = {
   // 省略配置
@@ -73,7 +73,7 @@ option = {
 要点：
 - 在需要绘制参考线的系列中添加*markLine.data*属性，配置参考线的具体信息。
 
-```render
+```jsx file="runtime.jsx"
 // 仅声明配置项代码
 option = {
   // 省略配置

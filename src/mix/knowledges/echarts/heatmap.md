@@ -12,7 +12,7 @@
 - 开启*visualMap*颜色映射选项配置，开启颜色映射将不同的值映射到不同的颜色，同时配置出来可拖动修改的颜色映射组件。
 - 将*xAxis.splitLine.show*和*yAxis.splitLine.shwo*设置为true，展示x和y轴坐标轴背景的分割线。
 
-```render
+```jsx file="runtime.jsx"
 // 仅声明配置项代码
 option = {
   // 省略配置
@@ -69,7 +69,7 @@ option = {
   - *calendar.range*为日历坐标的范围，支持多种格式，某一年为 '2017'、某个月为 '2017-02'、某个区间为 ['2017-01-02', '2017-02-23']。
   - *calendar.itemStyle*为日历每格的样式，目前默认设置一个边框 borderWidth 为 0.5。
 
-```render
+```jsx file="runtime.jsx"
 // 仅声明配置项代码
 option = {
   // 省略配置

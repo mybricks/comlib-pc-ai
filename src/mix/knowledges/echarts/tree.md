@@ -10,7 +10,7 @@
 - 配置系列*series-tree.edgeShape*属性，配置正交布局下边的形状，分别有曲线和折线两种，对应的取值是 curve 和 polyline。
 - 配置系列*series-tree.emphasis.focus*的属性为descendant，默认为聚焦所有子孙节点。
 
-```render
+```jsx file="runtime.jsx"
 // 仅声明配置项代码
 option = {
   // 省略配置

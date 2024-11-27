@@ -8,7 +8,7 @@
 - 声明一个*type*为boxplot的系列。
 - 将*yAxis.splitLine.show*设置为true，展示y轴坐标轴背景的分割线。
 
-```render
+```jsx file="runtime.jsx"
 // 仅声明配置项代码
 option = {
   // 省略配置

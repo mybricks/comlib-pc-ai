@@ -42,7 +42,7 @@
 - 引用*Calendar*
 - 使用*dayjs*类型来设置和获取value
 
-```render
+```jsx file="runtime.jsx"
 imoprt react from 'react';
 import { Calendar } from 'antd';
 import dayjs from 'dayjs';

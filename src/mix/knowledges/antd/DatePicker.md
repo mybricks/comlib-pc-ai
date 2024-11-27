@@ -207,7 +207,7 @@ export type FormatType =
 - 引用*DatePicker*
 - 使用*dayjs*类型来设置和获取value
 
-```render
+```jsx file="runtime.jsx"
 imoprt react from 'react';
 import { DatePicker } from 'antd';
 import { comRef } from 'mybricks';
@@ -236,7 +236,7 @@ export default comRef(({ data }) => {
 - *DatePicker.RangePicker*是*DatePicker*的子组件，引用*DatePicker*来获取*DatePicker.RangePicker*
 - 使用*dayjs*类型来设置和获取日期
 
-```render
+```jsx file="runtime.jsx"
 imoprt react from 'react';
 import { DatePicker } from 'antd';
 import { comRef } from 'mybricks';

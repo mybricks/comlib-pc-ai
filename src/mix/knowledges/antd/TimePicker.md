@@ -108,7 +108,7 @@ type RangeDisabledTime = (
 - 引用*TimePicker*
 - 使用*dayjs*类型来设置和获取value
 
-```render
+```jsx file="runtime.jsx"
 imoprt react from 'react';
 import { TimePicker } from 'antd';
 import dayjs from 'dayjs';
@@ -132,7 +132,7 @@ export default comRef(({ data }) => {
 - *TimePicker.RangePicker*是*TimePicker*的子组件，引用*TimePicker*来获取*TimePicker.RangePicker*
 - 使用*dayjs*类型来设置和获取时间
 
-```render
+```jsx file="runtime.jsx"
 imoprt react from 'react';
 import { TimePicker } from 'antd';
 import dayjs from 'dayjs';

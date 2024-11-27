@@ -10,7 +10,7 @@
 - 配置系列*series-funnel.sort*属性，配置数据排序以决定漏斗的方向，可以取 'ascending'，'descending'，'none'。
 - 配置系列*series-funnel.gap*属性为2，配置数据图形的间距，使漏斗图更好看。
 
-```render
+```jsx file="runtime.jsx"
 // 仅声明配置项代码
 option = {
   // 省略配置

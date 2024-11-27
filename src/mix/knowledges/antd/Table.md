@@ -50,7 +50,7 @@
 
 适用于 `onRow` `onHeaderRow` `onCell` `onHeaderCell`。
 
-```render
+```jsx file="runtime.jsx"
 imoprt react from 'react';
 import { Table } from 'antd';
 import { comRef } from 'mybricks';

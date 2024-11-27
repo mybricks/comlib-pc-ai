@@ -13,7 +13,7 @@
 - 将*series-scatter.symbolSize*设置为固定大小，例如20，保证不同的点大小一致。
 - 将*xAxis.splitLine.show*和*yAxis.splitLine.show*设置为true，展示x和y轴坐标轴背景的分割线。
 
-```render
+```jsx file="runtime.jsx"
 // 仅声明配置项代码
 option = {
   // 省略配置
@@ -47,7 +47,7 @@ option = {
 要点：
 - 在*series*中添加多个系列数据，可用于不同维度数据的对比。
 
-```render
+```jsx file="runtime.jsx"
 // 仅声明配置项代码
 option = {
   // 省略配置
@@ -96,7 +96,7 @@ option = {
 - 将*series-scatter.symbolSize*设置为动态函数，根据数值来决定展示多大的点。
 - 将*xAxis.splitLine.show*和*yAxis.splitLine.shwo*设置为true，展示x和y轴坐标轴北京的分割线。
 
-```render
+```jsx file="runtime.jsx"
 // 仅声明配置项代码
 option = {
   // 省略配置

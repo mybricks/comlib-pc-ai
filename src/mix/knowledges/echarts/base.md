@@ -6,11 +6,11 @@
 - 添加*comRef*的引用和使用。
 
 #### 最佳实践
-```render
+```jsx file="runtime.jsx"
 import ReactECharts from 'echarts-for-react';
 import { useMemo } from 'react';
 import { comRef } from 'mybricks';
-import css from 'index.less';
+import css from 'style.less';
 
 export default comRef(({ data }) => {
   const option = useMemo(() => {
@@ -40,10 +40,10 @@ export default comRef(({ data }) => {
 - 在使用响应式对象的时候，如果在hook中使用了，必须要添加到依赖项中。
 
 #### 最佳实践
-```render
+```jsx file="runtime.jsx"
 import ReactECharts from 'echarts-for-react';
 import { useMemo } from 'react';
-import css from 'index.less';
+import css from 'style.less';
 
 export default ({ data }) => {
 
@@ -81,10 +81,10 @@ export default ({ data }) => {
 场景：图表需要通过监听事件向外部抛出数据。
 
 #### 最佳实践-基本使用
-```render
+```jsx file="runtime.jsx"
 import ReactECharts from 'echarts-for-react';
 import { useMemo, useCallback } from 'react';
-import css from 'index.less';
+import css from 'style.less';
 
 export default ({ data }) => {
   const option = useMemo(() => {
@@ -119,10 +119,10 @@ export default ({ data }) => {
 场景：在需要监听鼠标事件时，包括 'click'、 'dblclick'、 'mousedown'、 'mousemove'、 'mouseup'、 'mouseover'、 'mouseout'、 'globalout'、 'contextmenu' 事件，可以参考此案例。
 
 
-```render
+```jsx file="runtime.jsx"
 import ReactECharts from 'echarts-for-react';
 import { useMemo, useCallback } from 'react';
-import css from 'index.less';
+import css from 'style.less';
 
 // 鼠标事件的参数
 type EventParams = {
@@ -204,10 +204,10 @@ export default ({ data }) => {
 场景：配置图表的调色盘颜色列表。如果系列没有设置颜色，则会依次循环从该列表中取颜色作为系列颜色
 
 #### 最佳实践
-```render
+```jsx file="runtime.jsx"
 import ReactECharts from 'echarts-for-react'
 import { useMemo } from 'react'
-import css from 'index.less'
+import css from 'style.less'
 
 export default ({ data }) => {
   const option = useMemo(() => {
@@ -276,10 +276,10 @@ const color = [
 
 #### 最佳实践-使用 markArea 绘制辅助区
 
-```render
+```jsx file="runtime.jsx"
 import ReactECharts from 'echarts-for-react'
 import { useMemo } from 'react'
-import css from 'index.less'
+import css from 'style.less'
 
 export default ({ data }) => {
   const option = useMemo(() => {
@@ -333,10 +333,10 @@ export default ({ data }) => {
 
 #### 最佳实践-使用 markPoint 绘制辅助点
 
-```render
+```jsx file="runtime.jsx"
 import ReactECharts from 'echarts-for-react'
 import { useMemo } from 'react'
-import css from 'index.less'
+import css from 'style.less'
 
 export default ({ data }) => {
   const option = useMemo(() => {
@@ -372,10 +372,10 @@ export default ({ data }) => {
 ```
 
 #### 最佳实践-使用 markLine 绘制辅助参考线
-```render
+```jsx file="runtime.jsx"
 import ReactECharts from 'echarts-for-react'
 import { useMemo } from 'react'
-import css from 'index.less'
+import css from 'style.less'
 
 export default ({ data }) => {
   const option = useMemo(() => {
@@ -436,10 +436,10 @@ image, text, circle, sector, ring, polygon, polyline, rect, line, bezierCurve, a
 
 #### 最佳实践-元素相对定位
 
-```render
+```jsx file="runtime.jsx"
 import ReactECharts from 'echarts-for-react'
 import { useMemo, useCallback } from 'react'
-import css from 'index.less'
+import css from 'style.less'
 
 export default ({ data }) => {
   const option = useMemo(() => {
@@ -516,7 +516,7 @@ export default ({ data }) => {
 提示框组件 tooltip 一般用于鼠标悬浮/点击时展示对应图形的信息。
 
 #### 最佳实践-打开tooltip
-```render
+```jsx file="runtime.jsx"
 option = {
   // 省略配置
   tooltip: {} // 设置为空对象，默认开启
@@ -537,7 +537,7 @@ option = {
 
 饼图、仪表盘、漏斗图: {a}（系列名称），{b}（数据项名称），{c}（数值）, {d}（百分比）
 
-```render
+```jsx file="runtime.jsx"
 option = {
   // 省略配置
   tooltip: {
@@ -568,7 +568,7 @@ option = {
 }
 ```
 所以格式化可以这么配置
-```render
+```jsx file="runtime.jsx"
 option = {
   // 省略配置
   tooltip: {

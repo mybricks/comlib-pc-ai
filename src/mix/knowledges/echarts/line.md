@@ -15,7 +15,7 @@
 要点：
 - 折线图一般把*tooltip.trigger*设置为axis，鼠标悬浮时，用十字准星来展示具体数据的提示效果。
 
-```render
+```jsx file="runtime.jsx"
 // 仅声明配置项代码
 option = {
   // 省略配置
@@ -44,7 +44,7 @@ option = {
 - 开启*areaStyle*设置。
 - 把*tooltip.trigger*设置为axis，用十字准星来展示具体数据的提示效果。
 
-```render
+```jsx file="runtime.jsx"
 // 仅声明配置项代码
 option = {
   // 省略配置
@@ -77,7 +77,7 @@ option = {
 - 给面积*areaStyle*设置一个渐变色，并且设置*showSymbol*为false，取消点的展示。
 - 给线*itemStyle*选择一个相近的纯色，保证图例和鼠标悬浮都是纯色。
 
-```render
+```jsx file="runtime.jsx"
 // 仅声明配置项代码
 option = {
   // 省略配置

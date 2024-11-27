@@ -9,7 +9,7 @@
 - 声明一个*type*为sunburst的系列。
 - 声明一下系列内*series-sunburst.label*配置，默认设置开启，并且将position设置为inside。
 
-```render
+```jsx file="runtime.jsx"
 // 仅声明配置项代码
 option = {
   // 省略配置

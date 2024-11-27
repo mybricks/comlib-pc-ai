@@ -10,7 +10,7 @@
 - 配置系列*series-gauge.progress*的属性，默认开启进度条，让图表更好看。
 - 配置系列*series-gauge.detail.valueAnimation*的属性为true，默认开启标签数字动画，让图表更好看。
 
-```render
+```jsx file="runtime.jsx"
 // 仅声明配置项代码
 option = {
   // 省略配置
@@ -39,7 +39,7 @@ option = {
 要点：
 - 添加*series-gauge.axisLine*配置，价格坐标轴配置为三段不同的颜色。
 
-```render
+```jsx file="runtime.jsx"
 // 仅声明配置项代码
 option = {
   // 省略配置

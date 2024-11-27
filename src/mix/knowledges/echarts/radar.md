@@ -26,7 +26,7 @@
 - 配置*radar*属性，配置*radar.indicator*用于展示不同维度指示器及其顶点配置。
 - 配置*radar*属性，配置*radar.shape*用于展示多边形还是圆形的雷达图，默认使用 polygon 多边形。
 
-```render
+```jsx file="runtime.jsx"
 // 仅声明配置项代码
 option = {
   // 省略配置
@@ -62,7 +62,7 @@ option = {
 要点：
 - 在雷达图中，多个维度数据的对比，我们直接在原有系列上的data属性上添加即可。
 
-```render
+```jsx file="runtime.jsx"
 // 仅声明配置项代码
 option = {
   // 省略配置

@@ -8,7 +8,7 @@ K线图，又称为蜡烛图，是一种用于展示金融市场价格变动的�
 要点：
 - 声明一个*type*为candlestick的系列。
 
-```render
+```jsx file="runtime.jsx"
 // 仅声明配置项代码
 option = {
   // 省略配置

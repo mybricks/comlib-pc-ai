@@ -94,7 +94,7 @@
 
 你可以通过 `messageVariables` 修改 Form.Item 的默认验证信息。
 
-```render
+```jsx file="runtime.jsx"
 imoprt react from 'react';
 import { Form } from 'antd';
 import { comRef } from 'mybricks';
@@ -144,7 +144,7 @@ export default comRef(({ data }) => {
 | rules | 校验规则，仅支持自定义规则。需要配合 [ErrorList](#formerrorlist) 一同使用。 | { validator, message }\[] | - | 4.7.0 |
 
 
-```render
+```jsx file="runtime.jsx"
 imoprt react from 'react';
 import { Form } from 'antd';
 import { comRef } from 'mybricks';
@@ -198,7 +198,7 @@ Form.List 渲染表单相关操作函数。
 | onFormChange | 子表单字段更新时触发 | function(formName: string, info: { changedFields, forms }) | - |
 | onFormFinish | 子表单提交时触发 | function(formName: string, info: { values, forms }) | - |
 
-```render
+```jsx file="runtime.jsx"
 imoprt react from 'react';
 import { Form } from 'antd';
 import { comRef } from 'mybricks';
@@ -271,7 +271,7 @@ export interface ValidateConfig {
 `4.20.0` 新增，获取当前上下文正在使用的 Form 实例，常见于封装子组件消费无需透传 Form 实例：
 
 
-```render
+```jsx file="runtime.jsx"
 imoprt react from 'react';
 import { Form } from 'antd';
 import { comRef } from 'mybricks';
@@ -304,7 +304,7 @@ export default comRef(({ data }) => {
 
 用于直接获取 form 中字段对应的值。通过该 Hooks 可以与诸如 `useSWR` 进行联动从而降低维护成本：
 
-```render
+```jsx file="runtime.jsx"
 imoprt react from 'react';
 import { Form } from 'antd';
 import { comRef } from 'mybricks';
@@ -332,7 +332,7 @@ export default comRef(({ data }) => {
 
 `useWatch` 默认只监听在 Form 中注册的字段，如果需要监听非注册字段，可以通过配置 `preserve` 进行监听：
 
-```render
+```jsx file="runtime.jsx"
 imoprt react from 'react';
 import { Form } from 'antd';
 import { comRef } from 'mybricks';
@@ -365,7 +365,7 @@ export default comRef(({ data }) => {
 
 `4.22.0` 新增，可用于获取当前 Form.Item 的校验状态，如果上层没有 Form.Item，`status` 将会返回 `undefined`。`5.4.0` 新增 `errors` 和 `warnings`，可用于获取当前 Form.Item 的错误信息和警告信息：
 
-```render
+```jsx file="runtime.jsx"
 imoprt react from 'react';
 import { Form } from 'antd';
 import { comRef } from 'mybricks';

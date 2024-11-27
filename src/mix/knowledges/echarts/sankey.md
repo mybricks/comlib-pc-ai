@@ -9,7 +9,7 @@
 
 #### 最佳实践-桑基图
 
-```render
+```jsx file="runtime.jsx"
 // 仅声明配置项代码
 option = {
   // 省略配置
