@@ -40,7 +40,7 @@ export const genAIEditor = ({ prompts, langs = `HTML、CSS、Javascript、react`
         }
       },
       loadKnowledge,
-      preview(response: { render, style }, edtCtx, libs: { mybricksSdk }) {
+      preview(response: { runtime, style }, edtCtx, libs: { mybricksSdk }) {
         return new Promise((resolve, reject) => {
           if (response) {
             const rtn = (com, css) => {
@@ -50,7 +50,7 @@ export const genAIEditor = ({ prompts, langs = `HTML、CSS、Javascript、react`
               })
             }
             Promise.all([
-              getComponentFromJSX(response.render, libs, dependencies),
+              getComponentFromJSX(response.runtime, libs, dependencies),
               transformLess(response.style)
             ]).then(([com, css]) => {
               rtn(com, css)
@@ -62,17 +62,17 @@ export const genAIEditor = ({ prompts, langs = `HTML、CSS、Javascript、react`
       },
       execute(
         { id, data, inputs, outputs, slots },
-        response: { render; style }
+        response: { runtime; style }
       ) {
         return new Promise((resolve, reject) => {
           if (response) {
-            if (!(response.render || response.style)) {
+            if (!(response.runtime || response.style)) {
               resolve(true)
               return
             }
 
-            if (response.render) {
-              updateRender({ data }, response.render)
+            if (response.runtime) {
+              updateRender({ data }, response.runtime)
             }
 
             if (response.style) {

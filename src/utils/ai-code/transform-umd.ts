@@ -1,4 +1,4 @@
-import { CSS_LANGUAGE } from './types'
+import {CSS_LANGUAGE} from './types'
 import React from 'react'
 
 export function getComponentFromJSX(jsxCode, libs: { mybricksSdk }, dependencies = {}): Promise<Function> {
