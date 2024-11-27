@@ -1,3 +1,5 @@
+import Pagination from "./Pagination.ts"
+
 export default {
   description: `表格组件`,
   editors: {
@@ -30,7 +32,8 @@ export default {
           options: ['background', 'font'],
         }
       ]
-    }
+    },
+    ...Pagination.editors,
   },
   docs: `
 通用属性参考：[通用属性](/docs/react/common-props)

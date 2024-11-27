@@ -11,16 +11,16 @@ export default {
         }
       ]
     },
-    '.ant-btn:not(:disabled):not(.ant-btn-disabled):hover': {
-      title: '按钮悬浮效果',
-      items: [
-        {
-          title: '样式',
-          type: 'style',
-          options: ['background', 'font', 'border'],
-        }
-      ]
-    }
+    // '.ant-btn:not(:disabled):not(.ant-btn-disabled):hover': {
+    //   title: '按钮悬浮态',
+    //   items: [
+    //     {
+    //       title: '样式',
+    //       type: 'style',
+    //       options: ['background', 'font', 'border'],
+    //     }
+    //   ]
+    // }
   },
   docs: `
 通过设置 Button 的属性来产生不同的按钮样式，推荐顺序为：\`type\` -> \`shape\` -> \`size\` -> \`loading\` -> \`disabled\`。

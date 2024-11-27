@@ -12,7 +12,7 @@ export default {
       ]
     },
     '.ant-menu-item.ant-menu-item-disabled': {
-      title: '菜单项',
+      title: '菜单项（禁用）',
       items: [
         {
           title: '样式',
@@ -22,7 +22,7 @@ export default {
       ]
     },
     '.ant-menu-item:not(.ant-menu-item-disabled)': {
-      title: '菜单项（禁用）',
+      title: '菜单项',
       items: [
         {
           title: '样式',
