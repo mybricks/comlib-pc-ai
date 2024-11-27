@@ -34,3 +34,27 @@
 ### 为什么时间类组件的国际化 locale 设置不生效？
 
 参考 FAQ [为什么时间类组件的国际化 locale 设置不生效？](/docs/react/faq#为什么时间类组件的国际化-locale-设置不生效)。
+
+## 最佳实践
+
+### 最佳实践-日历的基础使用
+要点：
+- 引用*Calendar*
+- 使用*dayjs*类型来设置和获取value
+
+```render
+imoprt react from 'react';
+import { Calendar } from 'antd';
+import dayjs from 'dayjs';
+
+export default comRef(({ data }) => {
+  return (
+    <Calendar
+      defaultValue={dayjs()}
+    />
+  );
+}, {
+  type: 'main',
+  title: '日历的基础使用',
+});
+```
