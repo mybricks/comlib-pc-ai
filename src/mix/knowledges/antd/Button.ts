@@ -10,6 +10,16 @@ export default {
           options: ['background', 'font', 'border'],
         }
       ]
+    },
+    '.ant-btn:not(:disabled):not(.ant-btn-disabled):hover': {
+      title: '按钮悬浮效果',
+      items: [
+        {
+          title: '样式',
+          type: 'style',
+          options: ['background', 'font', 'border'],
+        }
+      ]
     }
   },
   docs: `
