@@ -31,6 +31,26 @@ export default {
         }
       ]
     },
+    '.ant-picker-calendar-month-select .ant-select-selector': {
+      title: '月份选择',
+      items: [
+        {
+          title: '样式',
+          type: 'style',
+          options: ['background', 'padding'],
+        }
+      ]
+    },
+    '.ant-picker-calendar-year-select .ant-select-selector': {
+      title: '年份选择',
+      items: [
+        {
+          title: '样式',
+          type: 'style',
+          options: ['background', 'padding'],
+        }
+      ]
+    }
   },
   docs: require('./Calendar.md').default
 }
