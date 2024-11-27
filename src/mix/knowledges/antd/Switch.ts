@@ -1,13 +1,13 @@
 export default {
   description: `开关`,
   editors: {
-    ':root': {
+    '.ant-switch.ant-switch-checked:not(.ant-switch-disabled)': {
       title: '开关',
       items: [
         {
           title: '样式',
           type: 'style',
-          options: ['font'],
+          options: ['background'],
         }
       ]
     },
