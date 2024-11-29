@@ -108,12 +108,12 @@ export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, erro
   }, [styleCode, appendCssApi])
 
   // 卸载 CSS 代码
-  useEffect(() => {
-    return () => {
-      // mbcrcss = mybricks_custom_render缩写
-      appendCssApi.remove(`${id}`)
-    }
-  }, [])
+  // useEffect(() => {
+  //   return () => {
+  //     // mbcrcss = mybricks_custom_render缩写
+  //     appendCssApi.remove(`${id}`)
+  //   }
+  // }, [])
 
   const ReactNode = useMemo(() => {
     if (errorInfo) return () => <ErrorTip title={errorInfo.title} desc={errorInfo.desc} />;
