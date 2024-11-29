@@ -1,7 +1,7 @@
 export default {
   description: `按钮组件`,
   editors: {
-    ':root': {
+    '.ant-btn': {
       title: '按钮',
       items: [
         {
