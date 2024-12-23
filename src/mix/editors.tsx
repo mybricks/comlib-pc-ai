@@ -4,7 +4,13 @@ import echartsForReact from './../utils/echarts-for-react'
 import antdPrompt from './prompts/antd-summary.md'
 import echartsPrompt from './prompts/echarts-summary.md'
 import iconPrompt from "./prompts/icon-summary.md"
+import dndkitPrompt from "./prompts/dndkit-summary.md"
 import { ANTD_KNOWLEDGES_MAP, ECHARTS_KNOWLEDGES_MAP } from './knowledges'
+
+import * as dndCore from "@dnd-kit/core";
+import * as dndModifiers from '@dnd-kit/modifiers';
+import * as dndSortable from '@dnd-kit/sortable'; 
+import * as dndUtilities from '@dnd-kit/utilities';
 
 export default {
   '@init': (params) => {
@@ -16,7 +22,7 @@ export default {
     options: ['width', 'height'],
   },
   '@ai': genAIEditor({
-    prompts: iconPrompt + `\n` + antdPrompt + `\n` + echartsPrompt,
+    prompts: iconPrompt + `\n` + antdPrompt + `\n` + echartsPrompt + `\n` + dndkitPrompt,
     loadKnowledge: (items) => {
       const rtn: any = []
       items.forEach((now) => {
@@ -68,6 +74,10 @@ export default {
     dependencies: {
       antd: window['antd_5_21_4'],
       'echarts-for-react': echartsForReact,
+      "@dnd-kit/core": dndCore,
+      '@dnd-kit/modifiers': dndModifiers,
+      '@dnd-kit/sortable': dndSortable,
+      '@dnd-kit/utilities': dndUtilities
     },
   }),
   ':slot': {},

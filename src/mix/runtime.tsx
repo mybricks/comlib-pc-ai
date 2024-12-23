@@ -2,6 +2,11 @@ import React, { useRef } from 'react'
 import { genAIRuntime } from './../utils/ai-code'
 import echartsForReact from './../utils/echarts-for-react'
 import { StyleProvider } from '@ant-design/cssinjs'
+import * as dndCore from '@dnd-kit/core';
+import * as dndModifiers from '@dnd-kit/modifiers';
+import * as dndSortable from '@dnd-kit/sortable'; 
+import * as dndUtilities from '@dnd-kit/utilities';
+
 
 export default genAIRuntime({
   title: 'AI组件',
@@ -15,6 +20,10 @@ export default genAIRuntime({
   dependencies: {
     antd: window['antd_5_21_4'],
     'echarts-for-react': echartsForReact,
+    '@dnd-kit/core': dndCore,
+    '@dnd-kit/modifiers': dndModifiers,
+    '@dnd-kit/sortable': dndSortable,
+    '@dnd-kit/utilities': dndUtilities
   },
   wrapper: ({ children, env }) => {
     const container = useRef(
