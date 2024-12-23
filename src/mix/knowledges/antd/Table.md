@@ -10,7 +10,7 @@
 | --- | --- | --- | --- | --- |
 | bordered | 是否展示外边框和列边框 | boolean | false |  |
 | columns | 表格列的配置描述，具体项见下表 | [ColumnsType](#column)\[] | - |  |
-| components | 覆盖默认的 table 元素 | [TableComponents](https://github.com/react-component/table/blob/75ee0064e54a4b3215694505870c9d6c817e9e4a/src/interface.ts#L129) | - |  |
+| components | 覆盖默认的 table 元素 | [TableComponents](#TableComponents) | - |  |
 | dataSource | 数据数组 | object\[] | - |  |
 | expandable | 配置展开属性 | [expandable](#expandable) | - |  |
 | footer | 表格尾部 | function(currentPageData) | - |  |
@@ -203,3 +203,184 @@ export default comRef(({ data }) => {
 | key      | React 需要的 key，建议设置 | string                      | -      |
 | text     | 选择项显示的文字           | ReactNode                   | -      |
 | onSelect | 选择项点击回调             | function(changeableRowKeys) | -      |
+
+### 拖拽排序
+
+表格拖拽排序相关的需求，直接参考下方两个例子即可。
+
+#### 整行可拖拽
+```jsx file="runtime.jsx"
+import React, { useState } from 'react';
+import { DndContext, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { Table } from 'antd';
+import { comRef } from 'mybricks';
+const Row = (props) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: props['data-row-key'],
+  });
+  const style = {
+    ...props.style,
+    transform: CSS.Translate.toString(transform),
+    transition,
+    cursor: 'move',
+    ...(isDragging
+      ? {
+          position: 'relative',
+          zIndex: 9999,
+        }
+      : {}),
+  };
+  return <tr {...props} ref={setNodeRef} style={style} {...attributes} {...listeners} />;
+};
+export default comRef(({data}) => {
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 1,
+      },
+    }),
+  );
+  const onDragEnd = ({ active, over }) => {
+    if (active.id !== over?.id) {
+      const activeIndex = data.dataSource.findIndex((i) => i.key === active.id);
+      const overIndex = data.dataSource.findIndex((i) => i.key === over?.id);
+      data.dataSource = arrayMove(data.dataSource, activeIndex, overIndex)
+    }
+  };
+  return (
+    <DndContext sensors={sensors} modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
+      <SortableContext
+        items={data.dataSource.map((i) => i.key)}
+        strategy={verticalListSortingStrategy}
+      >
+        <Table
+          components={{
+            body: {
+              row: Row,
+            },
+          }}
+          rowKey="key"
+          columns={data.columns}
+          dataSource={data.dataSource}
+          pagination={false}
+        />
+      </SortableContext>
+    </DndContext>
+  );
+}, {
+  type: 'main',
+  title: '可拖拽排序表格'
+})
+```
+
+#### 仅通过组件进行拖拽，不可拖动行
+```jsx file="runtime.jsx"
+import React, { useContext, useMemo } from 'react';
+import { HolderOutlined } from '@ant-design/icons';
+import { DndContext } from '@dnd-kit/core';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { Button, Table } from 'antd';
+import { comRef } from 'mybricks';
+
+const RowContext = React.createContext({});
+const DragHandle = () => {
+  const { setActivatorNodeRef, listeners } = useContext(RowContext);
+  return (
+    <Button
+      type="text"
+      size="small"
+      icon={<HolderOutlined />}
+      style={{
+        cursor: 'move',
+      }}
+      ref={setActivatorNodeRef}
+      {...listeners}
+    />
+  );
+};
+const Row = (props) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: props['data-row-key'],
+  });
+  const style = {
+    ...props.style,
+    transform: CSS.Translate.toString(transform),
+    transition,
+    ...(isDragging
+      ? {
+          position: 'relative',
+          zIndex: 9999,
+        }
+      : {}),
+  };
+  const contextValue = useMemo(
+    () => ({
+      setActivatorNodeRef,
+      listeners,
+    }),
+    [setActivatorNodeRef, listeners],
+  );
+  return (
+    <RowContext.Provider value={contextValue}>
+      <tr {...props} ref={setNodeRef} style={style} {...attributes} />
+    </RowContext.Provider>
+  );
+};
+export default comRef(() => {
+  const onDragEnd = ({ active, over }) => {
+    if (active.id !== over?.id) {
+      const activeIndex = data.dataSource.findIndex((record) => record.key === active?.id);
+      const overIndex = data.dataSource.findIndex((record) => record.key === over?.id);
+      data.dataSource = arrayMove(data.dataSource, activeIndex, overIndex);
+    }
+  };
+  return (
+    <DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
+      <SortableContext items={data.dataSource.map((i) => i.key)} strategy={verticalListSortingStrategy}>
+        <Table
+          rowKey="key"
+          components={{
+            body: {
+              row: Row,
+            },
+          }}
+          columns={[{
+            key: 'sort',
+            align: 'center',
+            width: 80,
+            render: () => <DragHandle />,
+          }].concat(data.columns)}
+          dataSource={data.dataSource}
+          pagination={false}
+        />
+      </SortableContext>
+    </DndContext>
+  );
+}, {
+  type: 'main',
+  title: '可拖拽排序表格'
+});
+```

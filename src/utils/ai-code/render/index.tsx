@@ -149,7 +149,7 @@ export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, erro
     } else {
       return
     }
-  }, [renderCode, errorInfo, dependencies])
+  }, [renderCode, errorInfo])
 
 
   if (typeof ReactNode !== 'function') {
