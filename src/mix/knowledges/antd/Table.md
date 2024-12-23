@@ -282,6 +282,9 @@ export default comRef(({data}) => {
 ```
 
 #### 仅通过组件进行拖拽，不可拖动行
+
+注意：拖拽手柄必须使用useContext，给组件ref以及listeners。
+
 ```jsx file="runtime.jsx"
 import React, { useContext, useMemo } from 'react';
 import { HolderOutlined } from '@ant-design/icons';
@@ -299,7 +302,7 @@ import { comRef } from 'mybricks';
 
 const RowContext = React.createContext({});
 const DragHandle = () => {
-  const { setActivatorNodeRef, listeners } = useContext(RowContext);
+  const { setActivatorNodeRef, listeners } = useContext(RowContext); // 注意必须使用useContext
   return (
     <Button
       type="text"
