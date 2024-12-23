@@ -3,6 +3,7 @@ import echartsForReact from './../utils/echarts-for-react'
 
 import antdPrompt from './prompts/antd-summary.md'
 import echartsPrompt from './prompts/echarts-summary.md'
+import iconPrompt from "./prompts/icon-summary.md"
 import { ANTD_KNOWLEDGES_MAP, ECHARTS_KNOWLEDGES_MAP } from './knowledges'
 
 export default {
@@ -15,7 +16,7 @@ export default {
     options: ['width', 'height'],
   },
   '@ai': genAIEditor({
-    prompts: antdPrompt + `\n` + echartsPrompt,
+    prompts: iconPrompt + `\n` + antdPrompt + `\n` + echartsPrompt,
     loadKnowledge: (items) => {
       const rtn: any = []
       items.forEach((now) => {
