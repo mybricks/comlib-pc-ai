@@ -26,7 +26,8 @@
 ## @dnd-kit/sortable
 > 用于构建可排序的拖放列表，当拖放的同时需要排序能力时，必须同时使用这个库来共同实现。
 
-- SortableContext：它是 React Context Provider，
+- SortableContext：它是 React Context Provider，用于管理可排序列表的状态和行为。它提供了必要的上下文信息，使得列表中的元素可以被排序。
+- useSortable：它是 React Hooks，用于将 DOM 节点转变为可排序的元素。它允许元素在列表中被拖动时改变其顺序，并且处理排序逻辑，如拖动开始、拖动结束以及元素位置的更新。
 
 ## @dnd-kit/utilities
 

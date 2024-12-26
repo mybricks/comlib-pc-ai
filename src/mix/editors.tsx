@@ -5,7 +5,7 @@ import antdPrompt from './prompts/antd-summary.md'
 import echartsPrompt from './prompts/echarts-summary.md'
 import iconPrompt from "./prompts/icon-summary.md"
 import dndkitPrompt from "./prompts/dndkit-summary.md"
-import { ANTD_KNOWLEDGES_MAP, ECHARTS_KNOWLEDGES_MAP } from './knowledges'
+import { ANTD_KNOWLEDGES_MAP, ECHARTS_KNOWLEDGES_MAP, DNDKIT_KNOWLEDGES_MAP } from './knowledges'
 
 import * as dndCore from "@dnd-kit/core";
 import * as dndModifiers from '@dnd-kit/modifiers';
@@ -59,6 +59,17 @@ export default {
             knowledge: ECHARTS_KNOWLEDGES_MAP['base'],
           })
 
+          if (knowledge) {
+            rtn.push({
+              lib: library,
+              item: now.item,
+              knowledge,
+            })
+          }
+        }
+
+        if (library.startsWith("@dnd-kit")) {
+          const knowledge = DNDKIT_KNOWLEDGES_MAP[now.item.toUpperCase()]
           if (knowledge) {
             rtn.push({
               lib: library,
