@@ -1,7 +1,7 @@
 export default {
   description: `滑块`,
   editors: {
-    '.ant-slider-rail': {
+    ':root': {
       title: '全部区间',
       items: [
         {

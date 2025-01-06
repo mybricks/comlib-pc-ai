@@ -1,7 +1,7 @@
 export default {
   description: `树形控件`,
   editors: {
-    '.ant-tree': {
+    ':root': {
       title: '树形控件',
       items: [
         {

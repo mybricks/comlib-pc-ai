@@ -1,7 +1,7 @@
 export default {
   description: `折叠面板`,
   editors: {
-    '.ant-collapse': {
+    ':root': {
       title: '折叠面板',
       items: [
         {

@@ -1,7 +1,7 @@
 export default {
   description: `级联选择器`,
   editors: {
-    '.ant-select-selector': {
+    ':root': {
       title: '级联选择器',
       items: [
         {

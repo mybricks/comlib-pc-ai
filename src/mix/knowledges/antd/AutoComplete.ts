@@ -1,7 +1,7 @@
 export default {
   description: `自动完成输入框`,
   editors: {
-    '.ant-select-selector': {
+    ':root': {
       title: '输入框',
       items: [
         {

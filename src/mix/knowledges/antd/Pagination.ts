@@ -1,7 +1,7 @@
 export default {
   description: `分页`,
   editors: {
-    '.ant-pagination': {
+    ':root': {
       title: '分页',
       items: [
         {

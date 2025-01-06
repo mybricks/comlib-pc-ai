@@ -1,7 +1,7 @@
 export default {
   description: `树形选择器`,
   editors: {
-    '.ant-tree-select .ant-select-selector': {
+    ':root': {
       title: '树形选择器',
       items: [
         {

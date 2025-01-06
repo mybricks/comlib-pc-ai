@@ -1,7 +1,7 @@
 export default {
   description: `穿梭框`,
   editors: {
-    '.ant-transfer-list': {
+    ':root': {
       title: '穿梭框',
       items: [
         {

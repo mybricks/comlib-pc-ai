@@ -1,7 +1,7 @@
 export default {
   description: `徽标数`,
   editors: {
-    '.ant-scroll-number': {
+    ':root': {
       title: '徽标',
       items: [
         {

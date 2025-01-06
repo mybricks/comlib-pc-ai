@@ -1,7 +1,7 @@
 export default {
   description: `数字输入框`,
   editors: {
-    '.ant-input-number': {
+    ':root': {
       title: '数字输入框',
       items: [
         {
