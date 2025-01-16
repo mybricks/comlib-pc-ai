@@ -1,5 +1,5 @@
 
-const SPA_DESIGNER_VERSION = (window as any).mybricks.version;
+const SPA_DESIGNER_VERSION = (window as any).mybricks?.version;
 
 const isSmallVersion = (a, b) => {
   if (typeof a !== 'string' || a.split('.').length < 3) {
