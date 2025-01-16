@@ -1,3 +1,5 @@
+import { getStyleOptions } from './../utils'
+
 export default {
   description: `日历`,
   editors: {
@@ -7,7 +9,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['font', 'background', 'border'],
+          options: getStyleOptions(['font', 'background', 'border']),
         }
       ]
     },
@@ -17,7 +19,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['font', 'background', 'border'],
+          options: getStyleOptions(['font', 'background', 'border']),
         }
       ]
     },
@@ -27,7 +29,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['font', 'background', 'padding'],
+          options: getStyleOptions(['font', 'background', 'padding']),
         }
       ]
     },
@@ -37,7 +39,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['background', 'padding'],
+          options: getStyleOptions(['background', 'padding']),
         }
       ]
     },
@@ -47,7 +49,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['background', 'padding'],
+          options: getStyleOptions(['background', 'padding']),
         }
       ]
     }

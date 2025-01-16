@@ -1,3 +1,5 @@
+import { getStyleOptions } from "../utils";
+
 export default {
   description: `滑块`,
   editors: {
@@ -7,7 +9,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['background'],
+          options: getStyleOptions(['background']),
         }
       ]
     },
@@ -17,7 +19,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['background'],
+          options: getStyleOptions(['background']),
         }
       ]
     },

@@ -1,3 +1,5 @@
+import { getStyleOptions } from './../utils'
+
 export default {
   description: `面包屑`,
   editors: {
@@ -7,7 +9,7 @@ export default {
         {
           title: '字体样式',
           type: 'style',
-          options: ['background', 'padding', 'border'],
+          options: getStyleOptions(['background', 'padding', 'border']),
         }
       ]
     },
@@ -17,7 +19,7 @@ export default {
         {
           title: '字体样式',
           type: 'style',
-          options: ['font'],
+          options: getStyleOptions(['font']),
         }
       ]
     }

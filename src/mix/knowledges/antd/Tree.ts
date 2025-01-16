@@ -1,3 +1,5 @@
+import { getStyleOptions } from './../utils'
+
 export default {
   description: `树形控件`,
   editors: {
@@ -7,7 +9,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['background'],
+          options: getStyleOptions(['background']),
         }
       ]
     },
@@ -17,7 +19,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['font'],
+          options: getStyleOptions(['font']),
         }
       ]
     },
@@ -27,7 +29,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['font', 'padding'],
+          options: getStyleOptions(['font', 'padding']),
         }
       ]
     },
@@ -37,7 +39,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['size'],
+          options: getStyleOptions(['size']),
         }
       ]
     }

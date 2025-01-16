@@ -1,3 +1,5 @@
+import { getStyleOptions } from './../utils'
+
 export default {
   description: `数字输入框`,
   editors: {
@@ -7,7 +9,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['font', 'background', 'border'],
+          options: getStyleOptions(['font', 'background', 'border']),
         }
       ]
     },

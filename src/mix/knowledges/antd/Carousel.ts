@@ -1,3 +1,5 @@
+import { getStyleOptions } from './../utils'
+
 export default {
   description: `走马灯`,
   editors: {
@@ -7,7 +9,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['background', 'border'],
+          options: getStyleOptions(['background', 'border']),
         }
       ]
     },

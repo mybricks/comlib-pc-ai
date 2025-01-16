@@ -1,3 +1,5 @@
+import { getStyleOptions } from './../utils'
+
 export default {
   description: `卡片`,
   editors: {
@@ -7,7 +9,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['background', 'font', 'scroll'],
+          options: getStyleOptions(['background', 'font', 'scroll']),
         }
       ]
     },
@@ -17,7 +19,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['background', 'padding', 'border'],
+          options: getStyleOptions(['background', 'padding', 'border']),
         }
       ]
     },
@@ -27,7 +29,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['background', 'font', 'padding'],
+          options: getStyleOptions(['background', 'font', 'padding']),
         }
       ]
     },
@@ -37,7 +39,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['padding'],
+          options: getStyleOptions(['padding']),
         }
       ]
     },
@@ -56,7 +58,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['background', 'border', 'padding'],
+          options: getStyleOptions(['background', 'border', 'padding']),
         }
       ]
     },
@@ -66,7 +68,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['border'],
+          options: getStyleOptions(['border']),
         }
       ]
     },
@@ -76,7 +78,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['font', 'border'],
+          options: getStyleOptions(['font', 'border']),
         }
       ]
     },
@@ -86,7 +88,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['font', 'border'],
+          options: getStyleOptions(['font', 'border']),
         }
       ]
     }

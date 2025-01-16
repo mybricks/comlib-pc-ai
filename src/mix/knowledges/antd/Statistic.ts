@@ -1,3 +1,5 @@
+import { getStyleOptions } from "../utils";
+
 export default {
   description: `统计数值`,
   editors: {
@@ -7,7 +9,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['font', 'border', 'padding'],
+          options: getStyleOptions(['font', 'border', 'padding']),
         }
       ]
     },
@@ -17,7 +19,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['font', 'border', 'padding'],
+          options: getStyleOptions(['font', 'border', 'padding']),
         }
       ]
     },

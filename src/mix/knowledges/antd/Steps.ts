@@ -1,3 +1,5 @@
+import { getStyleOptions } from './../utils'
+
 export default {
   description: `步骤条`,
   editors: {
@@ -7,7 +9,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['background', 'font'],
+          options: getStyleOptions(['background', 'font']),
         }
       ]
     },
@@ -17,7 +19,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['font'],
+          options: getStyleOptions(['font']),
         }
       ]
     },
@@ -27,7 +29,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['background', 'font'],
+          options: getStyleOptions(['background', 'font']),
         }
       ]
     },
@@ -37,7 +39,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['font'],
+          options: getStyleOptions(['font']),
         }
       ]
     },
@@ -47,7 +49,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['font'],
+          options: getStyleOptions(['font']),
         }
       ]
     },
@@ -57,7 +59,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['background', 'font'],
+          options: getStyleOptions(['background', 'font']),
         }
       ]
     },
@@ -67,7 +69,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['font'],
+          options: getStyleOptions(['font']),
         }
       ]
     },

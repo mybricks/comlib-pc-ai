@@ -1,3 +1,5 @@
+import { getStyleOptions } from './../utils'
+
 export default {
   description: `穿梭框`,
   editors: {
@@ -7,7 +9,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['background', 'border'],
+          options: getStyleOptions(['background', 'border']),
         }
       ]
     },
@@ -17,7 +19,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['background', 'padding', 'border'],
+          options: getStyleOptions(['background', 'padding', 'border']),
         }
       ]
     },
@@ -27,7 +29,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['font'],
+          options: getStyleOptions(['font']),
         }
       ]
     },
@@ -37,7 +39,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['font'],
+          options: getStyleOptions(['font']),
         }
       ]
     },
@@ -47,7 +49,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['font', 'border', 'background'],
+          options: getStyleOptions(['font', 'border', 'background']),
         }
       ]
     },
@@ -57,7 +59,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['font', 'border', 'background'],
+          options: getStyleOptions(['font', 'border', 'background']),
         }
       ]
     }

@@ -1,3 +1,5 @@
+import { getStyleOptions } from './../utils'
+
 export default {
   description: `时间选择器`,
   editors: {
@@ -7,7 +9,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['background', 'border', 'padding'],
+          options: getStyleOptions(['background', 'border', 'padding']),
         }
       ]
     },

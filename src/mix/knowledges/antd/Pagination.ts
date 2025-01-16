@@ -1,3 +1,5 @@
+import { getStyleOptions } from './../utils'
+
 export default {
   description: `分页`,
   editors: {
@@ -7,7 +9,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['font'],
+          options: getStyleOptions(['font']),
         }
       ]
     },
@@ -17,7 +19,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['font', 'background', 'border'],
+          options: getStyleOptions(['font', 'background', 'border']),
         }
       ]
     },
@@ -27,7 +29,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['font', 'background', 'border'],
+          options: getStyleOptions(['font', 'background', 'border']),
         }
       ]
     },
@@ -37,7 +39,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['padding', 'background', 'border'],
+          options: getStyleOptions(['padding', 'background', 'border']),
         }
       ]
     },
@@ -47,7 +49,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['font', 'border'],
+          options: getStyleOptions(['font', 'border']),
         }
       ]
     },
@@ -57,7 +59,7 @@ export default {
         {
           title: '样式',
           type: 'style',
-          options: ['font', 'border'],
+          options: getStyleOptions(['font', 'border']),
         }
       ]
     }
