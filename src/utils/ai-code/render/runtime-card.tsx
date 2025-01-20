@@ -1,10 +1,10 @@
-import React, { FunctionComponent, ReactElement, useCallback, useMemo } from 'react'
-import { AIJsxRuntime } from './index'
-import { copyToClipboard } from './../index'
+import React, {FunctionComponent, ReactElement, useCallback, useMemo} from 'react'
+import {AIJsxRuntime} from './index'
+import {copyToClipboard} from './../index'
 
 import css from './runtime-card.less'
 
-const IdlePlaceholder = ({ title = 'AI 图表', orgName = 'MyBricks', examples = [] }) => {
+const IdlePlaceholder = ({title = 'AI 图表', orgName = 'MyBricks', examples = []}) => {
   const copy = useCallback((text) => {
     copyToClipboard(text).then((res) => {
       window?.antd?.message
@@ -15,39 +15,23 @@ const IdlePlaceholder = ({ title = 'AI 图表', orgName = 'MyBricks', examples =
 
   const CopyIcon = useCallback(() => {
     return (
-      <svg
-        viewBox="0 0 1024 1024"
-        version="1.1"
-        xmlns="http://www.w3.org/2000/svg"
-        p-id="5474"
-      >
+      <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+           width="16" height="16">
         <path
-          d="M720 192h-544A80.096 80.096 0 0 0 96 272v608C96 924.128 131.904 960 176 960h544c44.128 0 80-35.872 80-80v-608C800 227.904 764.128 192 720 192z m16 688c0 8.8-7.2 16-16 16h-544a16 16 0 0 1-16-16v-608a16 16 0 0 1 16-16h544a16 16 0 0 1 16 16v608z"
-          p-id="5475"
-          fill="#555555"
-        ></path>
-        <path
-          d="M848 64h-544a32 32 0 0 0 0 64h544a16 16 0 0 1 16 16v608a32 32 0 1 0 64 0v-608C928 99.904 892.128 64 848 64z"
-          p-id="5476"
-          fill="#555555"
-        ></path>
-        <path
-          d="M608 360H288a32 32 0 0 0 0 64h320a32 32 0 1 0 0-64zM608 520H288a32 32 0 1 0 0 64h320a32 32 0 1 0 0-64zM480 678.656H288a32 32 0 1 0 0 64h192a32 32 0 1 0 0-64z"
-          p-id="5477"
-          fill="#555555"
-        ></path>
+          d="M337.28 138.688a27.968 27.968 0 0 0-27.968 27.968v78.72h377.344c50.816 0 92.032 41.152 92.032 91.968v377.344h78.656a28.032 28.032 0 0 0 27.968-28.032V166.656a28.032 28.032 0 0 0-27.968-27.968H337.28z m441.408 640v78.656c0 50.816-41.216 91.968-92.032 91.968H166.656a92.032 92.032 0 0 1-91.968-91.968V337.28c0-50.816 41.152-92.032 91.968-92.032h78.72V166.656c0-50.816 41.152-91.968 91.968-91.968h520c50.816 0 91.968 41.152 91.968 91.968v520c0 50.816-41.152 92.032-91.968 92.032h-78.72zM166.656 309.312a27.968 27.968 0 0 0-27.968 28.032v520c0 15.424 12.544 27.968 27.968 27.968h520a28.032 28.032 0 0 0 28.032-27.968V337.28a28.032 28.032 0 0 0-28.032-28.032H166.656z"
+          fill="#707070"></path>
       </svg>
     )
   }, [])
 
   return (
     <div className={css.tip}>
-      <div className={css.title}>{title}</div>
+      {/*<div className={css.title}>{title}</div>*/}
       <div className={css.content}>
         欢迎使用 {orgName} {title}，
-        <strong>请通过右下角「对话框」提问生成组件</strong>
+        <strong>请和我对话完成组件开发吧</strong>
       </div>
-      比如：
+      <p>例如：</p>
       {examples.map((example) => {
         return (
           <div
@@ -55,7 +39,7 @@ const IdlePlaceholder = ({ title = 'AI 图表', orgName = 'MyBricks', examples =
             key={example}
             onClick={() => copy(example)}
           >
-            - {example} <CopyIcon />
+            {example} <CopyIcon/>
           </div>
         )
       })}
@@ -75,8 +59,8 @@ interface AIRuntimeProps {
   wrapper?: FunctionComponent<{ children: ReactElement, env: any }>,
 }
 
-export const genAIRuntime = ({ title, orgName, examples, dependencies, wrapper }: AIRuntimeProps) =>
-  ({ env, data, inputs, outputs, slots, logger, id }: RuntimeParams<any>) => {
+export const genAIRuntime = ({title, orgName, examples, dependencies, wrapper}: AIRuntimeProps) =>
+  ({env, data, inputs, outputs, slots, logger, id}: RuntimeParams<any>) => {
 
     useMemo(() => {
       if (env.edit) {
@@ -110,12 +94,12 @@ export const genAIRuntime = ({ title, orgName, examples, dependencies, wrapper }
           get(obj, id) {
             if (env.runtime) {
               const rtn = outputs[id]
-  
+
               if (rtn) {
                 return rtn
               }
             }
-  
+
             return () => {
             }
           }
@@ -123,13 +107,13 @@ export const genAIRuntime = ({ title, orgName, examples, dependencies, wrapper }
         slots: new Proxy({}, {
           get(obj, id) {
             const rtn = slots[id]
-  
+
             if (rtn) {
               return rtn
             } else {
               return {
                 render() {
-  
+
                 }
               }
             }
@@ -157,7 +141,7 @@ export const genAIRuntime = ({ title, orgName, examples, dependencies, wrapper }
     }, [data._jsxErr, data._cssErr])
 
     const Wrapper = useMemo(() => {
-      let comp = ({ children, env }) => <>{children}</>
+      let comp = ({children, env}) => <>{children}</>
       if (wrapper) {
         // @ts-ignore
         comp = wrapper;
@@ -175,7 +159,7 @@ export const genAIRuntime = ({ title, orgName, examples, dependencies, wrapper }
           renderCode={data._renderCode}
           renderProps={scope}
           errorInfo={errorInfo}
-          placeholder={<IdlePlaceholder title={title} orgName={orgName} examples={examples} />}
+          placeholder={<IdlePlaceholder title={title} orgName={orgName} examples={examples}/>}
           dependencies={{
             ...(dependencies ?? {}),
             'react': React,
