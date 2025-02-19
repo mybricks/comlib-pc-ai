@@ -4,7 +4,7 @@ import echartsForReact from './../utils/echarts-for-react'
 import antdPrompt from './prompts/antd-summary.md'
 import echartsPrompt from './prompts/echarts-summary.md'
 import iconPrompt from "./prompts/icon-summary.md"
-import dndkitPrompt from "./prompts/dndkit-summary.md"
+//import dndkitPrompt from "./prompts/dndkit-summary.md"
 import { ANTD_KNOWLEDGES_MAP, ECHARTS_KNOWLEDGES_MAP, DNDKIT_KNOWLEDGES_MAP } from './knowledges'
 
 import * as dndCore from "@dnd-kit/core";
@@ -24,7 +24,9 @@ export default {
     options: ['width', 'height'],
   },
   '@ai': genAIEditor({
-    prompts: iconPrompt + `\n` + antdPrompt + `\n` + echartsPrompt + `\n` + dndkitPrompt,
+    prompts: iconPrompt + `\n` + antdPrompt + `\n` + echartsPrompt
+      //+ `\n` + dndkitPrompt
+    ,
     loadKnowledge: (items) => {
       const rtn: any = []
       items.forEach((now) => {
@@ -70,16 +72,16 @@ export default {
           }
         }
 
-        if (library.startsWith("@dnd-kit")) {
-          const knowledge = DNDKIT_KNOWLEDGES_MAP[now.item.toUpperCase()]
-          if (knowledge) {
-            rtn.push({
-              lib: library,
-              item: now.item,
-              knowledge,
-            })
-          }
-        }
+        // if (library.startsWith("@dnd-kit")) {
+        //   const knowledge = DNDKIT_KNOWLEDGES_MAP[now.item.toUpperCase()]
+        //   if (knowledge) {
+        //     rtn.push({
+        //       lib: library,
+        //       item: now.item,
+        //       knowledge,
+        //     })
+        //   }
+        // }
       })
 
       return rtn
@@ -87,10 +89,10 @@ export default {
     dependencies: {
       antd: window['antd_5_21_4'],
       'echarts-for-react': echartsForReact,
-      "@dnd-kit/core": dndCore,
-      '@dnd-kit/modifiers': dndModifiers,
-      '@dnd-kit/sortable': dndSortable,
-      '@dnd-kit/utilities': dndUtilities
+      // "@dnd-kit/core": dndCore,
+      // '@dnd-kit/modifiers': dndModifiers,
+      // '@dnd-kit/sortable': dndSortable,
+      // '@dnd-kit/utilities': dndUtilities
     },
   }),
   ':slot': {},

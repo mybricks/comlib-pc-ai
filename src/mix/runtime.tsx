@@ -19,10 +19,10 @@ export default genAIRuntime({
   dependencies: {
     antd: window['antd_5_21_4'],
     'echarts-for-react': echartsForReact,
-    '@dnd-kit/core': dndCore,
-    '@dnd-kit/modifiers': dndModifiers,
-    '@dnd-kit/sortable': dndSortable,
-    '@dnd-kit/utilities': dndUtilities
+    // '@dnd-kit/core': dndCore,
+    // '@dnd-kit/modifiers': dndModifiers,
+    // '@dnd-kit/sortable': dndSortable,
+    // '@dnd-kit/utilities': dndUtilities
   },
   wrapper: ({ children, env }) => {
     const container = useRef(

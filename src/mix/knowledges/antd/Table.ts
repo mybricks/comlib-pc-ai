@@ -4,34 +4,13 @@ export default {
   description: `表格组件`,
   editors: {
     ':root': {
-      title: '表格',
-      items: [
-        {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['background', 'border']),
-        }
-      ]
+      title: '表格'
     },
     '.ant-table-thead': {
-      title: '表头',
-      items: [
-        {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['background']),
-        }
-      ]
+      title: '表头'
     },
     '.ant-table-thead .ant-table-cell': {
-      title: '列',
-      items: [
-        {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['background', 'font']),
-        }
-      ]
+      title: '列'
     },
     ...(require('./Pagination.ts')?.default?.editors ?? {}),
   },
