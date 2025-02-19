@@ -37,6 +37,13 @@
   "componentType": "PC",
   "externals": [
     {
+      "name": "@ant-design/cssinjs",
+      "library": "antdCssinjs",
+      "urls": [
+        "public/antd/cssinjs.min.js"
+      ]
+    },
+    {
       "name": "dayjs",
       "library": "dayjs",
       "version": "1.11.13",
