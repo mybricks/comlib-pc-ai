@@ -1,31 +1,40 @@
-import { genAIEditor } from './../utils/ai-code'
+import {genAIEditor} from './../utils/ai-code'
 import echartsForReact from './../utils/echarts-for-react'
 
 import antdPrompt from './prompts/antd-summary.md'
 import echartsPrompt from './prompts/echarts-summary.md'
 import iconPrompt from "./prompts/icon-summary.md"
 //import dndkitPrompt from "./prompts/dndkit-summary.md"
-import { ANTD_KNOWLEDGES_MAP, ECHARTS_KNOWLEDGES_MAP, DNDKIT_KNOWLEDGES_MAP } from './knowledges'
+import {ANTD_KNOWLEDGES_MAP, ECHARTS_KNOWLEDGES_MAP, DNDKIT_KNOWLEDGES_MAP} from './knowledges'
 
 import * as dndCore from "@dnd-kit/core";
 import * as dndModifiers from '@dnd-kit/modifiers';
-import * as dndSortable from '@dnd-kit/sortable'; 
+import * as dndSortable from '@dnd-kit/sortable';
 import * as dndUtilities from '@dnd-kit/utilities';
-
 
 
 export default {
   '@init': (params) => {
-    const { style, data, id, input, output } = params
+    const {style, data, id, input, output} = params
     // style.width = 480
     // style.height = 420
   },
   '@resize': {
     options: ['width', 'height'],
   },
+  // '@save'({data}) {
+  //   const saveData = {}
+  //   for (const key in data) {
+  //     if (key.startsWith('_')) {//去除中间运行产生的数据
+  //       saveData[key] = data[key]
+  //     }
+  //   }
+  //
+  //   return saveData
+  // },
   '@ai': genAIEditor({
     prompts: iconPrompt + `\n` + antdPrompt + `\n` + echartsPrompt
-      //+ `\n` + dndkitPrompt
+    //+ `\n` + dndkitPrompt
     ,
     loadKnowledge: (items) => {
       const rtn: any = []
