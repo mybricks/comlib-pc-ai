@@ -1,11 +1,7 @@
-import React, { useRef } from 'react'
-import { genAIRuntime } from './../utils/ai-code'
+import React, {useRef} from 'react'
+import {genAIRuntime} from './../utils/ai-code'
 import echartsForReact from './../utils/echarts-for-react'
-import { StyleProvider } from '@ant-design/cssinjs'
-import * as dndCore from '@dnd-kit/core';
-import * as dndModifiers from '@dnd-kit/modifiers';
-import * as dndSortable from '@dnd-kit/sortable'; 
-import * as dndUtilities from '@dnd-kit/utilities';
+import {StyleProvider} from '@ant-design/cssinjs'
 
 
 export default genAIRuntime({
