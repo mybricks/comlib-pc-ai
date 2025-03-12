@@ -3,7 +3,7 @@
   "namespace": "mybricks.basic-comlib.ai-mix",
   "author": "MyBricks Team",
   "author_name": "MyBricks Team",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "AI组件",
   "icon": "./icon.svg",
   "runtime": "./runtime.tsx",
