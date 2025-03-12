@@ -120,7 +120,8 @@ export const genAIRuntime = ({title, orgName, examples, dependencies, wrapper}: 
           }
         }),
         env,
-        context: {React}
+        context: {React},
+        logger
       }
     }, [slots])
 
