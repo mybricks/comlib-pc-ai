@@ -1,0 +1,8 @@
+{
+  "version": "0.0.1-next.3",
+  "comAry": [
+    "./src/mix/com.json"
+  ],
+  "tags": "react",
+  "webpackConfig": "./webpack.config.local.js"
+}
