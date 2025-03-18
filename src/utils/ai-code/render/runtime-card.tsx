@@ -1,4 +1,6 @@
 import React, {FunctionComponent, ReactElement, useCallback, useMemo} from 'react'
+import * as antd from "antd";
+import * as icons from "@ant-design/icons"
 import {AIJsxRuntime} from './index'
 import {copyToClipboard} from './../index'
 
@@ -7,8 +9,8 @@ import css from './runtime-card.less'
 const IdlePlaceholder = ({title = 'AI 图表', orgName = 'MyBricks', examples = []}) => {
   const copy = useCallback((text) => {
     copyToClipboard(text).then((res) => {
-      window?.antd?.message
-        ? window?.antd?.message.success('复制成功')
+      antd?.message
+        ? antd?.message.success('复制成功')
         : alert('复制成功')
     })
   }, [])
@@ -164,7 +166,7 @@ export const genAIRuntime = ({title, orgName, examples, dependencies, wrapper}: 
           dependencies={{
             ...(dependencies ?? {}),
             'react': React,
-            '@ant-design/icons': window['icons'],
+            '@ant-design/icons': icons,
             'mybricks': env.mybricksSdk,
           }}
         />

@@ -1,4 +1,5 @@
 import React, {useRef} from 'react'
+import * as antd from "antd";
 import {genAIRuntime} from './../utils/ai-code'
 import echartsForReact from './../utils/echarts-for-react'
 import {StyleProvider} from '@ant-design/cssinjs'
@@ -13,7 +14,7 @@ export default genAIRuntime({
     '绘制杭州今年每月的降水量面积图，用渐变色展示'
   ],
   dependencies: {
-    antd: window['antd_5_21_4'],
+    antd,
     'echarts-for-react': echartsForReact,
     // '@dnd-kit/core': dndCore,
     // '@dnd-kit/modifiers': dndModifiers,

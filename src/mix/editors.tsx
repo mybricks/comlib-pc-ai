@@ -7,10 +7,11 @@ import iconPrompt from "./prompts/icon-summary.md"
 //import dndkitPrompt from "./prompts/dndkit-summary.md"
 import {ANTD_KNOWLEDGES_MAP, ECHARTS_KNOWLEDGES_MAP, DNDKIT_KNOWLEDGES_MAP} from './knowledges'
 
-import * as dndCore from "@dnd-kit/core";
-import * as dndModifiers from '@dnd-kit/modifiers';
-import * as dndSortable from '@dnd-kit/sortable';
-import * as dndUtilities from '@dnd-kit/utilities';
+// import * as dndCore from "@dnd-kit/core";
+// import * as dndModifiers from '@dnd-kit/modifiers';
+// import * as dndSortable from '@dnd-kit/sortable';
+// import * as dndUtilities from '@dnd-kit/utilities';
+import * as antd from "antd";
 
 
 export default {
@@ -96,7 +97,7 @@ export default {
       return rtn
     },
     dependencies: {
-      antd: window['antd_5_21_4'],
+      antd,
       'echarts-for-react': echartsForReact,
       // "@dnd-kit/core": dndCore,
       // '@dnd-kit/modifiers': dndModifiers,

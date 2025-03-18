@@ -1,5 +1,6 @@
 import React, {useEffect, useMemo, useState, Component, ReactElement, cloneElement} from 'react';
 import css from './index.less'
+import dayjs from "dayjs";
 
 
 interface CssApi {
@@ -124,7 +125,7 @@ export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, erro
         const Com = runRender(oriCode, {
           'react': React,
           'mybricks': env.mybricksSdk,
-          'dayjs': window['dayjs'] ?? window['moment'],
+          'dayjs': dayjs,
           ...dependencies,
         })
         // TODO 没有key的话会用预览的高度

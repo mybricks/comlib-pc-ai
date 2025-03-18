@@ -1,9 +1,10 @@
 import * as React from 'react';
 import ReactEChartsCore from 'echarts-for-react/lib/core'
+import * as echarts from "echarts";
 
 
 const ReactEcharts = (props) => {
-  return <ReactEChartsCore {...props} echarts={window['echarts']} />
+  return <ReactEChartsCore {...props} echarts={echarts} />
 }
 
 function createSelfReferencingFunction() {
