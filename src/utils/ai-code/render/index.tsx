@@ -83,7 +83,7 @@ export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, erro
       set: (id: string, content: string) => {
         const el = document.getElementById(id);
         if (el) {
-          el.innerText = content
+          el.innerText = content.replaceAll('__id__', id)//替换模版
           return
         }
         const styleEle = document.createElement('style')
