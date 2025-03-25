@@ -58,7 +58,7 @@ interface AIRuntimeProps {
   examples: string[],
   /** 组件运行时的依赖 */
   dependencies?: Record<string, any>,
-  wrapper?: FunctionComponent<{ children: ReactElement, env: any }>,
+  wrapper?: FunctionComponent<{ children: ReactElement, env: any, canvasContainer: any }>,
 }
 
 export const genAIRuntime = ({title, orgName, examples, dependencies, wrapper}: AIRuntimeProps) =>
@@ -144,7 +144,7 @@ export const genAIRuntime = ({title, orgName, examples, dependencies, wrapper}: 
     }, [data._jsxErr, data._cssErr])
 
     const Wrapper = useMemo(() => {
-      let comp = ({children, env}) => <>{children}</>
+      let comp = ({children, env, canvasContainer}) => <>{children}</>
       if (wrapper) {
         // @ts-ignore
         comp = wrapper;
@@ -152,9 +152,13 @@ export const genAIRuntime = ({title, orgName, examples, dependencies, wrapper}: 
       return comp
     }, [wrapper])
 
+    const canvasContainer = useMemo(() => {
+      return document?.querySelector('#_mybricks-geo-webview_')?.shadowRoot || null;
+    }, [])
+
 
     return (
-      <Wrapper env={env}>
+      <Wrapper env={env} canvasContainer={canvasContainer}>
         <AIJsxRuntime
           env={env}
           id={id}
@@ -169,6 +173,7 @@ export const genAIRuntime = ({title, orgName, examples, dependencies, wrapper}: 
             '@ant-design/icons': icons,
             'mybricks': env.mybricksSdk,
           }}
+          inMybricksGeoWebview={!!canvasContainer}
         />
       </Wrapper>
     )

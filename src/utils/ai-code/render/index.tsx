@@ -62,11 +62,13 @@ interface AIJsxProps {
   placeholder?: string | ReactElement
   /**  依赖组件信息 */
   dependencies?: Record<string, any>
+  /** 是否在引擎环境 */
+  inMybricksGeoWebview: boolean;
 }
 
-export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, errorInfo, placeholder = 'AI组件', dependencies = {} } : AIJsxProps) => {
+export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, errorInfo, placeholder = 'AI组件', dependencies = {}, inMybricksGeoWebview } : AIJsxProps) => {
   const appendCssApi = useMemo<CssApi>(() => {
-    if ((env.edit || env.runtime?.debug) && env.canvas?.css) {
+    if (inMybricksGeoWebview && env.canvas?.css) {
       const cssAPI = env.canvas.css
       return {
         set(id: string, content: string) {

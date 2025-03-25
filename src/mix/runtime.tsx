@@ -21,14 +21,18 @@ export default genAIRuntime({
     // '@dnd-kit/sortable': dndSortable,
     // '@dnd-kit/utilities': dndUtilities
   },
-  wrapper: ({ children, env }) => {
-    const container = useRef(
-      env.edit || env.runtime.debug
-        ? document.querySelector('#_mybricks-geo-webview_')!.shadowRoot
-        : null
-    )
+  wrapper: ({ children, env, canvasContainer }) => {
+    // const container = useRef(
+    //   env.edit || env.runtime.debug
+    //     ? document.querySelector('#_mybricks-geo-webview_')!.shadowRoot
+    //     : null
+    // )
     return (
-      <StyleProvider container={container.current!} hashPriority="high">
+      <StyleProvider
+        // container={container.current!}
+        container={canvasContainer}
+        hashPriority="high"
+      >
         {children}
       </StyleProvider>
     )
