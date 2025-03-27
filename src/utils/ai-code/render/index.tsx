@@ -159,7 +159,11 @@ export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, erro
     return placeholder
   }
 
-  return <ReactNode {...renderProps} />
+  return (
+    <div className={css.aiCom}>
+      <ReactNode {...renderProps} />
+    </div>
+  )
 }
 
 function runRender(code, dependencies) {

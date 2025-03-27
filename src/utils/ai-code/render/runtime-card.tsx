@@ -80,11 +80,12 @@ export const genAIRuntime = ({title, orgName, examples, dependencies, wrapper}: 
                 inputs[id]((value, relOutputs) => {
                   fn(value, new Proxy({}, {
                     get(_, key) {
-                      ///TODO
+                      return relOutputs[key]
                     }
                   }))
                 })
               }
+
               return () => {
               }
             }
