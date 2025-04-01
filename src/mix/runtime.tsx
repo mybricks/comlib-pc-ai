@@ -3,6 +3,7 @@ import * as antd from "antd";
 import {genAIRuntime} from './../utils/ai-code'
 import echartsForReact from './../utils/echarts-for-react'
 import {StyleProvider} from '@ant-design/cssinjs'
+import {ConfigProvider} from "antd";
 
 
 export default genAIRuntime({
@@ -33,7 +34,9 @@ export default genAIRuntime({
         container={canvasContainer}
         hashPriority="high"
       >
-        {children}
+        <ConfigProvider getPopupContainer={() => canvasContainer}>
+          {children}
+        </ConfigProvider>
       </StyleProvider>
     )
   },
