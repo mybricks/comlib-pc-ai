@@ -61,9 +61,8 @@ interface AIRuntimeProps {
   wrapper?: FunctionComponent<{ children: ReactElement, env: any, canvasContainer: any }>,
 }
 
-export const genAIRuntime = ({title, orgName, examples, dependencies, wrapper}: AIRuntimeProps) =>
+export const genAIRuntime = ({title, orgName, examples, dependencies, wrapper,ref}: AIRuntimeProps) =>
   ({env, data, inputs, outputs, slots, logger, id}: RuntimeParams<any>) => {
-
     useMemo(() => {
       if (env.edit) {
         data._editors = void 0
