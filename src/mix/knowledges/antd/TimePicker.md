@@ -152,3 +152,6 @@ export default comRef(({ data }) => {
   title: '时间范围选择器',
 });
 ```
+
+## 注意
+当日期值来自data下的属性时，一定要用dayjs进行转换，dayjs(data.xxx)。
