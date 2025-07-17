@@ -9,9 +9,10 @@ import css from './runtime-card.less'
 const IdlePlaceholder = ({title = 'AI 图表', orgName = 'MyBricks', examples = []}) => {
   const copy = useCallback((text) => {
     copyToClipboard(text).then((res) => {
-      antd?.message
-        ? antd?.message.success('复制成功')
-        : alert('复制成功')
+      window.antd?.message?.success?.("复制成功") || alert('复制成功')
+      // antd?.message
+      //   ? antd?.message.success('复制成功')
+      //   : alert('复制成功')
     })
   }, [])
 
