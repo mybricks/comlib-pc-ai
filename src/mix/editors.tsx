@@ -1,11 +1,11 @@
-import {genAIEditor} from './../utils/ai-code'
+import { genAIEditor } from './../utils/ai-code'
 import echartsForReact from './../utils/echarts-for-react'
 
 import antdPrompt from './prompts/antd-summary.md'
 import echartsPrompt from './prompts/echarts-summary.md'
 import iconPrompt from "./prompts/icon-summary.md"
 //import dndkitPrompt from "./prompts/dndkit-summary.md"
-import {ANTD_KNOWLEDGES_MAP, ECHARTS_KNOWLEDGES_MAP, DNDKIT_KNOWLEDGES_MAP} from './knowledges'
+import { ANTD_KNOWLEDGES_MAP, ECHARTS_KNOWLEDGES_MAP, DNDKIT_KNOWLEDGES_MAP } from './knowledges'
 
 // import * as dndCore from "@dnd-kit/core";
 // import * as dndModifiers from '@dnd-kit/modifiers';
@@ -16,7 +16,7 @@ import * as antd from "antd";
 
 export default {
   '@init': (params) => {
-    const {style, data, id, input, output} = params
+    const { style, data, id, input, output } = params
     // style.width = 480
     // style.height = 420
   },
@@ -106,4 +106,110 @@ export default {
     },
   }),
   ':slot': {},
+  ':root': {
+    items({ data, env, id, input, output }, ...catalog) {
+      console.log("[items - data]", data)
+
+      // TODO: 临时代码
+      if (!data.configs) {
+        data.configs = []
+      }
+      if (!data.config) {
+        data.config = {}
+      }
+
+      const items0 = data.configs.filter((config) => {
+        return config.type !== "style"
+      }).map(({ type, title, fieldName }) => {
+        return {
+          title,
+          type,
+          value: {
+            get({ data }) {
+              return data.config[fieldName];
+            },
+            set({ data }, value) {
+              data.config[fieldName] = value;
+            }
+          }
+        }
+      })
+
+      if (data.outputs) {
+        items0.push({
+          title: "事件",
+          items: data.outputs.map(({ id, title }) => {
+            return {
+              title,
+              type: '_Event',
+              options: {
+                outputId: id
+              }
+            }
+          })
+        })
+      }
+
+      items0.push({
+        title: 'React',
+        type: 'code',
+        options: {
+          title: '编辑自定义JSX',
+          language: 'typescript',
+          width: 600,
+          minimap: {
+            enabled: false
+          },
+          eslint: {
+            parserOptions: {
+              ecmaVersion: '2020',
+              sourceType: 'module'
+            }
+          },
+          babel: false,
+          autoSave: false,
+          preview: false,
+          extraLib: data.extraLib,
+          isTsx: true
+        },
+        value: {
+          get({ data }) {
+            return data._sourceRenderCode;
+          },
+        }
+      },
+        {
+          title: 'Less',
+          type: 'code',
+          options: {
+            title: 'Less',
+            language: 'less',
+            width: 600,
+            minimap: {
+              enabled: false
+            },
+            autoSave: false,
+            preview: false
+          },
+          value: {
+            get({ data }) {
+              return data._sourceStyleCode;
+            },
+          }
+        },)
+
+      catalog[0].title = '常规';
+      catalog[0].items = items0;
+    },
+    style({ data }) {
+      return data.configs.filter((config) => {
+        return config.type === "style"
+      }).map(({ title, option }) => {
+        return {
+          title,
+          ...option
+        }
+      })
+    }
+  }
 }

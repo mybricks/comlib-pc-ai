@@ -72,7 +72,7 @@ export const genAIRuntime = ({title, orgName, examples, dependencies, wrapper,re
 
     const scope = useMemo(() => {
       return {
-        data,
+        data: data.config,
         inputs: new Proxy({}, {
           get(_, id) {
             if (env.runtime) {
@@ -126,7 +126,7 @@ export const genAIRuntime = ({title, orgName, examples, dependencies, wrapper,re
         context: {React},
         logger
       }
-    }, [slots])
+    }, [slots, data._renderCode])
 
     const errorInfo = useMemo(() => {
       if (!!data._jsxErr) {
