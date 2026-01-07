@@ -5,8 +5,8 @@ export default {
     return {}
   },
   prompts: {
-    summary: 'AI组件是一个高度灵活且可定制的组件，允许用户通过自然语言对话来生成符合其需求的自定义组件。用户可以描述所需组件的功能、外观和行为，AI组件将根据这些描述生成相应的代码。',
-    usage: `AI组件是一个高度灵活且可定制的组件，允许用户通过自然语言对话来生成符合其需求的自定义组件。用户可以描述所需组件的功能、外观和行为，AI组件将根据这些描述生成相应的代码。
+    summary: 'AI组件是一个高度灵活且可定制的组件，允许用户通过自然语言对话和附件图片来生成符合其需求的自定义组件。用户可以描述所需组件的功能、外观和行为和上传附件图片，AI组件将根据这些描述生成相应的代码。',
+    usage: `AI组件是一个高度灵活且可定制的组件，允许用户通过自然语言对话和附件图片来生成符合其需求的自定义组件。用户可以描述所需组件的功能、外观和行为和上传附件图片，AI组件将根据这些描述生成相应的代码。
 组件运行时：基于React、Less技术栈实现
 
 开发需知：
@@ -16,7 +16,7 @@ export default {
 注意：
  - 需要严格区分需求是对当前组件的实现，还是对外部调用和其它组件配置的实现。
  - 如果需求中涉及到输出事件，请务必通过“添加输出项”功能来创建对应的输出项，以便在代码中使用，输出事件要被用于搭建事件逻辑。
- - 当前用户消息只关注并作用于AI组件本身，只能通过配置AI组件来实现，禁止无关工具或操作。例如**还原图片**、**开发xx功能/组件**、**实现xx事件**等。
+ - 当前用户消息只关注并作用于AI组件本身，例如**还原图片**、**开发xx功能/组件**、**实现xx事件**等，只能通过配置AI组件来实现，禁止无关工具或操作。
 `,
     injectUserMessage: true,
     aiRole: "expert",
@@ -28,6 +28,14 @@ export default {
         type: "jsx-runtime-code-editor",
         description: `基于react框架编写组件的运行时代码，关注<使用说明>
 **data._renderCode**内容是当前组件runtime经过babel编译、encodeURIComponent转译后的代码
+
+在runtime代码中直接通过入参data属性即可获取组件的配置项数据
+
+更新组件runtime代码的参数如下：
+\`\`\`typescript
+/** 基于react框架编写组件的运行时代码 */
+type Value = string;
+\`\`\`
 
 注意：
  - 必须编写高可读性的源代码`,
@@ -44,8 +52,16 @@ export default {
         description: `基于Less框架编写组件的样式代码，关注<使用说明>
 **data._styleCode**内容是当前组件经过less编译、encodeURIComponent转译后的样式代码
 
+更新组件样式代码的参数如下：
+\`\`\`typescript
+/** 基于Less框架编写组件的样式代码 */
+type Value = string;
+\`\`\`
+
 注意：
- - 必须编写高可读性的源代码`,
+ - 必须编写高可读性的源代码
+ - 更新样式代码后按需同步实现对应的runtime代码
+ `,
         value: {
           set({ data }, value) {
             updateStyle({ data }, value)
@@ -72,6 +88,9 @@ interface Params {
   updateType: "delete" | undefined;
 }
 \`\`\`
+
+注意：
+ - 更新输出项后按需同步实现对应的runtime代码
 `,
         value: {
           set({ data, outputs }, value) {
@@ -122,6 +141,9 @@ interface Params {
   updateType: "delete" | undefined;
 }
 \`\`\`
+
+注意：
+ - 更新输入项后按需同步实现对应的runtime代码
 `,
         value: {
           set({ data, inputs }, value) {
@@ -212,6 +234,7 @@ interface StyleParams {
 
 注意：
  - 样式相关的配置必须使用**样式配置**
+ - 更新配置项后按需同步实现对应的runtime代码
         `,
         value: {
           set({ data }, value) {
