@@ -12,12 +12,9 @@ export default {
 开发需知：
 - 当要求要求根据附件中的图片进行开发时，注意结果与图片中的样式的对齐，包括文字图片等要素、布局、颜色、字体、间距、边框、阴影等。
 - 如果需求带有图片，请在设计开发中作为重要参考，进行详细的需求及设计分析，逐步思考，给出答案。
-
-注意：
- - 需要严格区分需求是对当前组件的实现，还是对外部调用和其它组件配置的实现。
- - 如果需求中涉及到输出事件，请务必通过“添加输出项”功能来创建对应的输出项，以便在代码中使用，输出事件要被用于搭建事件逻辑。
- - 当前用户消息只关注并作用于AI组件本身，例如**还原图片**、**开发xx功能/组件**、**实现xx事件**等，只能通过调用AI组件的配置实现，禁止无关工具或操作。
- - 聚焦于此的用户消息，都是开发的指令，通过调用AI组件的配置来实现。
+- 需求仅要求开发单一功能时
+  - 如仅要求一个按钮，只通过runtime和less实现按钮ui，不添加任何额外内容（如事件、配置等），保持最简实现。
+  - 还原图片，只通过runtime和less还原图片ui。
 `,
     injectUserMessage: true,
     aiRole: "expert",
@@ -95,28 +92,38 @@ interface Params {
 `,
         value: {
           set({ data, outputs }, value) {
-            const index = data.outputs.findIndex((output) => output.id === value.id);
-            const isDelete = value.updateType === "delete";
+            const fn = (value) => {
+              const index = data.outputs.findIndex((output) => output.id === value.id);
+              const isDelete = value.updateType === "delete";
 
-            if (index !== -1) {
-              // 配置项存在
-              if (isDelete) {
-                // 删除
-                outputs.remove(value.id);
-                data.outputs.splice(index, 1);
+              if (index !== -1) {
+                // 配置项存在
+                if (isDelete) {
+                  // 删除
+                  outputs.remove(value.id);
+                  data.outputs.splice(index, 1);
+                } else {
+                  // 更新
+                  data.outputs[index] = value;
+                  const output = outputs.get(value.id);
+                  output.setTitle(value.title);
+                }
               } else {
-                // 更新
-                data.outputs[index] = value;
-                const output = outputs.get(value.id);
-                output.setTitle(value.title);
+                // 配置项目不存在
+                if (!isDelete) {
+                  // 更新，判断下更保险
+                  outputs.add(value.id, value.title);
+                  data.outputs.push(value);
+                }
               }
+            }
+            
+            if (Array.isArray(value)) {
+              value.forEach((value) => {
+                fn(value);
+              })
             } else {
-              // 配置项目不存在
-              if (!isDelete) {
-                // 更新，判断下更保险
-                outputs.add(value.id, value.title);
-                data.outputs.push(value);
-              }
+              fn(value);
             }
 
             console.log("[更新输出项]", value)
@@ -148,28 +155,39 @@ interface Params {
 `,
         value: {
           set({ data, inputs }, value) {
-            const index = data.inputs.findIndex((input) => input.id === value.id);
-            const isDelete = value.updateType === "delete";
 
-            if (index !== -1) {
-              // 配置项存在
-              if (isDelete) {
-                // 删除
-                inputs.remove(value.id);
-                data.inputs.splice(index, 1);
+            const fn = (value) => {
+              const index = data.inputs.findIndex((input) => input.id === value.id);
+              const isDelete = value.updateType === "delete";
+
+              if (index !== -1) {
+                // 配置项存在
+                if (isDelete) {
+                  // 删除
+                  inputs.remove(value.id);
+                  data.inputs.splice(index, 1);
+                } else {
+                  // 更新
+                  data.inputs[index] = value;
+                  const input = inputs.get(value.id);
+                  input.setTitle(value.title);
+                }
               } else {
-                // 更新
-                data.inputs[index] = value;
-                const input = inputs.get(value.id);
-                input.setTitle(value.title);
+                // 配置项目不存在
+                if (!isDelete) {
+                  // 更新，判断下更保险
+                  inputs.add(value.id, value.title);
+                  data.inputs.push(value);
+                }
               }
+            }
+
+            if (Array.isArray(value)) {
+              value.forEach((value) => {
+                fn(value);
+              })
             } else {
-              // 配置项目不存在
-              if (!isDelete) {
-                // 更新，判断下更保险
-                inputs.add(value.id, value.title);
-                data.inputs.push(value);
-              }
+              fn(value);
             }
 
             console.log("[更新输入项]", value)
@@ -240,24 +258,35 @@ interface StyleParams {
         value: {
           set({ data }, value) {
             console.log("[修改配置项]", value)
-            const index = data.configs.findIndex((config) => config.key === value.key);
-            const isDelete = value.updateType === "delete";
 
-            if (index !== -1) {
-              // 配置项存在
-              if (isDelete) {
-                // 删除
-                data.configs.splice(index, 1);
+            const fn = (value) => {
+              const index = data.configs.findIndex((config) => config.key === value.key);
+              const isDelete = value.updateType === "delete";
+
+              if (index !== -1) {
+                // 配置项存在
+                if (isDelete) {
+                  // 删除
+                  data.configs.splice(index, 1);
+                } else {
+                  // 更新
+                  data.configs[index] = value;
+                }
               } else {
-                // 更新
-                data.configs[index] = value;
+                // 配置项目不存在
+                if (!isDelete) {
+                  // 更新，判断下更保险
+                  data.configs.push(value);
+                }
               }
+            }
+
+            if (Array.isArray(value)) {
+              value.forEach((value) => {
+                fn(value);
+              })
             } else {
-              // 配置项目不存在
-              if (!isDelete) {
-                // 更新，判断下更保险
-                data.configs.push(value);
-              }
+              fn(value);
             }
 
             console.log("[data.configs]", data.configs)
