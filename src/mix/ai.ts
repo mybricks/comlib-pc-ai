@@ -104,9 +104,11 @@ interface Params {
                   data.outputs.splice(index, 1);
                 } else {
                   // 更新
-                  data.outputs[index] = value;
+                  data.outputs[index] = Object.assign(data.outputs[index], value);
                   const output = outputs.get(value.id);
-                  output.setTitle(value.title);
+                  if (value.title) {
+                    output.setTitle(value.title);
+                  }
                 }
               } else {
                 // 配置项目不存在
@@ -168,9 +170,11 @@ interface Params {
                   data.inputs.splice(index, 1);
                 } else {
                   // 更新
-                  data.inputs[index] = value;
+                  data.inputs[index] = Object.assign(data.inputs[index], value);
                   const input = inputs.get(value.id);
-                  input.setTitle(value.title);
+                  if (value.title) {
+                    input.setTitle(value.title);
+                  }
                 }
               } else {
                 // 配置项目不存在
@@ -270,7 +274,7 @@ interface StyleParams {
                   data.configs.splice(index, 1);
                 } else {
                   // 更新
-                  data.configs[index] = value;
+                  data.configs[index] = Object.assign(data.configs[index], value);
                 }
               } else {
                 // 配置项目不存在

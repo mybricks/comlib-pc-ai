@@ -48,6 +48,43 @@ export function transformTsx(code): Promise<string> {
               isTSX: true
             }
           ],
+          function() {
+            return {
+              visitor: {
+                JSXElement(path) {
+                  const { node } = path;
+                  const dataLocValueObject: any = {
+                    jsx:{start:node.start,end:node.end},
+                    tag:{end:node.openingElement.end},
+                  }
+
+                  const classNameNode = node.openingElement.attributes.find((a) => a.name.name === "className")
+
+                  if (classNameNode) {
+                    dataLocValueObject.cn = classNameNode.value.value;
+                  }
+
+                  const dataLocValue = JSON.stringify(dataLocValueObject)
+
+                  node.openingElement.attributes.push({
+                    type: 'JSXAttribute',
+                    name: {
+                      type: 'JSXIdentifier',
+                      name: 'data-loc',
+                    },
+                    value: {
+                      type: 'StringLiteral',
+                      value: dataLocValue,
+                      extra: { 
+                        raw: `"${dataLocValue}"`,
+                        rawValue: dataLocValue
+                      }
+                    }
+                  })
+                }
+              }
+            };
+          }
           //transformImportPlugin()
         ]
       }

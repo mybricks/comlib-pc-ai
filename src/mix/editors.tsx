@@ -1,3 +1,4 @@
+import React from 'react';
 import { genAIEditor } from './../utils/ai-code'
 import echartsForReact from './../utils/echarts-for-react'
 
@@ -6,12 +7,14 @@ import echartsPrompt from './prompts/echarts-summary.md'
 import iconPrompt from "./prompts/icon-summary.md"
 //import dndkitPrompt from "./prompts/dndkit-summary.md"
 import { ANTD_KNOWLEDGES_MAP, ECHARTS_KNOWLEDGES_MAP, DNDKIT_KNOWLEDGES_MAP } from './knowledges'
+import { updateRender, updateStyle } from '../utils/ai-code/transform-umd'
 
 // import * as dndCore from "@dnd-kit/core";
 // import * as dndModifiers from '@dnd-kit/modifiers';
 // import * as dndSortable from '@dnd-kit/sortable';
 // import * as dndUtilities from '@dnd-kit/utilities';
 import * as antd from "antd";
+import VibeCoding from "./vibeCoding";
 
 
 export default {
@@ -58,6 +61,7 @@ export default {
         if (library === 'echarts-for-react') {
           const knowledge = ECHARTS_KNOWLEDGES_MAP[now.item.toLowerCase()]
 
+          // @ts-ignore
           if (typeof ECHARTS_KNOWLEDGES_MAP['base']?.docs === 'string') {
             // @ts-ignore
             ECHARTS_KNOWLEDGES_MAP['base']?.docs = ECHARTS_KNOWLEDGES_MAP['base']?.docs.replace(/import ReactECharts from 'echarts-for-react'/g, `import { 图表占位 } from 'echarts-for-react'`).replace(/ReactECharts/g, '图表占位')
@@ -176,6 +180,10 @@ export default {
           get({ data }) {
             return data._sourceRenderCode;
           },
+          set({ data }, value) {
+             data._sourceRenderCode = value;
+             updateRender({ data }, decodeURIComponent(value))
+          }
         }
       },
         {
@@ -195,6 +203,11 @@ export default {
             get({ data }) {
               return data._sourceStyleCode;
             },
+            set({ data }, value) {
+              data._sourceStyleCode = value;
+              updateStyle({ data }, decodeURIComponent(value)
+            )
+            }
           }
         },)
 
@@ -211,5 +224,55 @@ export default {
         }
       })
     }
+  },
+  "@vibeCoding": (props) => {
+    return <VibeCoding {...props} />
   }
+  // "[data-loc]": {
+  //   items(props, catalog0) {
+  //     console.log("items - props", props);
+
+  //     const { cn } = JSON.parse(props.focusArea.dataset.loc);
+
+  //     const items0 = props.data.configs.filter((config) => {
+  //       return config.type !== "style" && config.selector === `.${cn}`
+  //     }).map(({ type, title, fieldName }) => {
+  //       return {
+  //         title,
+  //         type,
+  //         value: {
+  //           get({ data }) {
+  //             return data.config[fieldName];
+  //           },
+  //           set({ data }, value) {
+  //             data.config[fieldName] = value;
+  //           }
+  //         }
+  //       }
+  //     })
+
+  //     catalog0.title = '常规';
+  //     catalog0.items = items0;
+  //   },
+  //   style(props) {
+  //     console.log("style - props", props);
+  //     const { cn } = JSON.parse(props.focusArea.dataset.loc);
+  //     console.log(1, props.data.configs.filter((config) => {
+  //       return config.type === "style" && config.selector === `.${cn}`
+  //     }).map(({ title, option }) => {
+  //       return {
+  //         title,
+  //         ...option
+  //       }
+  //     }))
+  //     return props.data.configs.filter((config) => {
+  //       return config.type === "style" && config.selector === `.${cn}`
+  //     }).map(({ title, option }) => {
+  //       return {
+  //         title,
+  //         ...option
+  //       }
+  //     })
+  //   }
+  // }
 }
