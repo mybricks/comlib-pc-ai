@@ -137,7 +137,7 @@ export function transformLess(code): Promise<string> {
 }
 
 export function updateRender({data}, renderCode) {
-  transformTsx(renderCode).then(code => {
+  transformTsx(renderCode.replace(/import css from ['"][^'"]*style.less['"]/, 'const css = new Proxy({}, { get(target, key) { return key } })')).then(code => {
     data._renderCode = encodeURIComponent(code)
     data._sourceRenderCode = encodeURIComponent(renderCode)
     data._jsxErr = ''

@@ -66,14 +66,13 @@ export default function developMyBricksModule(config: Config) {
       为了方便配置，用户需要通过配置项强制切换不同的变体，所以需要在model.json中定义可以强制改变变体的字段、同时runtime.jsx中需要做逻辑实现；
 
     **输入端口（inputs）**
-      在runtime.jsx中模块comDef inputs数组中定义，模块可以通过输入端口接收外部数据，在MyBricks平台中，输入端口主要是在逻辑编排中接收外部数据；
-      注意：输入端口不是模块中的文本框或按钮，而是外部的输入端口，用于接收外部数据；
+      模块对外暴露的回调接口，在 runtime.jsx 中完成回调注册后，支持外部调用，等效于 React 的 ref 调用能力；
       
     **输出端口（outputs）**
-      在runtime.jsx中模块的comDef outputs数组中定义，模块可以通过输出端口与外界进行互动，在MyBricks平台中，输出端口主要是在逻辑编排中向外部传递数据；
-      
+      模块的事件；
+
     **插槽（slots）**
-      在runtime.jsx中模块的comDef slots数组中定义，模块可以通过插槽包含其他内容；
+      模块可以通过插槽包含其它内容；
       
     **选区（selector）**
       在configs.js文件中定义，用户可以通过选区选择模块中的某个部分，选区中可能会包含配置项；
@@ -135,15 +134,13 @@ export default function developMyBricksModule(config: Config) {
   - 如果需要在model.json中定义数据，尽量不要出现空数据(null等），用户希望能尽早看到实际运行效果；
   - 返回的结果严格符合JSON结构，不能使用JSX、不要给出任何注释、不要用...等省略符号，如果数据为空，请返回{};
   
- 2、runtime.jsx文件，为模块的渲染逻辑，由一个通过comDef定义的函数构成，例如，下面是一个基于React与antd类库的模块：
+ 2、runtime.jsx文件，为模块的渲染逻辑，例如，下面是一个基于React与antd类库的模块：
   \`\`\`jsx file="runtime.jsx"
-    import {useMemo} from 'react';
-    import {comDef} from 'mybricks';
-    import {Card,Button} from 'antd';
-    
+    import { useMemo } from 'react';
+    import { Card,Button } from 'antd';
     import css from 'style.less';//style.less为返回的less代码
-    
-    export default comDef(({data,inputs,outputs,slots,logger})=>{
+
+    export default function ({ data, inputs, outputs, slots, logger }) {
       useMemo(()=>{
         inputs['u_i6']((val)=>{//监听输入端口
           data.title = val
@@ -158,57 +155,27 @@ export default function developMyBricksModule(config: Config) {
           <Card>{slots['s_u01'].render()}</Card>
         </Card>
       )
-    },{
-      title:'Banner',//模块标题
-      inputs:[//通过数组定义输入端口
-        {id:'u_i6',title:'标题',schema:{type:'string'}}
-      ],
-      outputs:[//通过数组定义输出端口
-        {id:'o_03',title:'点击标题',schema:{type:'string'}}
-      ],
-      slots:[//通过数组定义插槽
-        {id:'s_u01',title:'卡片内容'}//定义插槽
-      ]
-    })
+    }
   \`\`\`
   
   对runtime文件的说明：
   以下写法是固定的：
     - import css from 'style.less'
-    - import {comDef} from 'mybricks'
-      注意：使用mybricks类库中的comDef包裹，对于useMemo、useEffect等，需要通过 import {useMemo,useEffect} from 'react' 引入；
     
   runtime文件是一个jsx文件，禁止使用tsx(typescript)语法;
   按照react的代码编写规范，runtime文件中所有参与循环的组件，必需通过key属性做唯一标识，而且作为react的最佳实践，不要使用index作为key；
-  通过comDef声明模块：
-    1）第一个参数是render函数；
-    2）第二个参数：
-      title:模块的标题；
-      inputs:定义模块的所有输入端口，任何输入端口的使用必须首先在inputs中进行声明；
-      outputs:定义模块的所有输出端口，任何输出端口的使用必须首先在outputs中进行声明；
-      slots:定义模块的所有插槽，任何插槽的使用必须首先在slots中进行声明；
-      logger:日志对象，用于在开发过程中输出日志；
-
-      inputs、outputs、slots的声明形式为：
-      [
-        {
-          id:'唯一标识',
-          title:'标题',
-          schema:{type:'string'}//合理的JSONSchema,type可以使用string、number、boolean、array、object，不允许使用其他类型
-        }
-      ]
  
-    对于render函数的参数说明：({data,inputs,outputs,slots})=>JSX.Element
-    data是一个Observable对象，代表该模块的model数据；
-    inputs是一个数组,代表该模块的输入端口,仅提供对于输入端口的输入监听，形如：
-    inputs['输入端口的id'](val=>{})，其中，val为输入端口的值，id为输入端口的id。
-    inputs只能使用模块定义的输入端口，严禁使用未定义的输入端口。
-    
-    outputs是一个对象,代表该模块的输出端口，提供对于输出端口的输出方法，形如：
-    outputs['输出端口的id'](val)，其中，'输出端口的id'为输出端口的id,val为输出端口的值。
-    outputs只能使用模块定义的输出端口，严禁使用未定义的输出端口。
-    
-    slots是一个对象,代表该模块的插槽，提供对于插槽的渲染方法，形如：{slots['插槽的id'].render()}.
+  对于runtime的参数说明：({data,inputs,outputs,slots})=>JSX.Element
+  data是一个Observable对象，代表该模块的model数据；
+  inputs是一个数组,代表该模块的输入端口,仅提供对于输入端口的输入监听，形如：
+  inputs['输入端口的id'](val=>{})，其中，val为输入端口的值，id为输入端口的id。
+  inputs只能使用模块定义的输入端口，严禁使用未定义的输入端口。
+  
+  outputs是一个对象,代表该模块的输出端口，提供对于输出端口的输出方法，形如：
+  outputs['输出端口的id'](val)，其中，'输出端口的id'为输出端口的id,val为输出端口的值。
+  outputs只能使用模块定义的输出端口，严禁使用未定义的输出端口。
+  
+  slots是一个对象,代表该模块的插槽，提供对于插槽的渲染方法，形如：{slots['插槽的id'].render()}.
   
   3、style.less文件，为当前模块的样式代码,例如：
   \`\`\`less file="style.less"
@@ -377,8 +344,6 @@ ${comPrompts.join('\n')}
       9）对于图标，判断具体的图标，优先采用允许使用的类库中黑白风格的图标，否则采用宽高20的浅灰色正圆形状作为替代；
       
     3、对于runtime.jsx代码的修改，需要严格遵循以下要求：
-      - 使用mybricks类库中的comDef包裹模块;
-      - 严格按照 export default comDef() 的格式返回；
       - 所有数据字段都应该体现在model.json文件中，通过data进行引用；
       - data是一个Observable对象，所有字段定义都来自当前模块的model部分;
       - 如果用户明确要求模块存在变体，需要在model.json中添加强制改变变体的控制字段；
@@ -602,11 +567,10 @@ ${comPrompts.join('\n')}
   
   \`\`\`after file="runtime.jsx"
   import css from 'style.less';
-  import {comDef} from 'mybricks';
-  import {useCallback} from 'react';
-  import {Button} from 'antd';
+  import { useCallback } from 'react';
+  import { Button } from 'antd';
   
-  return comDef(({data,logger})=>{
+  export default function({ data, inputs, outputs }) {
     const click = useCallback(()=>{
       outputs['onclick'](data.text)
     },[])
@@ -616,15 +580,9 @@ ${comPrompts.join('\n')}
     },[])
     
     return (
-       <Button onClick={click} onDoubleClick={dblClick} className={css.mainBtn}>{data.text}</Button>
+      <Button onClick={click} onDoubleClick={dblClick} className={css.mainBtn}>{data.text}</Button>
     )
-  },{
-    title:'按钮',
-    outputs:[
-      {id:'onclick',title:'单击',schema:{type:'string'}},
-      {id:'dblclick',title:'双击',schema:{type:'string'}}
-    ]
-  })
+  }
   \`\`\`
   </assistant_response>
 </example>
@@ -749,28 +707,22 @@ ${comPrompts.join('\n')}
 
   \`\`\`after file="runtime.jsx"
   import css from 'style.less';
-  import {comDef} from 'mybricks';
-  import {useCallback} from 'react';
-  import {View,Button} from 'xy-ui';
+  import { useCallback } from 'react';
+  import { View, Button } from 'xy-ui';
     
-  return comDef(({data,outputs,logger})=>{
+  export default function({ data, outputs }) {
     const click = useCallback((index)=>{
       outputs['click'](index)
     },[])
     
     return (
       <View className={css.viewContainer}>
-        {data.btns.map((btn,index)=>{
+        {data.btns.map((btn, index)=>{
           return <Button className={css.btn} key={index} onClick={e=>click(index)}>{btn.text}</Button>
         })}
       </View>
     )
-  },{
-    title:'工具条',
-    outputs:[
-      {id:'click',title:'点击',schema:{type:'number'}}
-    ]
-  })
+  }
   \`\`\`
   </assistant_response>
 </example>
@@ -809,12 +761,11 @@ ${comPrompts.join('\n')}
   \`\`\`
   
   \`\`\`after file="runtime.jsx"
-  import {useMemo,useCallback} from 'react';
+  import { useMemo, useCallback } from 'react';
   import css from 'style.less';
-  import {comDef} from 'mybricks';
-  import {View,Button} from 'xy-ui';
+  import { View, Button } from 'xy-ui';
   
-  return comDef(({data,inputs,outputs,logger})=>{
+  export default function({ data, inputs, outputs, logger }) {
     useMemo(()=>{
       inputs['u_i34']((btns)=>{
         data.btns = btns
@@ -834,29 +785,7 @@ ${comPrompts.join('\n')}
         })}
       </View>
     )
-  },{
-    title:'工具条',
-    inputs:[
-      {
-        id:'u_i34',
-        title:'按钮数据',
-        schema:{
-          type:'object',
-          properties:{
-            id:{
-              type:'string'
-            },
-            text:{
-              type:'string'
-            }
-          }
-        }
-      }
-    ],
-    outputs:[
-      {id:'click',title:'点击',schema:{type:'number'}}
-    ]
-  })
+  }
   \`\`\`
   </assistant_response>
 </example>
@@ -925,11 +854,11 @@ ${comPrompts.join('\n')}
   本次更新仅需要修改runtime.jsx文件：
 
   \`\`\`before file="runtime.jsx"
-  export default comDef(({data,inputs,outputs,logger})=>{
+  export default function({ data, inputs, outputs, logger }) {
   \`\`\`
   
   \`\`\`after file="runtime.jsx"
-  export default comDef(({data,inputs,outputs,logger})=>{
+  export default function({ data, inputs, outputs, logger }) {
     const search = useCallback((e)=>{
       outputs['o_012'](e.target.value)
     },[])
