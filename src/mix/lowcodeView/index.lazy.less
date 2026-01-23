@@ -1,0 +1,31 @@
+.lowcode-view {
+  width: 100%;
+  height: 100%;
+  display: flex;
+
+  .file-list {
+    border-top: 1px solid #EEE;
+    height: 100%;
+    position: relative;
+    overflow: auto;
+    padding: 10px;
+    width: 150px;
+
+    .file-item {
+      border-radius: 6px;
+      position: relative;
+      height: 24px;
+      margin: 2px 5px;
+      padding: 0 10px 0 15px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      border: 1px solid transparent;
+      cursor: pointer;
+    }
+
+    .file-item-active {
+      background-color: #DDD;
+    }
+  }
+}

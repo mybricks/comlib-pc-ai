@@ -14,8 +14,9 @@ import { updateRender, updateStyle } from '../utils/ai-code/transform-umd'
 // import * as dndSortable from '@dnd-kit/sortable';
 // import * as dndUtilities from '@dnd-kit/utilities';
 import * as antd from "antd";
-import VibeCoding from "./vibeCoding";
-
+import LowcodeView from "./lowcodeView";
+import lowcodeViewCss from "./lowcodeView/index.lazy.less";
+import context from "./context";
 
 export default {
   '@init': (params) => {
@@ -225,9 +226,21 @@ export default {
       })
     }
   },
-  "@vibeCoding": (props) => {
-    return <VibeCoding {...props} />
-  }
+ '@lowcode':{
+    render(params, plugins){
+      context.plugins = plugins;
+      context.createVibeCodingAgent({ register: plugins.aiService.registerAgent })
+
+      return (
+        <LowcodeView {...params}/>
+      )
+    },
+    useCSS(){
+      return [
+        lowcodeViewCss
+      ]
+    }
+  },
   // "[data-loc]": {
   //   items(props, catalog0) {
   //     console.log("items - props", props);
