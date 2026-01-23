@@ -3,6 +3,7 @@ import LowcodeView from "./lowcodeView";
 import lowcodeViewCss from "./lowcodeView/index.lazy.less";
 import context from "./context";
 
+<<<<<<< HEAD
 function evalConfigJsCompiled(code: string) {
   const evalStr = `
     let result;
@@ -23,9 +24,63 @@ function detectJsonIndent(jsonStr: string): string | number {
   if (match) return match[1];
   return 2;
 }
+=======
+import css from './test.lazy.less'
 
+import LowCodeView from './LowcodeView'
+>>>>>>> fb23122 (for lazy.less)
+
+<<<<<<< HEAD
 export default function (props) {
   console.log("[@editors - props]", props);
+=======
+export default {
+  '@init': (params) => {
+    const { style, data, id, input, output } = params
+    // style.width = 480
+    // style.height = 420
+  },
+  '@resize': {
+    options: ['width', 'height'],
+  },
+<<<<<<< HEAD
+  // '@save'({ data }) {
+  //   console.log("[@save - data]", data);
+  
+  //   return data
+=======
+  '@lowcode':{
+    render({data},{aiService}){
+      return (
+        <LowCodeView/>
+      )
+    },
+    useCSS(){
+      return [
+        css
+      ]
+    }
+  },
+  // '@save'({data}) {
+  //   const saveData = {}
+  //   for (const key in data) {
+  //     if (key.startsWith('_')) {//去除中间运行产生的数据
+  //       saveData[key] = data[key]
+  //     }
+  //   }
+  //
+  //   return saveData
+>>>>>>> fb23122 (for lazy.less)
+  // },
+  '@ai': genAIEditor({
+    prompts: iconPrompt + `\n` + antdPrompt + `\n` + echartsPrompt
+    //+ `\n` + dndkitPrompt
+    ,
+    loadKnowledge: (items) => {
+      const rtn: any = []
+      items.forEach((now) => {
+        const library = now.from || now.lib
+>>>>>>> dd8b4ef (for lazy.less)
 
   if (!props) {
     return {};
