@@ -112,119 +112,121 @@ export default {
   }),
   ':slot': {},
   ':root': {
-    items({ data, env, id, input, output }, ...catalog) {
-      console.log("[items - data]", data)
+    // items({ data, env, id, input, output }, ...catalog) {
+    //   // console.log("[items - data]", data)
 
-      // TODO: 临时代码
-      if (!data.configs) {
-        data.configs = []
-      }
-      if (!data.config) {
-        data.config = {}
-      }
+    //   // // TODO: 临时代码
+    //   // if (!data.configs) {
+    //   //   data.configs = []
+    //   // }
+    //   // if (!data.config) {
+    //   //   data.config = {}
+    //   // }
 
-      const items0 = data.configs.filter((config) => {
-        return config.type !== "style"
-      }).map(({ type, title, fieldName }) => {
-        return {
-          title,
-          type,
-          value: {
-            get({ data }) {
-              return data.config[fieldName];
-            },
-            set({ data }, value) {
-              data.config[fieldName] = value;
-            }
-          }
-        }
-      })
+    //   // const items0 = data.configs.filter((config) => {
+    //   //   return config.type !== "style"
+    //   // }).map(({ type, title, fieldName }) => {
+    //   //   return {
+    //   //     title,
+    //   //     type,
+    //   //     value: {
+    //   //       get({ data }) {
+    //   //         return data.config[fieldName];
+    //   //       },
+    //   //       set({ data }, value) {
+    //   //         data.config[fieldName] = value;
+    //   //       }
+    //   //     }
+    //   //   }
+    //   // })
 
-      if (data.outputs) {
-        items0.push({
-          title: "事件",
-          items: data.outputs.map(({ id, title }) => {
-            return {
-              title,
-              type: '_Event',
-              options: {
-                outputId: id
-              }
-            }
-          })
-        })
-      }
+    //   // if (data.outputs) {
+    //   //   items0.push({
+    //   //     title: "事件",
+    //   //     items: data.outputs.map(({ id, title }) => {
+    //   //       return {
+    //   //         title,
+    //   //         type: '_Event',
+    //   //         options: {
+    //   //           outputId: id
+    //   //         }
+    //   //       }
+    //   //     })
+    //   //   })
+    //   // }
 
-      items0.push({
-        title: 'React',
-        type: 'code',
-        options: {
-          title: '编辑自定义JSX',
-          language: 'typescript',
-          width: 600,
-          minimap: {
-            enabled: false
-          },
-          eslint: {
-            parserOptions: {
-              ecmaVersion: '2020',
-              sourceType: 'module'
-            }
-          },
-          babel: false,
-          autoSave: false,
-          preview: false,
-          extraLib: data.extraLib,
-          isTsx: true
-        },
-        value: {
-          get({ data }) {
-            return data._sourceRenderCode;
-          },
-          set({ data }, value) {
-             data._sourceRenderCode = value;
-             updateRender({ data }, decodeURIComponent(value))
-          }
-        }
-      },
-        {
-          title: 'Less',
-          type: 'code',
-          options: {
-            title: 'Less',
-            language: 'less',
-            width: 600,
-            minimap: {
-              enabled: false
-            },
-            autoSave: false,
-            preview: false
-          },
-          value: {
-            get({ data }) {
-              return data._sourceStyleCode;
-            },
-            set({ data }, value) {
-              data._sourceStyleCode = value;
-              updateStyle({ data }, decodeURIComponent(value)
-            )
-            }
-          }
-        },)
+    //   const items0: any[] = [];
 
-      catalog[0].title = '常规';
-      catalog[0].items = items0;
-    },
-    style({ data }) {
-      return data.configs.filter((config) => {
-        return config.type === "style"
-      }).map(({ title, option }) => {
-        return {
-          title,
-          ...option
-        }
-      })
-    }
+    //   items0.push({
+    //     title: 'React',
+    //     type: 'code',
+    //     options: {
+    //       title: '编辑自定义JSX',
+    //       language: 'typescript',
+    //       width: 600,
+    //       minimap: {
+    //         enabled: false
+    //       },
+    //       eslint: {
+    //         parserOptions: {
+    //           ecmaVersion: '2020',
+    //           sourceType: 'module'
+    //         }
+    //       },
+    //       babel: false,
+    //       autoSave: false,
+    //       preview: false,
+    //       extraLib: data.extraLib,
+    //       isTsx: true
+    //     },
+    //     value: {
+    //       get({ data }) {
+    //         return data._sourceRenderCode;
+    //       },
+    //       set({ data }, value) {
+    //          data._sourceRenderCode = value;
+    //          updateRender({ data }, decodeURIComponent(value))
+    //       }
+    //     }
+    //   },
+    //     {
+    //       title: 'Less',
+    //       type: 'code',
+    //       options: {
+    //         title: 'Less',
+    //         language: 'less',
+    //         width: 600,
+    //         minimap: {
+    //           enabled: false
+    //         },
+    //         autoSave: false,
+    //         preview: false
+    //       },
+    //       value: {
+    //         get({ data }) {
+    //           return data._sourceStyleCode;
+    //         },
+    //         set({ data }, value) {
+    //           data._sourceStyleCode = value;
+    //           updateStyle({ data }, decodeURIComponent(value)
+    //         )
+    //         }
+    //       }
+    //     },)
+
+    //   catalog[0].title = '常规';
+    //   catalog[0].items = items0;
+    // },
+    // style({ data }) {
+    //   return data.configs.filter((config) => {
+    //     return config.type === "style"
+    //   }).map(({ title, option }) => {
+    //     return {
+    //       title,
+    //       ...option
+    //     }
+    //   })
+    // }
   },
  '@lowcode':{
     render(params, plugins){

@@ -71,8 +71,19 @@ export const genAIRuntime = ({title, orgName, examples, dependencies, wrapper,re
     }, [])
 
     const scope = useMemo(() => {
+      let model = {};
+
+      try {
+        model = JSON.parse(decodeURIComponent(data.modelConfig));
+        Object.entries(model).forEach(([key, value]) => {
+          data.proxyModel[key] = value;
+        })
+      } catch (e) {
+        console.error("[@aicom - model解析失败]", e)
+      };
+
       return {
-        data: data.config,
+        data: data.proxyModel,
         inputs: new Proxy({}, {
           get(_, id) {
             if (env.runtime) {
@@ -126,7 +137,7 @@ export const genAIRuntime = ({title, orgName, examples, dependencies, wrapper,re
         context: {React},
         logger
       }
-    }, [slots, data._renderCode])
+    }, [slots, data.runtimeJsxCompiled])
 
     const errorInfo = useMemo(() => {
       if (!!data._jsxErr) {
@@ -163,8 +174,8 @@ export const genAIRuntime = ({title, orgName, examples, dependencies, wrapper,re
         <AIJsxRuntime
           env={env}
           id={id}
-          styleCode={data._styleCode}
-          renderCode={data._renderCode}
+          styleCode={data.styleCompiled}
+          renderCode={data.runtimeJsxCompiled}
           renderProps={scope}
           errorInfo={errorInfo}
           placeholder={<IdlePlaceholder title={title} orgName={orgName} examples={examples}/>}

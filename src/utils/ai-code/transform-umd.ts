@@ -138,8 +138,8 @@ export function transformLess(code): Promise<string> {
 
 export function updateRender({data}, renderCode) {
   transformTsx(renderCode.replace(/import css from ['"][^'"]*style.less['"]/, 'const css = new Proxy({}, { get(target, key) { return key } })')).then(code => {
-    data._renderCode = encodeURIComponent(code)
-    data._sourceRenderCode = encodeURIComponent(renderCode)
+    data.runtimeJsxCompiled = encodeURIComponent(code)
+    data.runtimeJsxSource = encodeURIComponent(renderCode)
     data._jsxErr = ''
   }).catch(e => {
     data._jsxErr = e?.message ?? '未知错误'
@@ -148,8 +148,8 @@ export function updateRender({data}, renderCode) {
 
 export function updateStyle({data}, styleCode) {
   transformLess(styleCode).then(css => {
-    data._styleCode = encodeURIComponent(css)
-    data._sourceStyleCode = encodeURIComponent(styleCode)
+    data.styleCompiled =  encodeURIComponent(css)
+    data.styleSource = encodeURIComponent(styleCode)
     data._cssErr = '';
   }).catch(e => {
     data._cssErr = e?.message ?? '未知错误'
