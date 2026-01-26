@@ -1,6 +1,11 @@
 {
-  "inputs": [],
-  "outputs": [],
-  "editors": [],
-  "config": {}
+  "modelConfig": "{}",
+  "styleCompiled": "",
+  "styleSource": "",
+  "runtimeJsxCompiled": "",
+  "runtimeJsxSource": "",
+  "configJsCompiled": "",
+  "configJsSource": "",
+  "componentConfig": "{}",
+  "proxyModel": {}
 }

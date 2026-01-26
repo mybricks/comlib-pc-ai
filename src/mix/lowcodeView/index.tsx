@@ -6,7 +6,7 @@ import lazyCss from "./index.lazy.less";
 const css = lazyCss.locals;
 
 interface Params {
-
+  data: any;
 }
 
 const FILES = [
@@ -16,8 +16,15 @@ const FILES = [
   "config.js"
 ]
 
+const FILES_MAP = {
+  "model.json": "modelConfig",
+  "style.less": "styleSource",
+  "runtime.jsx": "runtimeJsxSource",
+  "config.js": "configJsSource"
+}
+
 export default function LowcodeView(params: Params) {
-  const [selectedFile, setSelectedFile] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<string>("model.json");
 
   useLayoutEffect(() => {
     // console.log("[@LowcodeView - params]", params)
@@ -32,9 +39,11 @@ export default function LowcodeView(params: Params) {
     // console.log("[@params]", params)
     let options = {} as any
 
+    const path =  `file:///${"组件id"}/${selectedFile}`;
+
     if (selectedFile === "runtime.jsx") {
       return {
-        path: `file:///${"组件id"}/${selectedFile}`,
+        path,
         language: 'typescript',
         encodeValue: false,
         //height: 300,
@@ -54,33 +63,15 @@ export default function LowcodeView(params: Params) {
         //extraLib: data.extraLib,
         isTsx: true
       }
+    } else if (["model.json", "style.less"].includes(selectedFile)) {
+      return {
+        path,
+        language: selectedFile.split(".").pop()
+      }
     }
 
     return options;
-    // if (curFile.type === 'jsx') {
-    //   const path = `file:///${curFile._model.id}/${curFile.name}.tsx`
 
-    //   options = {
-    //     path,
-    //     language: 'typescript',
-    //     encodeValue: false,
-    //     //height: 300,
-    //     minimap: {
-    //       enabled: false
-    //     },
-    //     eslint: {
-    //       parserOptions: {
-    //         ecmaVersion: '2020',
-    //         sourceType: 'module'
-    //       }
-    //     },
-    //     babel: false,
-    //     //comments: Comments,
-    //     autoSave: false,
-    //     preview: false,
-    //     //extraLib: data.extraLib,
-    //     isTsx: true
-    //   }
     // } else if (curFile.type === 'js') {
     //   options = {
     //     path: `file:///${curFile._model.id}/${curFile.name}.js`,
@@ -100,9 +91,10 @@ export default function LowcodeView(params: Params) {
   }, [selectedFile])
 
   const code = useMemo(() => {
-    if (selectedFile === "runtime.jsx") {
-      return decodeURIComponent(params.data['_sourceRenderCode'])
-    }
+    return decodeURIComponent(params.data[FILES_MAP[selectedFile]])
+    // if (selectedFile === "runtime.jsx") {
+    //   return decodeURIComponent(params.data[FILES_MAP])
+    // }
   }, [selectedFile])
 
   const codeIns = useRef<HandlerType>(null)
@@ -120,7 +112,7 @@ export default function LowcodeView(params: Params) {
           </div>
         ))}
       </div>
-      <div style={{ height: 500, width: 500}}>
+      <div style={{ height: "100%", width: 800 }}>
         <Editor
           ref={codeIns}
           value={code}

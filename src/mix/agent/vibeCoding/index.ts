@@ -61,10 +61,12 @@ export default function ({ context }) {
                       updateStyle({ data: aiComParams.data }, content);
                       break;
                     case "model.json":
-                      aiComParams.data["model"] = content;
+                      aiComParams.data.modelConfig = encodeURIComponent(content);
                       break;
                     case "config.js":
-                      aiComParams.data["config"] = content;
+                      // TODO: 编译
+                      aiComParams.data.configJsCompiled = encodeURIComponent(content);
+                      aiComParams.data.configJsSource = encodeURIComponent(content);
                       break;
                     default:
                       break;
