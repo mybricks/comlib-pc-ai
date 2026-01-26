@@ -1,6 +1,7 @@
 import classLibrarySelection from "./tools/classLibrarySelection"
 import developMyBricksModule from "./tools/developMyBricksModule";
 import { updateRender, updateStyle } from "../../../utils/ai-code/transform-umd";
+import { createWorkspace } from "./workspace";
 
 export default function ({ context }) {
   console.log("[context]", context);
@@ -14,6 +15,14 @@ export default function ({ context }) {
       console.log("[@request - params]", params);
       console.log("[@request - focus]", focus);
       console.log("[aiComParams]", aiComParams);
+
+      // 创建workspace实例
+      const workspace = createWorkspace({
+        comId: focus.comId,
+        aiComParams,
+        libraryDocs: [] // 备用的类库文档（可选）
+      });
+
       return new Promise((resolve, reject) => {
         rxai.requestAI({
           ...params,
@@ -32,9 +41,10 @@ export default function ({ context }) {
           // 需求分析、重构（从0-1）、修改
           tools: [
             classLibrarySelection({
+              librarySummaryDoc: workspace.getAvailableLibraryInfo() || '',
               fileFormat: context.plugins.aiService.fileFormat,
-              execute(params) {
-                console.log("[@类库选型 - execute]", params);
+              onOpenLibraryDoc: (libs) => {
+                workspace.openLibraryDoc(libs)
               }
             }), 
             developMyBricksModule({
@@ -63,16 +73,16 @@ export default function ({ context }) {
               }
             })
           ],
-          presetMessages: () => {
-            console.log("[@获取presetMessages]")
+          presetMessages: async () => {
+            const content = await workspace.exportToMessage()
             return [
               {
                 role: 'user',
-                content: `hello`
+                content
               },
               {
                 role: 'assistant',
-                content: 'world'
+                content: '感谢您提供的知识，我会参考这些知识进行开发。'
               },
             ]
           },
