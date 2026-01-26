@@ -170,29 +170,43 @@ export class Workspace {
 
         switch (fileName) {
           case 'runtime.jsx': {
-            let runtimeCode = data._sourceRenderCode ?? ''
+            let runtimeCode = data.runtimeJsxCompiled ?? ''
             try {
               runtimeCode = decodeURIComponent(runtimeCode)
             } catch (error) {
               runtimeCode = ''
-              console.error('[Workspace.readFile] 解码runtime.jsx失败:', error);
+              console.error('[Workspace.readFile] 获取runtime.jsx失败:', error);
             }
             return runtimeCode
           }
           case 'style.less': {
-            let styleCode = data._sourceStyleCode ?? ''
+            let styleCode = data.styleCompiled ?? ''
             try {
               styleCode = decodeURIComponent(styleCode)
             } catch (error) {
               styleCode = ''
-              console.error('[Workspace.readFile] 解码style.less失败:', error);
+              console.error('[Workspace.readFile] 获取style.less失败:', error);
             }
             return styleCode
           }
-          case 'model.json':
-            return data['model.json'] || '';
+          case 'model.json': {
+            let modelCode = data.modelConfig ?? ''
+            try {
+              modelCode = decodeURIComponent(modelCode)
+            } catch (error) {
+              modelCode = ''
+              console.error('[Workspace.readFile] 获取model.json失败:', error);
+            }
+            return modelCode
+          }
           case 'config.js': {
-            let configCode = data['config'] ?? ''
+            let configCode = data.configJsCompiled ?? ''
+            try {
+              configCode = decodeURIComponent(configCode)
+            } catch (error) {
+              configCode = ''
+              console.error('[Workspace.readFile] 获取config.js失败:', error);
+            }
             return configCode
           }
           default:
