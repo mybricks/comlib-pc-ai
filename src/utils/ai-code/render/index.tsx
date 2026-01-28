@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState, Component, ReactElement, cloneElement} from 'react';
+import React, {useEffect, useMemo, useState, Component, ReactElement, cloneElement, useRef} from 'react';
 import css from './index.less'
 import dayjs from "dayjs";
 
@@ -64,9 +64,13 @@ interface AIJsxProps {
   dependencies?: Record<string, any>
   /** 是否在引擎环境 */
   inMybricksGeoWebview: boolean;
+  data: any;
+  inputs: any;
+  outputs: any;
 }
 
-export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, errorInfo, placeholder = 'AI组件', dependencies = {}, inMybricksGeoWebview } : AIJsxProps) => {
+export const AIJsxRuntime = ({ id, env, styleCode, renderCode, data, inputs, outputs, errorInfo, placeholder = 'AI组件', dependencies = {}, inMybricksGeoWebview } : AIJsxProps) => {
+  const ref = useRef<any>(null);
   const appendCssApi = useMemo<CssApi>(() => {
     if (inMybricksGeoWebview && env.canvas?.css) {
       const cssAPI = env.canvas.css
@@ -118,6 +122,39 @@ export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, erro
   //   }
   // }, [])
 
+  const renderProps = useMemo(() => {
+    let modelConfig = {};
+
+    try {
+      modelConfig = JSON.parse(decodeURIComponent(data.modelConfig));
+    } catch {};
+
+    let componentConfig = {
+      inputs: [],
+      outputs: []
+    };
+
+    try {
+      componentConfig = JSON.parse(decodeURIComponent(data.componentConfig));
+    } catch {};
+
+    componentConfig.inputs?.forEach((input: any) => {
+      inputs[input.id]((value) => {
+        ref.current[input.id](value);
+      })
+    })
+
+    return {
+      ...modelConfig,
+      ...componentConfig.outputs?.reduce((pre: any, cur: any) => {
+        pre[cur.id] = (value) => {
+          outputs[cur.id](value);
+        }
+        return pre;
+      }, {})
+    }
+  }, [data.runtimeJsxCompiled, data.modelConfig])
+
   const ReactNode = useMemo(() => {
     if (errorInfo) return () => <ErrorTip title={errorInfo.title} desc={errorInfo.desc} />;
     if (renderCode) {
@@ -131,7 +168,7 @@ export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, erro
           ...dependencies,
         })
         // TODO 没有key的话会用预览的高度
-        return (props) => cloneElement(<Com {...props} />, {}, null);
+        return (props) => cloneElement(<Com ref={ref} {...props} />, {}, null);
 
 
         // let RT = window[`mbcrjsx_${id}`]
@@ -152,7 +189,7 @@ export const AIJsxRuntime = ({ id, env, styleCode, renderCode, renderProps, erro
     } else {
       return
     }
-  }, [renderCode, errorInfo])
+  }, [renderCode, errorInfo, data.modelConfig])
 
 
   if (typeof ReactNode !== 'function') {

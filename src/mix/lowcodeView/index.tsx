@@ -1,159 +1,155 @@
-import React, { useState, useLayoutEffect, useEffect, useMemo, useRef } from "react";
-import context from "../context";
+import React, { useState, useMemo, useCallback, useRef } from "react";
 import Editor, { HandlerType } from "@mybricks/coder/dist/umd";
+import context from "../context";
 import lazyCss from "./index.lazy.less";
 
 const css = lazyCss.locals;
 
 interface Params {
   data: any;
+  model: any;
 }
 
 const FILES = [
   "model.json",
   "style.less",
   "runtime.jsx",
-  "config.js"
-]
+  "config.js",
+  "com.json"
+] as const;
 
-const FILES_MAP = {
+type FileName = typeof FILES[number];
+
+const FILES_MAP: Record<string, string> = {
   "model.json": "modelConfig",
   "style.less": "styleSource",
   "runtime.jsx": "runtimeJsxSource",
-  "config.js": "configJsSource"
-}
+  "config.js": "configJsSource",
+  "com.json": "componentConfig"
+};
 
 export default function LowcodeView(params: Params) {
-  const [selectedFile, setSelectedFile] = useState<string>("model.json");
-
-  useLayoutEffect(() => {
-    // console.log("[@LowcodeView - params]", params)
-  }, [])
-
-  useEffect(() => {
-    console.log("[@LowcodeView - params]", params)
-  }, [selectedFile])
+  const [selectedFileName, setSelectedFileName] = useState<FileName>(FILES[0]);
+  const [modifiedContent, setModifiedContent] = useState<Record<string, string>>({});
 
   const coderOptions = useMemo(() => {
-    // console.log("[@selectedFile]", selectedFile)
-    // console.log("[@params]", params)
-    let options = {} as any
-
-    const path =  `file:///${"组件id"}/${selectedFile}`;
-
-    if (selectedFile === "runtime.jsx") {
+    const path = `file:///${"组件id"}/${selectedFileName}`;
+    if (selectedFileName === "runtime.jsx") {
       return {
         path,
         language: 'typescript',
         encodeValue: false,
-        //height: 300,
-        minimap: {
-          enabled: false
-        },
+        minimap: { enabled: false },
         eslint: {
-          parserOptions: {
-            ecmaVersion: '2020',
-            sourceType: 'module'
-          }
+          parserOptions: { ecmaVersion: '2020', sourceType: 'module' }
         },
         babel: false,
-        //comments: Comments,
         autoSave: false,
         preview: false,
-        //extraLib: data.extraLib,
         isTsx: true
-      }
-    } else if (["model.json", "style.less"].includes(selectedFile)) {
+      };
+    }
+    if (selectedFileName === "config.js") {
       return {
         path,
-        language: selectedFile.split(".").pop()
-      }
+        language: 'javascript',
+      };
     }
+    if (FILES.includes(selectedFileName)) {
+      return {
+        path,
+        language: selectedFileName.split(".").pop()
+      };
+    }
+    return {};
+  }, [selectedFileName]);
 
-    return options;
-
-    // } else if (curFile.type === 'js') {
-    //   options = {
-    //     path: `file:///${curFile._model.id}/${curFile.name}.js`,
-    //     language: 'javascript',
-    //     //height: 300,
-    //   }
-    // } else {
-    //   let path = `file:///${curFile._model.id}/${curFile.name}.${curFile.type}`;
-
-    //   options = {
-    //     path,
-    //     language: curFile.type,
-    //   }
-    // }
-
-    // return options
-  }, [selectedFile])
-
+  // 当前选中文件显示的内容：有未保存修改则用修改内容，否则从 data 读取
   const code = useMemo(() => {
-    return decodeURIComponent(params.data[FILES_MAP[selectedFile]])
-    // if (selectedFile === "runtime.jsx") {
-    //   return decodeURIComponent(params.data[FILES_MAP])
-    // }
-  }, [selectedFile])
+    if (selectedFileName in modifiedContent) {
+      return modifiedContent[selectedFileName];
+    }
+    const raw = params.data[FILES_MAP[selectedFileName]];
+    return raw != null ? decodeURIComponent(raw) : "";
+  }, [selectedFileName, modifiedContent, params.data]);
 
-  const codeIns = useRef<HandlerType>(null)
+  const codeIns = useRef<HandlerType>(null);
+
+  const handleEditorChange = useCallback((value: string) => {
+    setModifiedContent((prev) => ({
+      ...prev,
+      [selectedFileName]: value,
+    }));
+  }, [selectedFileName]);
+
+  const handleSave = useCallback(() => {
+    const dataKey = FILES_MAP[selectedFileName];
+    if (dataKey && params.data && selectedFileName in modifiedContent) {
+      context.updateFile(params.model.runtime.id, { fileName: selectedFileName, content: modifiedContent[selectedFileName] });
+      setModifiedContent((prev) => {
+        const next = { ...prev };
+        delete next[selectedFileName];
+        return next;
+      });
+    }
+  }, [selectedFileName, modifiedContent, params.data]);
+
+  // 仅当当前聚焦的文件有未保存修改时，保存按钮可用
+  const hasUnsavedChanges = selectedFileName in modifiedContent;
+
+  const editorOptions = useMemo(() => ({
+    fontSize: 12,
+    scrollbar: {
+      horizontal: "auto",
+      vertical: "auto",
+      verticalScrollbarSize: 10,
+      horizontalScrollbarSize: 10
+    }
+  }), []);
 
   return (
-    <div className={css['lowcode-view']}>
-      <div className={css['file-list']}>
-        {FILES.map((file, index) => (
-          <div
-            key={index}
-            className={`${css['file-item']} ${selectedFile === file ? css['file-item-active'] : ""}`}
-            onClick={() => setSelectedFile(file)}
-          >
-            {file}
-          </div>
-        ))}
-      </div>
-      <div style={{ height: "100%", width: 800 }}>
-        <Editor
-          ref={codeIns}
-          value={code}
-          {...coderOptions}
-          options={{
-            fontSize: 12,
-            scrollbar: {
-              horizontal: "auto",
-              vertical: "auto",
-              verticalScrollbarSize: 10,
-              horizontalScrollbarSize: 10
-            }
-          }}
-          theme={'light'}
-          wrapperClassName={css.coder}
-          //height={'auto'}
-          onChange={(value) => {
-            // curFile._content = value
-
-            // if (value !== curFile.content) {
-            //   curFile._updated = true
-            // } else {
-            //   curFile._updated = false
-            // }
-          }}
-
-          onMount={(editor, monaco) => {
-            // console.log("编辑器初始化: ", {
-            //   editor,
-            //   monaco
-            // })
-            // console.log("类型提示: ", {
-            //   LegacyLib,
-            //   extraLib
-            // })
-            // setEditor(editor);
-            // setMonaco(monaco);
-          }}
+    <>
+      <div className={css['lowcode-view-toolbar']}>
+        <button
+          type="button"
+          className={`${css['lowcode-view-toolbar-button']} ${hasUnsavedChanges ? css['lowcode-view-toolbar-button-nosave'] : css['lowcode-view-toolbar-button-disabled']}`}
+          onClick={handleSave}
+          disabled={!hasUnsavedChanges}
         >
-        </Editor>
+          保存
+        </button>
       </div>
-    </div>
+      <div className={css['lowcode-view']}>
+        <div className={css['file-list']}>
+          {FILES.map((fileName) => (
+            <div
+              key={fileName}
+              className={`${css['file-item']} ${selectedFileName === fileName ? css['file-item-active'] : ""}`}
+              onClick={() => setSelectedFileName(fileName)}
+            >
+              {fileName in modifiedContent ? "*" : ""}{fileName}
+            </div>
+          ))}
+        </div>
+        <div className={css['code-container']}>
+          <Editor
+            ref={codeIns}
+            value={code}
+            {...coderOptions}
+            options={editorOptions}
+            theme={'light'}
+            wrapperClassName={css['coder']}
+            onChange={handleEditorChange}
+            onMount={(editor, monaco) => {
+              console.log("[@编辑器初始化]", {
+                editor,
+                monaco
+              })
+            }}
+          >
+          </Editor>
+        </div>
+      </div>
+    </>
   )
 }

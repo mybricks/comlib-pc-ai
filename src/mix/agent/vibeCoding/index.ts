@@ -2,9 +2,11 @@ import classLibrarySelection from "./tools/classLibrarySelection"
 import developMyBricksModule from "./tools/developMyBricksModule";
 import { updateRender, updateStyle } from "../../../utils/ai-code/transform-umd";
 import { createWorkspace } from "./workspace";
+import { PromiseStack } from "../utils";
 
 export default function ({ context }) {
-  console.log("[context]", context);
+  console.log("[@vibeCoding - context]", context);
+
   return {
     type: "vibeCoding",
     name: '智能组件助手',
@@ -27,7 +29,7 @@ export default function ({ context }) {
         rxai.requestAI({
           ...params,
           emits: {
-            write: () => {},
+            write: () => { },
             complete: () => {
               resolve('complete');
               params?.onProgress?.("complete");
@@ -36,7 +38,7 @@ export default function ({ context }) {
               reject(error);
               params?.onProgress?.("error");
             },
-            cancel: () => {},
+            cancel: () => { },
           },
           // 需求分析、重构（从0-1）、修改
           tools: [
@@ -46,32 +48,54 @@ export default function ({ context }) {
               onOpenLibraryDoc: (libs) => {
                 workspace.openLibraryDoc(libs)
               }
-            }), 
+            }),
             developMyBricksModule({
               execute(params) {
                 console.log("[@开发模块 - execute]", params);
                 const { files } = params;
-                files.forEach((file: any) => {
-                  const { fileName, content } = file;
-                  switch (fileName) {
-                    case "runtime.jsx":
-                      updateRender({ data: aiComParams.data }, content);
-                      break;
-                    case "style.less":
-                      updateStyle({ data: aiComParams.data }, content);
-                      break;
-                    case "model.json":
-                      aiComParams.data.modelConfig = encodeURIComponent(content);
-                      break;
-                    case "config.js":
-                      // TODO: 编译
-                      aiComParams.data.configJsCompiled = encodeURIComponent(content);
-                      aiComParams.data.configJsSource = encodeURIComponent(content);
-                      break;
-                    default:
-                      break;
+
+                const fileToDataKey: Array<{ fileName: string; dataKey: string; cb: (content: string) => void }> = [
+                  {
+                    fileName: 'model.json', dataKey: 'modelConfig', cb: (content) => {
+                      context.updateFile(focus.comId, { fileName: 'model.json', content });
+                    }
+                  },
+                  {
+                    fileName: 'runtime.jsx', dataKey: 'runtimeJsxSource', cb: (content) => {
+                      context.updateFile(focus.comId, { fileName: 'runtime.jsx', content });
+                    }
+                  },
+                  {
+                    fileName: 'style.less', dataKey: 'styleSource', cb: (content) => {
+                      context.updateFile(focus.comId, { fileName: 'style.less', content });
+                    }
+                  },
+                  {
+                    fileName: 'config.js', dataKey: 'configJsSource', cb: (content) => {
+                      context.updateFile(focus.comId, { fileName: 'config.js', content });
+                    }
+                  },
+                  {
+                    fileName: 'com.json', dataKey: 'componentConfig', cb: (content) => {
+                      context.updateFile(focus.comId, { fileName: 'com.json', content });
+                    }
+                  },
+                ];
+
+                fileToDataKey.forEach(({ fileName, dataKey, cb }) => {
+                  const matchedFiles = files.filter((file: any) => file.fileName === fileName);
+                  if (matchedFiles.length === 1) {
+                    cb(matchedFiles[0].content)
+                  } else if (matchedFiles.length === 2) {
+                    let current = decodeURIComponent(aiComParams.data[dataKey] || '');
+                    for (let i = 0; i < matchedFiles.length; i+=2) {
+                      const before = matchedFiles[i];
+                      const after = matchedFiles[i + 1];
+                      current = current.replace(before.content, after.content)
+                    }
+                    cb(current);
                   }
-                })
+                });
               }
             })
           ],

@@ -62,82 +62,13 @@ interface AIRuntimeProps {
   wrapper?: FunctionComponent<{ children: ReactElement, env: any, canvasContainer: any }>,
 }
 
-export const genAIRuntime = ({title, orgName, examples, dependencies, wrapper,ref}: AIRuntimeProps) =>
+export const genAIRuntime = ({title, orgName, examples, dependencies, wrapper}: AIRuntimeProps) =>
   ({env, data, inputs, outputs, slots, logger, id}: RuntimeParams<any>) => {
-    useMemo(() => {
-      if (env.edit) {
-        data._editors = void 0
-      }
-    }, [])
-
-    const scope = useMemo(() => {
-      let model = {};
-
-      try {
-        model = JSON.parse(decodeURIComponent(data.modelConfig));
-        Object.entries(model).forEach(([key, value]) => {
-          data.proxyModel[key] = value;
-        })
-      } catch (e) {
-        console.error("[@aicom - model解析失败]", e)
-      };
-
-      return {
-        data: data.proxyModel,
-        inputs: new Proxy({}, {
-          get(_, id) {
-            if (env.runtime) {
-              return (fn) => {
-                inputs[id]((value, relOutputs) => {
-                  fn(value, new Proxy({}, {
-                    get(_, key) {
-                      return relOutputs[key]
-                    }
-                  }))
-                })
-              }
-
-              return () => {
-              }
-            }
-            return () => {
-            }
-          }
-        }),
-        outputs: new Proxy({}, {
-          get(obj, id) {
-            if (env.runtime) {
-              const rtn = outputs[id]
-
-              if (rtn) {
-                return rtn
-              }
-            }
-
-            return () => {
-            }
-          }
-        }),
-        slots: new Proxy({}, {
-          get(obj, id) {
-            const rtn = slots[id]
-
-            if (rtn) {
-              return rtn
-            } else {
-              return {
-                render() {
-
-                }
-              }
-            }
-          }
-        }),
-        env,
-        context: {React},
-        logger
-      }
-    }, [slots, data.runtimeJsxCompiled])
+    // useMemo(() => {
+    //   if (env.edit) {
+    //     data._editors = void 0
+    //   }
+    // }, [])
 
     const errorInfo = useMemo(() => {
       if (!!data._jsxErr) {
@@ -168,7 +99,6 @@ export const genAIRuntime = ({title, orgName, examples, dependencies, wrapper,re
       return document?.querySelector('#_mybricks-geo-webview_')?.shadowRoot || null;
     }, [])
 
-
     return (
       <Wrapper env={env} canvasContainer={canvasContainer}>
         <AIJsxRuntime
@@ -176,7 +106,9 @@ export const genAIRuntime = ({title, orgName, examples, dependencies, wrapper,re
           id={id}
           styleCode={data.styleCompiled}
           renderCode={data.runtimeJsxCompiled}
-          renderProps={scope}
+          data={data}
+          inputs={inputs}
+          outputs={outputs}
           errorInfo={errorInfo}
           placeholder={<IdlePlaceholder title={title} orgName={orgName} examples={examples}/>}
           dependencies={{

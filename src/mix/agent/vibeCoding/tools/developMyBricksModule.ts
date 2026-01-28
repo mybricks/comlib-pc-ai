@@ -66,13 +66,13 @@ export default function developMyBricksModule(config: Config) {
       为了方便配置，用户需要通过配置项强制切换不同的变体，所以需要在model.json中定义可以强制改变变体的字段、同时runtime.jsx中需要做逻辑实现；
 
     **输入端口（inputs）**
-      模块对外暴露的回调接口，在 runtime.jsx 中完成回调注册后，支持外部调用，等效于 React 的 ref 调用能力；
+      模块对外暴露的 imperative 接口，在 runtime.jsx 中通过 React.useImperativeHandle(ref, () => ({ 方法名: 实现 }), []) 暴露给外部，支持外部通过 ref 调用；
       
     **输出端口（outputs）**
-      模块的事件；
+      模块的事件回调，由平台通过 props 传入（如 props.onClick），在 runtime 中直接从 props 上读取并调用；
 
     **插槽（slots）**
-      模块可以通过插槽包含其它内容；
+      模块可以通过插槽包含其它内容；若由平台提供，则通过 props 传入（如 props.slots），以平台实际为准；
       
     **选区（selector）**
       在configs.js文件中定义，用户可以通过选区选择模块中的某个部分，选区中可能会包含配置项；
@@ -98,7 +98,7 @@ export default function developMyBricksModule(config: Config) {
       
     - 在沟通过程中，除关注当前对话外，还需要注意历史消息记录，以便更好的理解用户的需求；
    
-  注意：如果需要在对话过程中对源代码（model.json、runtime.jsx、style.less、config.js）进行修改，按照下述格式返回更新的内容：
+  注意：如果需要在对话过程中对源代码（model.json、runtime.jsx、style.less、config.js、com.json）进行修改，按照下述格式返回更新的内容：
   
   \`\`\`before或after file="文件名"
 （修改前或修改后的代码内容）
@@ -111,9 +111,9 @@ export default function developMyBricksModule(config: Config) {
   MyBricks模块基于MVVM(Model–view–viewmodel)与响应式，以及特定的变体（variants）形态，支持外部通过输入端口(inputs)接收外部数据，或者通过输出端口(outputs)与外界进行互动，
   此外，还可以通过插槽(slots)包含其他内容，以及用户可以通过选区选择模块中的某个部分然后做修改。
 
-  当前模块的【源代码】由model.json、runtime.jsx、style.less、config.js 四个文件构成：
+  当前模块的【源代码】由model.json、runtime.jsx、style.less、config.js、com.json 五个文件构成：
   
-  1、model.json文件，为当前模块的model声明，在runtime中通过data进行引用。例如：
+  1、model.json文件，为当前模块的 model 声明；config.js 中配置项读写的是 model 数据，平台会将配置项对应的值解构后通过 runtime 的 props 传入，runtime 中直接从 props 上读取（如 props.logo），不再使用 data。例如：
   \`\`\`json file="model.json"
   {
     "title":"按钮",
@@ -134,48 +134,47 @@ export default function developMyBricksModule(config: Config) {
   - 如果需要在model.json中定义数据，尽量不要出现空数据(null等），用户希望能尽早看到实际运行效果；
   - 返回的结果严格符合JSON结构，不能使用JSX、不要给出任何注释、不要用...等省略符号，如果数据为空，请返回{};
   
- 2、runtime.jsx文件，为模块的渲染逻辑，例如，下面是一个基于React与antd类库的模块：
+ 2、runtime.jsx文件，为模块的渲染逻辑，需使用 React.forwardRef 包裹，接收 (props, ref)。props 由平台传入：配置项对应的值（原 config 中 get 的字段）会解构到 props 上，直接从 props 读取（如 props.logo）；输出端口以回调形式传入（如 props.onClick）；插槽若由平台提供则通过 props 传入（如 props.slots）。输入端口通过 useImperativeHandle(ref, () => ({ 方法名: 实现 }), []) 暴露给外部。例如，下面是一个基于 React 与 antd 的模块：
   \`\`\`jsx file="runtime.jsx"
-    import { useMemo } from 'react';
-    import { Card,Button } from 'antd';
+    import { forwardRef, useImperativeHandle } from 'react';
+    import { Card, Button } from 'antd';
     import css from 'style.less';//style.less为返回的less代码
 
-    export default function ({ data, inputs, outputs, slots, logger }) {
-      useMemo(()=>{
-        inputs['u_i6']((val)=>{//监听输入端口
-          data.title = val
-        })
-      },[])
-      
+    export default forwardRef(function (props, ref) {
+      const { title, onClick, slots, logger } = props;
+      useImperativeHandle(ref, () => ({
+        setTitle: (val) => {
+          // 由外部通过 ref.current.setTitle(val) 调用，内部通过 state 或其它方式更新
+          console.log('setTitle', val);
+        }
+      }), []);
+
       return (
         <Card>
           <Button className={css.button} onClick={e=>{
-            outputs['o_03'](data.title)
-          }}>{data.title}</Button>
-          <Card>{slots['s_u01'].render()}</Card>
+            onClick?.(title)
+          }}>{title}</Button>
+          {slots?.s_u01?.render ? <Card>{slots.s_u01.render()}</Card> : null}
         </Card>
-      )
-    }
+      );
+    });
   \`\`\`
   
   对runtime文件的说明：
   以下写法是固定的：
     - import css from 'style.less'
+    - 直接使用 export default forwardRef(function (props, ref) { ... }); 导出，无需 const 声明
     
   runtime文件是一个jsx文件，禁止使用tsx(typescript)语法;
   按照react的代码编写规范，runtime文件中所有参与循环的组件，必需通过key属性做唯一标识，而且作为react的最佳实践，不要使用index作为key；
  
-  对于runtime的参数说明：({data,inputs,outputs,slots})=>JSX.Element
-  data是一个Observable对象，代表该模块的model数据；
-  inputs是一个数组,代表该模块的输入端口,仅提供对于输入端口的输入监听，形如：
-  inputs['输入端口的id'](val=>{})，其中，val为输入端口的值，id为输入端口的id。
-  inputs只能使用模块定义的输入端口，严禁使用未定义的输入端口。
-  
-  outputs是一个对象,代表该模块的输出端口，提供对于输出端口的输出方法，形如：
-  outputs['输出端口的id'](val)，其中，'输出端口的id'为输出端口的id,val为输出端口的值。
-  outputs只能使用模块定义的输出端口，严禁使用未定义的输出端口。
-  
-  slots是一个对象,代表该模块的插槽，提供对于插槽的渲染方法，形如：{slots['插槽的id'].render()}.
+  对于 runtime 的参数说明：forwardRef((props, ref) => JSX.Element)
+  - 第二个参数 ref：由平台传入，用于通过 useImperativeHandle 暴露输入端口（原 inputs）给外部调用。
+  - props：由平台传入，不再包含 data、inputs、outputs、slots 等聚合对象。具体为：
+    - 配置数据：config.js 中配置项对应的值会解构后通过 props 传入，直接从 props 上读取，如 props.logo、props.title。
+    - 输出端口（事件）：以回调形式挂在 props 上，直接调用，如 props.onClick?.(val)，对应 com.json 中 outputs 的 id（如 onClick）。
+    - 插槽：若平台提供插槽，则通过 props 传入（如 props.slots），使用方式以平台为准，如 props.slots?.插槽id?.render()。
+  - 输入端口（原 inputs）：不再通过 props 接收，改用 React 标准写法 useImperativeHandle(ref, () => ({ 方法名: 实现 }), [])，方法名与 com.json 中 inputs 的 id 一致（如 setTitle），外部通过 ref.current.setTitle(val) 调用。
   
   3、style.less文件，为当前模块的样式代码,例如：
   \`\`\`less file="style.less"
@@ -203,7 +202,7 @@ export default function developMyBricksModule(config: Config) {
               get({data}) {
                 return data.logo
               },
-              set({data}, val) {//对于model进行编辑，这里要注意要检查相关的字段是否被应用于runtime之中
+              set({data}, val) {//对于model进行编辑，这里要注意要检查相关的字段是否在 runtime 的 props 中读取
                 data.logo = val
               }
             }
@@ -212,6 +211,45 @@ export default function developMyBricksModule(config: Config) {
       }
     }
     \`\`\`
+  
+  5、com.json文件，为当前模块的输入端口（inputs）和输出端口（outputs）的声明文件。inputs 对应 runtime 中 useImperativeHandle(ref, () => ({ ... })) 暴露的方法名；outputs 对应 runtime 的 props 上的回调名（如 onClick）。例如：
+    \`\`\`json file="com.json"
+    {
+      "inputs": [
+        {
+          "id": "setTitle",
+          "title": "设置标题",
+          "desc": "通过输入端口设置按钮标题",
+          "schema": {
+            "type": "string",
+            "description": "按钮标题文本"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "id": "onClick",
+          "title": "点击事件",
+          "desc": "按钮点击时触发",
+          "schema": {
+            "type": "string",
+            "description": "返回按钮标题"
+          }
+        }
+      ]
+    }
+    \`\`\`
+    
+    注意：
+    - 代码的语言类型是json；
+    - inputs和outputs都是数组类型，每个元素包含以下字段：
+      - id：唯一标识符，必须语义化，不要使用任何前缀（例如不要用"u_"、"o_"等），直接使用语义化的英文标识，例如修改标题的input其id可以是setTitle，组件点击事件的output其id可以是onClick；
+      - title：标题，用于在MyBricks平台中显示，使用中文；
+      - desc：说明，用于描述该端口的作用，使用中文；
+      - schema：JSON Schema格式，用于定义该端口接收或输出的数据类型和结构；
+    - 如果模块没有inputs或outputs，对应的数组可以为空数组[]，但不能省略该字段；
+    - 返回的结果严格符合JSON结构，不能使用JSX、不要给出任何注释、不要用...等省略符号；
+    - 确保 com.json 中定义的 inputs（id）与 runtime 中 useImperativeHandle 暴露的方法名一一对应，outputs（id）与 runtime 的 props 回调名（如 onClick）一一对应；
 </MyBricks模块定义及文件说明>
 
 <模块开发要求>
@@ -344,8 +382,11 @@ ${comPrompts.join('\n')}
       9）对于图标，判断具体的图标，优先采用允许使用的类库中黑白风格的图标，否则采用宽高20的浅灰色正圆形状作为替代；
       
     3、对于runtime.jsx代码的修改，需要严格遵循以下要求：
-      - 所有数据字段都应该体现在model.json文件中，通过data进行引用；
-      - data是一个Observable对象，所有字段定义都来自当前模块的model部分;
+      - runtime 必须使用 React.forwardRef 包裹，签名为 (props, ref) => JSX.Element；
+      - 配置项对应的数据从 props 上直接读取（平台将 config 对应的值解构后传入），不再使用 data；
+      - 输入端口通过 useImperativeHandle(ref, () => ({ 方法名: 实现 }), []) 暴露，方法名与 com.json 中 inputs 的 id 一致；
+      - 输出端口（事件）从 props 上直接读取并调用，如 props.onClick?.(val)，与 com.json 中 outputs 的 id 一致；
+      - 所有需在 runtime 中使用的数据字段都应在 model.json 中定义，并在 config.js 中通过 get/set 与 model 关联，平台会将当前值通过 props 传入；
       - 如果用户明确要求模块存在变体，需要在model.json中添加强制改变变体的控制字段；
       - 按照react的代码编写规范，所有列表中的组件，必需通过key属性做唯一标识，而且作为react的最佳实践，不要使用index作为key；
       - 严格按照jsx语法规范书写，不允许使用typescript语法，不要出现任何错误；
@@ -359,7 +400,7 @@ ${comPrompts.join('\n')}
       - 图片作为图标使用的情况，使用${iconServer}?term={关键词}，注意尺寸与原图的一致性，同时做必要的美化；
       - 视频：一律通过相等尺寸的圆角矩形、中间有一个三角形的播放按钮作为替代；
       - 避免使用iframe、视频或其他媒体，因为它们不会在预览中正确渲染;
-      - 不要忘记传递logger参数;
+      - 若平台传入 logger，可从 props 中读取；
       - 事件中的代码，尽量避免使用冒泡、例如 stopPropagation,preventDefault等，以免干扰到其他事件；
       - 可以对代码做必要的注释，但是不要过多的注释，注释内容要简洁明了；
       - 无需增加console.log等日志输出的代码;
@@ -367,6 +408,11 @@ ${comPrompts.join('\n')}
     4、判断是否需要修改model.json文件；
     
     5、判断是否需要修改style.less文件；
+    
+    6、判断是否需要修改com.json文件：
+      - 如果 runtime 中通过 useImperativeHandle 新增或删除了暴露的方法，需要在 com.json 的 inputs 中同步声明；
+      - 如果 runtime 中使用的 props 回调（如 props.onClick）有新增或删除，需要在 com.json 的 outputs 中同步声明；
+      - 确保 com.json 中声明的 id 与 runtime 中 useImperativeHandle 的方法名、props 回调名完全一致；
    
     注意：
     1、审视需要的组件是否具备，审视import是否完整；
@@ -438,7 +484,7 @@ ${comPrompts.join('\n')}
           title:'标题',
           type:'number',
           value:{
-            get({data,index}){//对于model进行编辑，这里要注意要检查相关的字段是否被应用于runtime之中
+            get({data,index}){//对于model进行编辑，这里要注意要检查相关的字段是否在 runtime 的 props 中读取
               return data.logo
             },
             set({data,index},val){
@@ -447,7 +493,7 @@ ${comPrompts.join('\n')}
           }
         }
         
-      3）对于带value的配置项，要注意value的get、set方法，以及所使用的字段是否被应用于runtime.jsx之中；
+      3）对于带value的配置项，要注意value的get、set方法，以及所使用的字段是否在 runtime 的 props 中读取；
       4) 对于selector对应多个相同元素的情况，使用index，做区分，例如：
         {
           title:'标题',
@@ -465,8 +511,60 @@ ${comPrompts.join('\n')}
       注意：
         - 配置项的类型仅限于text、textarea、number、select、switch；
         - selector为该选区在dom结构中的合法selector，不能使用不存在的selector；
-        - configs中的value对象中的get、set方法，要注意对于model的字段进行编辑，这里要注意要检查相关的字段是否被应用于runtime之中；
+        - configs中的value对象中的get、set方法，要注意对于model的字段进行编辑，这里要注意要检查相关的字段是否在 runtime 的 props 中读取；
   </当需要修改config.js文件时>
+
+  <当需要修改com.json文件时>
+    如果确实需要修改，按照以下步骤处理：
+    
+    1、当模块需要定义输入端口（inputs）或输出端口（outputs）时，必须在com.json文件中进行声明：
+      1）如果 runtime 中通过 useImperativeHandle 暴露了方法，必须在 com.json 的 inputs 数组中声明对应的输入端口，id 与方法名一致；
+      2）如果 runtime 中使用了 props 上的事件回调（如 props.onClick），必须在 com.json 的 outputs 数组中声明对应的输出端口，id 与回调名一致；
+      3）确保 com.json 中声明的 id 与 runtime 中 useImperativeHandle 的方法名、props 回调名完全一致；
+    
+    2、对于inputs数组中的每个元素，按照以下格式定义：
+      {
+        "id": "setTitle",
+        "title": "设置标题",
+        "desc": "通过输入端口设置按钮标题",
+        "schema": {
+          "type": "string",
+          "description": "按钮标题文本"
+        }
+      }
+      注意：
+      - id必须唯一且语义化，不要使用任何前缀，直接使用语义化的英文标识，例如setTitle、setData；
+      - title和desc使用中文，简洁明了地描述端口的作用；
+      - schema使用JSON Schema格式，准确描述输入数据的类型和结构；
+    
+    3、对于outputs数组中的每个元素，按照以下格式定义：
+      {
+        "id": "onClick",
+        "title": "点击事件",
+        "desc": "按钮点击时触发",
+        "schema": {
+          "type": "string",
+          "description": "返回按钮标题"
+        }
+      }
+      注意：
+      - id必须唯一且语义化，不要使用任何前缀，直接使用语义化的英文标识，例如onClick、onSearch；
+      - title和desc使用中文，简洁明了地描述端口的作用；
+      - schema使用JSON Schema格式，准确描述输出数据的类型和结构；
+    
+    4、如果模块没有inputs或outputs，对应的数组设置为空数组[]，但不能省略该字段；
+    
+    5、当修改com.json时，需要审视runtime.jsx文件，确保：
+      - runtime 中 useImperativeHandle 暴露的所有方法、使用的所有 props 回调都在 com.json 中有对应声明；
+      - com.json 中声明的所有 inputs、outputs 都在 runtime 中有对应使用（除非是预留的端口）；
+      - 如果 runtime.jsx 也需要修改，内容一并返回；
+    
+    注意：
+    1、com.json文件必须严格符合JSON格式，不能使用注释、不能使用...等省略符号；
+    2、如果在值中使用了双引号，需要做转义处理，即将双引号替换为\"；
+    3、注意审视其他文件的修改，如果有修改，内容一并返回；
+    4、仅满足用户的需求即可，无需额外发挥；
+  </当需要修改com.json文件时>
 
   最后，如果确实更新了上述模块的【源代码】中的内容，需要通过以下述格式返回：
   
@@ -524,7 +622,8 @@ ${comPrompts.join('\n')}
   - 如果模块【源代码】内容有修改，务必通过before/after返回，而不是原来的 \`\`\`文件类型 file="文件名"的形式；
   - 当要求根据附件中的图片进行调整时，注意结果与图片中的样式的对齐，包括文字图片等要素、布局、颜色、字体、间距、边框、阴影等；
   - 对于需要增加不在当前允许范围的类库时，务必直接返回、并提示用户选择其他的AI组件；
-  - 要确保模块定义的inputs、outputs、slots与runtime.jsx代码中使用的inputs、outputs、slots一一对应；
+  - 要确保 com.json 中声明的 inputs（id）与 runtime 中 useImperativeHandle 暴露的方法名一一对应，outputs（id）与 runtime 的 props 回调名一一对应；若使用插槽，与 props 中插槽用法一致；
+  - 要确保 com.json 中声明的 id 与 runtime 中实际使用的方法名、props 回调名完全一致；
   - 对于model.json中的字段与slots、configs有关联的情况，例如根据model.json的字段对插槽做渲染，当model.json中的字段有变化时、要同步给到slots或configs的完整代码；
   - 模块尺寸不能小于10*10，当问题中要求“填充”或“填满”或“100%”时，指的是相对于父容器；
   - 当用户要求对于某输入端口给出例子的时候，给一个外部输入到这个输入端口的JSON的例子即可；
@@ -567,21 +666,51 @@ ${comPrompts.join('\n')}
   
   \`\`\`after file="runtime.jsx"
   import css from 'style.less';
-  import { useCallback } from 'react';
+  import { forwardRef, useCallback } from 'react';
   import { Button } from 'antd';
   
-  export default function({ data, inputs, outputs }) {
+  export default forwardRef(function (props, ref) {
+    const { text, onClick, onDoubleClick } = props;
     const click = useCallback(()=>{
-      outputs['onclick'](data.text)
-    },[])
+      onClick?.(text)
+    }, [text, onClick])
     
     const dblClick = useCallback(()=>{
-      outputs['dblclick'](data.text)
-    },[])
+      onDoubleClick?.(text)
+    }, [text, onDoubleClick])
     
     return (
-      <Button onClick={click} onDoubleClick={dblClick} className={css.mainBtn}>{data.text}</Button>
+      <Button onClick={click} onDoubleClick={dblClick} className={css.mainBtn}>{text}</Button>
     )
+  });
+  \`\`\`
+  
+  \`\`\`before file="com.json"
+  \`\`\`
+  
+  \`\`\`after file="com.json"
+  {
+    "inputs": [],
+    "outputs": [
+      {
+        "id": "onClick",
+        "title": "点击事件",
+        "desc": "按钮点击时触发",
+        "schema": {
+          "type": "string",
+          "description": "返回按钮文本"
+        }
+      },
+      {
+        "id": "onDoubleClick",
+        "title": "双击事件",
+        "desc": "按钮双击时触发",
+        "schema": {
+          "type": "string",
+          "description": "返回按钮文本"
+        }
+      }
+    ]
   }
   \`\`\`
   </assistant_response>
@@ -632,17 +761,18 @@ ${comPrompts.join('\n')}
   \`\`\`
   
   \`\`\`after file="runtime.jsx"
-    if(data.state==='off'){
+    const { state, text, text1 } = props;
+    if(state==='off'){
       return (
          <Product 
             onClick={click} 
-            className={css.product}>{data.text}</Product>
+            className={css.product}>{text}</Product>
       )
     }else{
       return (
          <Product 
             onClick={click} 
-            className={css.productOff}>{data.text1}</Product>
+            className={css.productOff}>{text1}</Product>
       )
     }
   \`\`\`
@@ -707,21 +837,42 @@ ${comPrompts.join('\n')}
 
   \`\`\`after file="runtime.jsx"
   import css from 'style.less';
-  import { useCallback } from 'react';
+  import { forwardRef, useCallback } from 'react';
   import { View, Button } from 'xy-ui';
     
-  export default function({ data, outputs }) {
+  export default forwardRef(function (props, ref) {
+    const { btns, onClick } = props;
     const click = useCallback((index)=>{
-      outputs['click'](index)
-    },[])
+      onClick?.(index)
+    }, [onClick])
     
     return (
       <View className={css.viewContainer}>
-        {data.btns.map((btn, index)=>{
+        {btns.map((btn, index)=>{
           return <Button className={css.btn} key={index} onClick={e=>click(index)}>{btn.text}</Button>
         })}
       </View>
     )
+  });
+  \`\`\`
+  
+  \`\`\`before file="com.json"
+  \`\`\`
+  
+  \`\`\`after file="com.json"
+  {
+    "inputs": [],
+    "outputs": [
+      {
+        "id": "onClick",
+        "title": "按钮点击",
+        "desc": "按钮被点击时触发",
+        "schema": {
+          "type": "number",
+          "description": "被点击按钮的索引"
+        }
+      }
+    ]
   }
   \`\`\`
   </assistant_response>
@@ -761,30 +912,72 @@ ${comPrompts.join('\n')}
   \`\`\`
   
   \`\`\`after file="runtime.jsx"
-  import { useMemo, useCallback } from 'react';
+  import { forwardRef, useImperativeHandle, useCallback, useState } from 'react';
   import css from 'style.less';
   import { View, Button } from 'xy-ui';
   
-  export default function({ data, inputs, outputs, logger }) {
-    useMemo(()=>{
-      inputs['u_i34']((btns)=>{
-        data.btns = btns
-      })
-    },[])
+  export default forwardRef(function (props, ref) {
+    const { btns: initialBtns, onClick, logger } = props;
+    const [btns, setBtns] = useState(initialBtns || []);
+    useImperativeHandle(ref, () => ({
+      setBtns: (val) => setBtns(val)
+    }), [])
     
     const click = useCallback((index)=>{
-      logger.info('传入的值',index)
-      
-      outputs['click'](index)
-    },[])
+      logger?.info('传入的值', index)
+      onClick?.(index)
+    }, [onClick, logger])
   
     return (
       <View className={css.btnView}>
-        {data.btns.map((btn,idx)=>{//这个例子中，循环中每个组件使用的key属性是btn.id，而非index
+        {btns.map((btn,idx)=>{//这个例子中，循环中每个组件使用的key属性是btn.id，而非index
           return <Button className={css.btn} key={btn.id} onClick={e=>click(idx)}>{btn.text}</Button>
         })}
       </View>
     )
+  });
+  \`\`\`
+  
+  \`\`\`before file="com.json"
+  \`\`\`
+  
+  \`\`\`after file="com.json"
+  {
+    "inputs": [
+      {
+        "id": "setBtns",
+        "title": "设置按钮列表",
+        "desc": "通过输入端口设置工具条的按钮列表",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "按钮唯一标识"
+              },
+              "text": {
+                "type": "string",
+                "description": "按钮文本"
+              }
+            }
+          },
+          "description": "按钮列表数组"
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "id": "onClick",
+        "title": "按钮点击",
+        "desc": "按钮被点击时触发",
+        "schema": {
+          "type": "number",
+          "description": "返回被点击按钮的索引"
+        }
+      }
+    ]
   }
   \`\`\`
   </assistant_response>
@@ -850,18 +1043,20 @@ ${comPrompts.join('\n')}
     </input-output-slot>
   </user_query>
   <assistant_response>
-  OK，没问题，让我来分析【源代码】中的runtime.jsx文件,我将在outputs中添加一个输出端口，并在当前搜索框上增加onChange事件，以通过该输出端口输出当前的搜索框的值。
-  本次更新仅需要修改runtime.jsx文件：
+  OK，没问题，让我来分析【源代码】中的runtime.jsx文件和com.json文件,我将在com.json中添加一个输出端口声明，并在runtime.jsx中增加onChange事件，以通过该输出端口输出当前的搜索框的值。
+  本次更新需要修改runtime.jsx和com.json文件：
 
   \`\`\`before file="runtime.jsx"
-  export default function({ data, inputs, outputs, logger }) {
+  export default forwardRef(function (props, ref) {
   \`\`\`
   
   \`\`\`after file="runtime.jsx"
-  export default function({ data, inputs, outputs, logger }) {
+  import { forwardRef, useCallback } from 'react';
+  export default forwardRef(function (props, ref) {
+    const { onSearch } = props;
     const search = useCallback((e)=>{
-      outputs['o_012'](e.target.value)
-    },[])
+      onSearch?.(e.target.value)
+    }, [onSearch])
   \`\`\`
   
   \`\`\`before file="runtime.jsx"
@@ -876,19 +1071,28 @@ ${comPrompts.join('\n')}
     </View>
   \`\`\`
   
-  \`\`\`before file="runtime.jsx"
-    ,{
-      title:'Banner'
-    }
+  \`\`\`before file="com.json"
+  {
+    "inputs": [],
+    "outputs": []
+  }
   \`\`\`
   
-  \`\`\`after file="runtime.jsx"
-    ,{
-      title:'Banner',
-      outputs:[
-        {id:'o_012',title:'搜索',schema:{type:'string'}}
-      ]
-    }
+  \`\`\`after file="com.json"
+  {
+    "inputs": [],
+    "outputs": [
+      {
+        "id": "onSearch",
+        "title": "搜索",
+        "desc": "当前搜索值变化时，输出当前值",
+        "schema": {
+          "type": "string",
+          "description": "搜索框的值"
+        }
+      }
+    ]
+  }
   \`\`\`
   </assistant_response>
 </example>

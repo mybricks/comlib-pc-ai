@@ -5,18 +5,33 @@ import echartsForReact from './../utils/echarts-for-react'
 import antdPrompt from './prompts/antd-summary.md'
 import echartsPrompt from './prompts/echarts-summary.md'
 import iconPrompt from "./prompts/icon-summary.md"
-//import dndkitPrompt from "./prompts/dndkit-summary.md"
-import { ANTD_KNOWLEDGES_MAP, ECHARTS_KNOWLEDGES_MAP, DNDKIT_KNOWLEDGES_MAP } from './knowledges'
-import { updateRender, updateStyle } from '../utils/ai-code/transform-umd'
+import { ANTD_KNOWLEDGES_MAP, ECHARTS_KNOWLEDGES_MAP } from './knowledges'
 
-// import * as dndCore from "@dnd-kit/core";
-// import * as dndModifiers from '@dnd-kit/modifiers';
-// import * as dndSortable from '@dnd-kit/sortable';
-// import * as dndUtilities from '@dnd-kit/utilities';
 import * as antd from "antd";
 import LowcodeView from "./lowcodeView";
 import lowcodeViewCss from "./lowcodeView/index.lazy.less";
 import context from "./context";
+
+function evalConfigJsCompiled(code: string) {
+  const evalStr = `
+    let result;
+    ${code.replace('export default', 'result =')};
+    result; // 最后一行返回结果
+  `;
+  
+  try {
+    return eval(evalStr);
+  } catch (error) {
+    console.error('eval执行失败：', error);
+    return null;
+  }
+}
+
+function detectJsonIndent(jsonStr: string): string | number {
+  const match = jsonStr.match(/\n([ \t]+)/);
+  if (match) return match[1];
+  return 2;
+}
 
 export default {
   '@init': (params) => {
@@ -27,15 +42,10 @@ export default {
   '@resize': {
     options: ['width', 'height'],
   },
-  // '@save'({data}) {
-  //   const saveData = {}
-  //   for (const key in data) {
-  //     if (key.startsWith('_')) {//去除中间运行产生的数据
-  //       saveData[key] = data[key]
-  //     }
-  //   }
-  //
-  //   return saveData
+  // '@save'({ data }) {
+  //   console.log("[@save - data]", data);
+  
+  //   return data
   // },
   '@ai': genAIEditor({
     prompts: iconPrompt + `\n` + antdPrompt + `\n` + echartsPrompt
@@ -112,111 +122,56 @@ export default {
   }),
   ':slot': {},
   ':root': {
-    // items({ data, env, id, input, output }, ...catalog) {
-    //   // console.log("[items - data]", data)
+    items({ data  }, ...catalog) {
+      const items0: any[] = [];
+      let componentConfig: any = {};
 
-    //   // // TODO: 临时代码
-    //   // if (!data.configs) {
-    //   //   data.configs = []
-    //   // }
-    //   // if (!data.config) {
-    //   //   data.config = {}
-    //   // }
+      try {
+        componentConfig = JSON.parse(decodeURIComponent(data.componentConfig));
+      } catch {}
 
-    //   // const items0 = data.configs.filter((config) => {
-    //   //   return config.type !== "style"
-    //   // }).map(({ type, title, fieldName }) => {
-    //   //   return {
-    //   //     title,
-    //   //     type,
-    //   //     value: {
-    //   //       get({ data }) {
-    //   //         return data.config[fieldName];
-    //   //       },
-    //   //       set({ data }, value) {
-    //   //         data.config[fieldName] = value;
-    //   //       }
-    //   //     }
-    //   //   }
-    //   // })
+      let configs = {};
 
-    //   // if (data.outputs) {
-    //   //   items0.push({
-    //   //     title: "事件",
-    //   //     items: data.outputs.map(({ id, title }) => {
-    //   //       return {
-    //   //         title,
-    //   //         type: '_Event',
-    //   //         options: {
-    //   //           outputId: id
-    //   //         }
-    //   //       }
-    //   //     })
-    //   //   })
-    //   // }
+      try {
+        configs = evalConfigJsCompiled(decodeURIComponent(data.configJsCompiled));
+        const rootConfig = configs[':root'];
+        items0.push(...rootConfig.items.map((item) => {
+          return {
+            ...item,
+            value: {
+              get({ data }) {
+                return item.value.get({ data: JSON.parse(decodeURIComponent(data.modelConfig)) });
+              },
+              set({ data }, value) {
+                const rawConfig = decodeURIComponent(data.modelConfig);
+                const model = JSON.parse(rawConfig);
+                item.value.set({ data: model }, value);
+                data.modelConfig = encodeURIComponent(JSON.stringify(model, null, detectJsonIndent(rawConfig)));
+              }
+            }
+          }
+        }))
+      } catch {}
 
-    //   const items0: any[] = [];
+      if (componentConfig.outputs?.length) {
+        items0.push({
+          title: "事件",
+          items: componentConfig.outputs.map(({ id, title }) => {
+            return {
+              title,
+              type: '_Event',
+              options: {
+                outputId: id
+              }
+            }
+          })
+        })
+      }
 
-    //   items0.push({
-    //     title: 'React',
-    //     type: 'code',
-    //     options: {
-    //       title: '编辑自定义JSX',
-    //       language: 'typescript',
-    //       width: 600,
-    //       minimap: {
-    //         enabled: false
-    //       },
-    //       eslint: {
-    //         parserOptions: {
-    //           ecmaVersion: '2020',
-    //           sourceType: 'module'
-    //         }
-    //       },
-    //       babel: false,
-    //       autoSave: false,
-    //       preview: false,
-    //       extraLib: data.extraLib,
-    //       isTsx: true
-    //     },
-    //     value: {
-    //       get({ data }) {
-    //         return data._sourceRenderCode;
-    //       },
-    //       set({ data }, value) {
-    //          data._sourceRenderCode = value;
-    //          updateRender({ data }, decodeURIComponent(value))
-    //       }
-    //     }
-    //   },
-    //     {
-    //       title: 'Less',
-    //       type: 'code',
-    //       options: {
-    //         title: 'Less',
-    //         language: 'less',
-    //         width: 600,
-    //         minimap: {
-    //           enabled: false
-    //         },
-    //         autoSave: false,
-    //         preview: false
-    //       },
-    //       value: {
-    //         get({ data }) {
-    //           return data._sourceStyleCode;
-    //         },
-    //         set({ data }, value) {
-    //           data._sourceStyleCode = value;
-    //           updateStyle({ data }, decodeURIComponent(value)
-    //         )
-    //         }
-    //       }
-    //     },)
 
-    //   catalog[0].title = '常规';
-    //   catalog[0].items = items0;
-    // },
+      catalog[0].title = '常规';
+      catalog[0].items = items0;
+    },
     // style({ data }) {
     //   return data.configs.filter((config) => {
     //     return config.type === "style"
@@ -230,6 +185,8 @@ export default {
   },
  '@lowcode':{
     render(params, plugins){
+      console.log("[@lowcode - render - params]", params);
+      context.setAiComParams(params.model.runtime.id, params);
       context.plugins = plugins;
       context.createVibeCodingAgent({ register: plugins.aiService.registerAgent })
 
@@ -290,4 +247,10 @@ export default {
   //     })
   //   }
   // }
+  // '@toJSON'({ data, scenes }){
+  //   console.log("@toJSON: ", data)
+  //   return {
+  //     data
+  //   }
+  // },
 }

@@ -101,7 +101,8 @@ const REQUIRED_FILES: Array<{ fileName: string; extname: string; description: st
   { fileName: 'runtime.jsx', extname: '.jsx', description: '运行时文件' },
   { fileName: 'style.less', extname: '.less', description: '样式代码' },
   { fileName: 'model.json', extname: '.json', description: 'model声明' },
-  { fileName: 'config.js', extname: '.js', description: '配置声明文件' }
+  { fileName: 'config.js', extname: '.js', description: '配置声明文件' },
+  { fileName: 'com.json', extname: '.json', description: '当前模块的输入端口（inputs）和输出端口（outputs）的声明文件' }
 ];
 
 /**
@@ -170,7 +171,7 @@ export class Workspace {
 
         switch (fileName) {
           case 'runtime.jsx': {
-            let runtimeCode = data.runtimeJsxCompiled ?? ''
+            let runtimeCode = data.runtimeJsxSource ?? ''
             try {
               runtimeCode = decodeURIComponent(runtimeCode)
             } catch (error) {
@@ -180,7 +181,7 @@ export class Workspace {
             return runtimeCode
           }
           case 'style.less': {
-            let styleCode = data.styleCompiled ?? ''
+            let styleCode = data.styleSource ?? ''
             try {
               styleCode = decodeURIComponent(styleCode)
             } catch (error) {
@@ -200,7 +201,7 @@ export class Workspace {
             return modelCode
           }
           case 'config.js': {
-            let configCode = data.configJsCompiled ?? ''
+            let configCode = data.configJsSource ?? ''
             try {
               configCode = decodeURIComponent(configCode)
             } catch (error) {
@@ -208,6 +209,16 @@ export class Workspace {
               console.error('[Workspace.readFile] 获取config.js失败:', error);
             }
             return configCode
+          }
+          case 'com.json': {
+            let componentConfigCode = data.componentConfig ?? ''
+            try {
+              componentConfigCode = decodeURIComponent(componentConfigCode)
+            } catch (error) {
+              componentConfigCode = ''
+              console.error('[Workspace.readFile] 获取com.json失败:', error);
+            }
+            return componentConfigCode
           }
           default:
             return data[fileName] || '';
@@ -288,7 +299,7 @@ export class Workspace {
   /**
    * 打开类库文档
    */
-  async openLibraryDoc(libs = []) {
+  async openLibraryDoc(libs: any[] = []) {
     const componentKnowledges = loadKnowledge(libs)
 
     componentKnowledges.forEach(async (componentKnowledge) => {

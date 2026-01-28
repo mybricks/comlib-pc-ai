@@ -2,8 +2,9 @@ const NAME = 'load-extra-component-docs'
 classLibrarySelection.toolName = NAME
 
 interface Config {
-  onOpenLibraryDoc: (libraryDoc: string) => void;
+  onOpenLibraryDoc: (libraryDoc: any[]) => void;
   librarySummaryDoc: string;
+  fileFormat: (params: { fileName: string; content: string }) => string;
 }
 
 export default function classLibrarySelection(config: Config) {
