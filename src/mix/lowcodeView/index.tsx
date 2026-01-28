@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useRef } from "react";
+import React, { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import Editor, { HandlerType } from "@mybricks/coder/dist/umd";
 import context from "../context";
 import lazyCss from "./index.lazy.less";
@@ -106,6 +106,40 @@ export default function LowcodeView(params: Params) {
       horizontalScrollbarSize: 10
     }
   }), []);
+
+  // 按需覆盖：仅当某 data 字段变化时，只清除对应文件的未保存内容，其它文件保留
+  const clearFileIfDataChanged = useCallback((fileName: FileName) => {
+    setModifiedContent((prev) => {
+      if (!(fileName in prev)) {
+        return {
+          ...prev,
+        };
+      }
+      const next = { ...prev };
+      delete next[fileName];
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    clearFileIfDataChanged("model.json");
+  }, [params.data?.modelConfig]);
+
+  useEffect(() => {
+    clearFileIfDataChanged("style.less");
+  }, [params.data?.styleSource]);
+
+  useEffect(() => {
+    clearFileIfDataChanged("runtime.jsx");
+  }, [params.data?.runtimeJsxSource]);
+
+  useEffect(() => {
+    clearFileIfDataChanged("config.js");
+  }, [params.data?.configJsSource]);
+
+  useEffect(() => {
+    clearFileIfDataChanged("com.json");
+  }, [params.data?.componentConfig]);
 
   return (
     <>
