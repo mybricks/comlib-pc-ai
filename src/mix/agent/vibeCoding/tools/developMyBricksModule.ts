@@ -1243,5 +1243,6 @@ ${comPrompts.join('\n')}
       config.execute(params);
       return "编写完成"
     },
+    aiRole: "architect",
   };
 }
