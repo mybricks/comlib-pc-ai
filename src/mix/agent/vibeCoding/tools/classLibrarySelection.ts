@@ -73,7 +73,7 @@ export default function classLibrarySelection(config: Config) {
     execute(params: any) {
       let requireData = []
       const requireFile = params?.files?.[0];
-      if (requireFile.extension === 'json') {
+      if (requireFile?.extension === 'json') {
         try {
           requireData = JSON.parse(requireFile.content);
         } catch (error) {
