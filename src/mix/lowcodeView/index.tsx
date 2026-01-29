@@ -174,12 +174,12 @@ export default function LowcodeView(params: Params) {
             theme={'light'}
             wrapperClassName={css['coder']}
             onChange={handleEditorChange}
-            onMount={(editor, monaco) => {
-              console.log("[@编辑器初始化]", {
-                editor,
-                monaco
-              })
-            }}
+            // onMount={(editor, monaco) => {
+            //   console.log("[@编辑器初始化]", {
+            //     editor,
+            //     monaco
+            //   })
+            // }}
           >
           </Editor>
         </div>
