@@ -1,4 +1,4 @@
-import React from 'react';
+、import React from 'react';
 import LowcodeView from "./lowcodeView";
 import lowcodeViewCss from "./lowcodeView/index.lazy.less";
 import context from "./context";
@@ -10,7 +10,7 @@ function evalConfigJsCompiled(code: string) {
     ${code.replace('export default', 'result =')};
     result; // 最后一行返回结果
   `;
-  
+
   try {
     return eval(evalStr);
   } catch (error) {
@@ -109,19 +109,21 @@ export default function (props) {
     })
   }
 
-  return {
+  console.log("[@focusAreaConfigs]", focusAreaConfigs);
+
+  const res = {
     ...focusAreaConfigs,
     /** 可调整宽高 */
     '@resize': {
       options: ['width', 'height'],
     },
     /** 代码编辑器面板 */
-   '@lowcode':{
+    '@lowcode':{
       render(params, plugins){
         context.setAiComParams(params.model.runtime.id, params);
         context.plugins = plugins;
         context.createVibeCodingAgent({ register: plugins.aiService.registerAgent })
-  
+
         return (
           <LowcodeView {...params}/>
         )
@@ -139,4 +141,8 @@ export default function (props) {
     /** toJSON的回调 */
     // '@toJSON'(){},
   }
+
+  console.log("[@res]", res);
+
+  return res;
 }
