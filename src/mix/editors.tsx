@@ -98,11 +98,19 @@ export default function (props) {
       const knowledge: any = ANTD_KNOWLEDGES_MAP[component.toUpperCase()];
 
       if (knowledge?.editors) {
-        Object.entries(knowledge.editors).forEach(([key, value]) => {
+        Object.entries(knowledge.editors).forEach(([key, value]: any) => {
           if (key === ":root") {
-            focusAreaConfigs[`.${className}`] = value;
+            if (!focusAreaConfigs[`.${className}`]) {
+              focusAreaConfigs[`.${className}`] = value;
+            } else {
+              focusAreaConfigs[`.${className}`].style = value.style;
+            }
           } else {
-            focusAreaConfigs[`.${className} ${key}`] = value;
+            if (!focusAreaConfigs[`.${className} ${key}`]) {
+              focusAreaConfigs[`.${className} ${key}`] = value;
+            } else {
+              focusAreaConfigs[`.${className} ${key}`].style = value;
+            }
           }
         })
       }

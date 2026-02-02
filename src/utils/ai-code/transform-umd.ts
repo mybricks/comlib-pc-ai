@@ -5,7 +5,7 @@ export function getComponentFromJSX(jsxCode, libs: { mybricksSdk }, dependencies
   return new Promise((resolve, reject) => {
     transformTsx(jsxCode).then(code => {
       try {
-        const rtn = runRender(code, {
+        const rtn: any = runRender(code, {
             'react': React,
             '@ant-design/icons': window['icons'],
             'dayjs': window['dayjs'] ?? window['moment'],
@@ -155,6 +155,7 @@ export function transformTsx(code): Promise<{ transformCode: string, constituenc
       }
 
     } catch (error) {
+      console.error("[@transformTsx error]", error);
       reject(error)
     }
 
@@ -205,8 +206,8 @@ export function updateRender({data}, renderCode) {
   })
 }
 
-export function updateStyle({data}, styleCode) {
-  transformLess(styleCode).then(css => {
+export function updateStyle({id, data}, styleCode) {
+  transformLess(`.${id} {${styleCode}}`).then(css => {
     data.styleCompiled =  encodeURIComponent(css)
     data.styleSource = encodeURIComponent(styleCode)
     data._cssErr = '';
