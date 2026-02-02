@@ -2,6 +2,7 @@ import React from 'react';
 import LowcodeView from "./lowcodeView";
 import lowcodeViewCss from "./lowcodeView/index.lazy.less";
 import context from "./context";
+import { ANTD_KNOWLEDGES_MAP } from "./knowledges";
 
 function evalConfigJsCompiled(code: string) {
   const evalStr = `
@@ -25,9 +26,7 @@ function detectJsonIndent(jsonStr: string): string | number {
 }
 
 export default function (props) {
-  console.log("[@editors - props]", props);
-
-  if (!props) {
+  if (!props?.data) {
     return {};
   }
 
@@ -93,6 +92,22 @@ export default function (props) {
       }
     }
   } catch {}
+
+  if (data.runtimeJsxConstituency) {
+    data.runtimeJsxConstituency.forEach(({ className, component }) => {
+      const knowledge: any = ANTD_KNOWLEDGES_MAP[component.toUpperCase()];
+
+      if (knowledge?.editors) {
+        Object.entries(knowledge.editors).forEach(([key, value]) => {
+          if (key === ":root") {
+            focusAreaConfigs[`.${className}`] = value;
+          } else {
+            focusAreaConfigs[`.${className} ${key}`] = value;
+          }
+        })
+      }
+    })
+  }
 
   return {
     ...focusAreaConfigs,

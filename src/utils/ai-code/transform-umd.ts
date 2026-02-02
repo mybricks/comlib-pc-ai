@@ -24,9 +24,11 @@ export function getComponentFromJSX(jsxCode, libs: { mybricksSdk }, dependencies
   })
 }
 
-export function transformTsx(code): Promise<string> {
+export function transformTsx(code): Promise<{ transformCode: string, constituency: any }> {
   return new Promise((resolve, reject) => {
     let transformCode
+    const componentToSource = new Map();
+    const constituency: any = [];
 
     try {
       const options = {
@@ -51,6 +53,38 @@ export function transformTsx(code): Promise<string> {
           function() {
             return {
               visitor: {
+                ImportDeclaration(path) {
+                  const { node } = path;
+                  const source = node.source.value
+                  const specifiers: string[] = []
+                  let isDefault = false
+                  let isNamespace = false
+
+                  for (const spec of node.specifiers) {
+                    if (spec.type === 'ImportDefaultSpecifier') {
+                      // import css from 'style.less'
+                      specifiers.push(spec.local.name)
+                      isDefault = true
+                    } else if (spec.type === 'ImportNamespaceSpecifier') {
+                      // import * as X from 'xxx'
+                      specifiers.push(spec.local.name)
+                      isNamespace = true
+                    } else if (spec.type === 'ImportSpecifier') {
+                      // import { forwardRef, useCallback } from 'react'
+                      // spec.imported.name 是原始名，spec.local.name 是别名
+                      const name = spec.imported?.name ?? spec.local.name
+                      specifiers.push(name)
+
+                      // [TODO] 目前默认引入组件都是解构的
+                      if (source !== 'react') {
+                        // react是默认的依赖，不处理
+                        componentToSource.set(name, source);
+                      }
+                    }
+                  }
+
+                  // imports.push({ source, specifiers, isDefault, isNamespace })
+                },
                 JSXElement(path) {
                   const { node } = path;
                   const dataLocValueObject: any = {
@@ -61,7 +95,13 @@ export function transformTsx(code): Promise<string> {
                   const classNameNode = node.openingElement.attributes.find((a) => a.name.name === "className")
 
                   if (classNameNode) {
-                    dataLocValueObject.cn = classNameNode.value.value;
+                    dataLocValueObject.cn = classNameNode.value.expression.property.name;
+                    if (componentToSource.has(node.openingElement.name.name)) {
+                      constituency.push({
+                        className: classNameNode.value.expression.property.name,
+                        component: node.openingElement.name.name,
+                      })
+                    }
                   }
 
                   const dataLocValue = JSON.stringify(dataLocValueObject)
@@ -118,7 +158,7 @@ export function transformTsx(code): Promise<string> {
       reject(error)
     }
 
-    return resolve(transformCode)
+    return resolve({ transformCode, constituency })
   })
 }
 
@@ -155,9 +195,10 @@ export function transformLess(code): Promise<string> {
 }
 
 export function updateRender({data}, renderCode) {
-  transformTsx(renderCode.replace(/import css from ['"][^'"]*style.less['"]/, 'const css = new Proxy({}, { get(target, key) { return key } })')).then(code => {
-    data.runtimeJsxCompiled = encodeURIComponent(code)
+  transformTsx(renderCode.replace(/import css from ['"][^'"]*style.less['"]/, 'const css = new Proxy({}, { get(target, key) { return key } })')).then(({ transformCode, constituency }) => {
+    data.runtimeJsxCompiled = encodeURIComponent(transformCode)
     data.runtimeJsxSource = encodeURIComponent(renderCode)
+    data.runtimeJsxConstituency = constituency
     data._jsxErr = ''
   }).catch(e => {
     data._jsxErr = e?.message ?? '未知错误'
