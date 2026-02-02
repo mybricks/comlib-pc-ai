@@ -81,6 +81,24 @@ export function transformTsx(code): Promise<string> {
                       }
                     }
                   })
+
+                  const comId = uuid();
+
+                  node.openingElement.attributes.push({
+                    type: 'JSXAttribute',
+                    name: {
+                      type: 'JSXIdentifier',
+                      name: 'data-com-id',
+                    },
+                    value: {
+                      type: 'StringLiteral',
+                      value: comId,
+                      extra: { 
+                        raw: `"${comId}"`,
+                        rawValue: comId
+                      }
+                    }
+                  })
                 }
               }
             };
@@ -205,4 +223,13 @@ function runRender(code, dependencies) {
   eval(wrapCode)(exports, require)
 
   return exports.default
+}
+
+export function uuid(pre = 'u_', len = 6) {
+  const seed = 'abcdefhijkmnprstwxyz0123456789', maxPos = seed.length;
+  let rtn = '';
+  for (let i = 0; i < len; i++) {
+    rtn += seed.charAt(Math.floor(Math.random() * maxPos));
+  }
+  return pre + rtn;
 }
