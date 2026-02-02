@@ -3,6 +3,7 @@ import LowcodeView from "./lowcodeView";
 import lowcodeViewCss from "./lowcodeView/index.lazy.less";
 import context from "./context";
 import { ANTD_KNOWLEDGES_MAP } from "./knowledges";
+import { parseLess, stringifyLess } from "./utils/transform/less";
 
 function evalConfigJsCompiled(code: string) {
   const evalStr = `
@@ -99,6 +100,31 @@ export default function (props) {
 
       if (knowledge?.editors) {
         Object.entries(knowledge.editors).forEach(([key, value]: any) => {
+          if (value.style?.length) {
+            value.style.forEach((style) => {
+              style.items?.forEach((item) => {
+                item.valueProxy = {
+                  set(params, value) {
+                    const comId = props.model?.runtime?.id || props.id;
+                    const aiComParams = context.getAiComParams(comId);
+                    const cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
+
+                    if (!cssObj[params.selector]) {
+                      cssObj[params.selector] = {};
+                    }
+
+                    Object.entries(value).forEach(([key, value]) => {
+                      cssObj[params.selector][key] = value;
+                    })
+
+                    const cssStr = stringifyLess(cssObj);
+                    context.updateFile(comId, { fileName: 'style.less', content: cssStr })
+                  }
+                }
+              })
+            })
+          }
+
           if (key === ":root") {
             if (!focusAreaConfigs[`.${className}`]) {
               focusAreaConfigs[`.${className}`] = value;
@@ -117,9 +143,9 @@ export default function (props) {
     })
   }
 
-  console.log("[@focusAreaConfigs]", focusAreaConfigs);
+  context.setAiComParams(props.id, props);
 
-  const res = {
+  return {
     ...focusAreaConfigs,
     /** 可调整宽高 */
     '@resize': {
@@ -128,7 +154,6 @@ export default function (props) {
     /** 代码编辑器面板 */
     '@lowcode':{
       render(params, plugins){
-        context.setAiComParams(params.model.runtime.id, params);
         context.plugins = plugins;
         context.createVibeCodingAgent({ register: plugins.aiService.registerAgent })
 
@@ -149,8 +174,4 @@ export default function (props) {
     /** toJSON的回调 */
     // '@toJSON'(){},
   }
-
-  console.log("[@res]", res);
-
-  return res;
 }

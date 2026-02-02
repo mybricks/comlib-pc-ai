@@ -208,7 +208,7 @@ export function updateRender({data}, renderCode) {
 
 export function updateStyle({id, data}, styleCode) {
   transformLess(`.${id} {${styleCode}}`).then(css => {
-    data.styleCompiled =  encodeURIComponent(css)
+    data.styleCompiled = encodeURIComponent(css)
     data.styleSource = encodeURIComponent(styleCode)
     data._cssErr = '';
   }).catch(e => {

@@ -54,46 +54,46 @@ export default function ({ context }) {
                 console.log("[@开发模块 - execute]", params);
                 const { files } = params;
 
-                const fileToDataKey: Array<{ fileName: string; dataKey: string; cb: (content: string) => void }> = [
+                const fileToDataKey: Array<{ fileName: string; dataKey: string;}> = [
                   {
-                    fileName: 'model.json', dataKey: 'modelConfig', cb: (content) => {
-                      context.updateFile(focus.comId, { fileName: 'model.json', content });
-                    }
+                    fileName: 'model.json', dataKey: 'modelConfig'
                   },
                   {
-                    fileName: 'runtime.jsx', dataKey: 'runtimeJsxSource', cb: (content) => {
-                      context.updateFile(focus.comId, { fileName: 'runtime.jsx', content });
-                    }
+                    fileName: 'runtime.jsx', dataKey: 'runtimeJsxSource'
                   },
                   {
-                    fileName: 'style.less', dataKey: 'styleSource', cb: (content) => {
-                      context.updateFile(focus.comId, { fileName: 'style.less', content });
-                    }
+                    fileName: 'style.less', dataKey: 'styleSource'
                   },
                   {
-                    fileName: 'config.js', dataKey: 'configJsSource', cb: (content) => {
-                      context.updateFile(focus.comId, { fileName: 'config.js', content });
-                    }
+                    fileName: 'config.js', dataKey: 'configJsSource'
                   },
                   {
-                    fileName: 'com.json', dataKey: 'componentConfig', cb: (content) => {
-                      context.updateFile(focus.comId, { fileName: 'com.json', content });
-                    }
+                    fileName: 'com.json', dataKey: 'componentConfig'
                   },
                 ];
 
-                fileToDataKey.forEach(({ fileName, dataKey, cb }) => {
+                fileToDataKey.forEach(({ fileName, dataKey }) => {
                   const matchedFiles = files.filter((file: any) => file.fileName === fileName);
                   if (matchedFiles.length === 1) {
-                    cb(matchedFiles[0].content)
+                    context.updateFile(focus.comId, { fileName, content: matchedFiles[0].content })
                   } else if (matchedFiles.length === 2) {
                     let current = decodeURIComponent(aiComParams.data[dataKey] || '');
                     for (let i = 0; i < matchedFiles.length; i+=2) {
                       const before = matchedFiles[i];
                       const after = matchedFiles[i + 1];
+
+                      const index = current.indexOf(before.content);
+                      if (index === -1) {
+                        console.error(`[@开发模块 - 文件${fileName}替换失败]`, {
+                          current,
+                          before: before.content,
+                          after: after.content,
+                        });
+                      }
+
                       current = current.replace(before.content, after.content)
                     }
-                    cb(current);
+                    context.updateFile(focus.comId, { fileName, content: current })
                   }
                 });
               }
