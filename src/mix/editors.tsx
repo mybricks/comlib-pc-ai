@@ -1,4 +1,4 @@
-、import React from 'react';
+import React from 'react';
 import LowcodeView from "./lowcodeView";
 import lowcodeViewCss from "./lowcodeView/index.lazy.less";
 import context from "./context";
