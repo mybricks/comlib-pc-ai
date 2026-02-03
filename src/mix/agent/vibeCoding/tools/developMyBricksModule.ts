@@ -176,15 +176,15 @@ export default function developMyBricksModule(config: Config) {
     - 插槽：若平台提供插槽，则通过 props 传入（如 props.slots），使用方式以平台为准，如 props.slots?.插槽id?.render()。
   - 输入端口（原 inputs）：不再通过 props 接收，改用 React 标准写法 useImperativeHandle(ref, () => ({ 方法名: 实现 }), [])，方法名与 com.json 中 inputs 的 id 一致（如 setTitle），外部通过 ref.current.setTitle(val) 调用。
   
-  3、style.less文件，为当前模块的样式代码,例如：
+  3、style.less文件，为当前模块的样式代码。**重要**：style.less 在构建后最终不会被做 CSS Module 处理，类名会按原样输出到最终 CSS，因此无需、也不应使用 CSS Module 相关写法。例如：
   \`\`\`less file="style.less"
     //style.less文件中的样式代码
   \`\`\`
   
   style.less文件的注意事项：
+   - 禁止使用 CSS Modules 的 :global 语法；
    - less文件，作为容器类的模块，最外层容器宽高应为100%以适应整个模块，不要做任何的假设，例如假设容器的宽度、高度等；
    - 不能使用 :root作为选择器；
-   - 禁止使用 :global，style.less 不会被当作 CSS Module 处理，三方库组件的 className 直接使用类选择器（如 .xxx）即可，无需用 :global 包裹；
    - 不要使用如下形式的代码 \${data.title}，因为在MyBricks平台中，不支持这种形式的代码；
    - 在选择器中，多个单词之间使用驼峰的方式，不能使用-连接;
    - 不能使用 @import引入其他的less文件、不要使用less的混合、函数、变量等；
@@ -258,7 +258,7 @@ export default function developMyBricksModule(config: Config) {
   <技术栈及类库声明>
     仅可以基于 ${libTitles} 技术栈进行开发，同时，可以使用下面声明的类库，根据场景做合理的技术方案设计、不要超出声明的类库范围。
     
-    **mybricks 默认技术栈**：mybricks 作为默认技术栈，提供 Container 组件。所有布局相关的实现都必须使用 Container 组件，并通过 CSS 来实现布局。禁止使用 div，应统一使用 Container 组件作为布局容器，相当于用 Container 替代 div，没有场景还需要使用 div。
+    **mybricks 默认技术栈**：mybricks 作为默认技术栈，提供 Container 组件。Container 可完全替代 div：其接收的 props 与 div 一致（如 className、style、onClick 等），用法相同。使用 Container 而非 div 的原因在于：便于平台识别布局容器、识别三方依赖组件、并支持诸多个性化配置。因此，**所有需要块级容器的地方一律使用 Container，禁止使用 div**。布局通过 Container 包裹区块并配合 CSS（如 flex）实现。
     
     **三方库组件的 className 要求**：所有来自三方库的组件，使用时必须带有 className 属性，无论是否真的需要设置样式。className 的值必须语义化明确且唯一，以便通过 CSS 选择器精确选中这些组件。
     
@@ -328,7 +328,7 @@ ${comPrompts.join('\n')}
 
   2、区块拆分及总体布局，按照以下步骤展开：
     1）按照自上而下、从左向右的方式分析拆解区块；
-    2）分析这些区块的总体布局：使用 Container 组件包裹各区块，通过 CSS（如 flex、grid）实现先行后列的排列；
+    2）分析这些区块的总体布局：一律使用 Container 组件包裹各区块（禁止使用 div），通过 CSS（如 flex）实现先行后列的排列；
     3）分析总体的响应式情况：哪些区块需要固定宽高、哪些区块需要随着总体宽度或高度变化如何变化；
   
   3、详细分析各个区块以及子元素，按照以下要点展开：
@@ -351,7 +351,7 @@ ${comPrompts.join('\n')}
       - 对于某类功能，如果组件通过配置属性即可完成，则不要新增其他组件；
       - 如果使用了类库中组件，务必注意其在知识库中的<组件字段声明/>要求；
     - 变体分析：如果用户明确要求模块存在变体，分析变体的内容、以及在model.json中对应的强制改变变体的字段、configs.js中对于强制改变变体的配置项等；
-    - 布局方案：使用 Container 组件实现布局，通过 CSS 控制排列、对齐、间距等，禁止使用 div；
+    - 布局方案：所有块级容器均使用 Container（与 div 的 props 一致，禁止使用 div），通过 CSS 控制排列、对齐、间距等；
     - 关键属性分析：区块对于所采用组件的关键属性，要包含在知识库中的<组件字段声明/>，以及考虑例如尺寸（size）、风格等，结合上面对样式的分析、组件需要做哪些配置等，一一给出方案；三方库组件必须分配语义化且唯一的 className；
     - 选区分析：返回所有有意义的选区（对于使用某类库中的组件，参考其在 知识库 中的 组件的选区声明），以便用户可以更方便的进行编辑；
     
@@ -380,7 +380,7 @@ ${comPrompts.join('\n')}
       1）根据用户的需求，对runtime.jsx文件中的内容进行修改；
       2）按照react的代码编写规范，所有列表中的组件，必需通过key属性做唯一标识，而且作为react的最佳实践，不要使用index作为key；
       3）对于模块的JSX部分，对于类库中的组件本身是root组件的情况、不必再用一个常规容器包裹；
-      4）所有布局容器必须使用 mybricks 的 Container 组件，禁止使用 div，通过 CSS 实现布局；
+      4）所有块级容器一律使用 mybricks 的 Container 组件（Container 与 div 的 props 一致，可完全替代 div；禁止使用 div），通过 CSS 实现布局；
       5）JSX部分最外层容器宽高应为100%以适应整个模块，不要做任何的假设，例如假设容器的宽度、高度等；
       6）对于使用类库中的组件，必须为其设置语义化明确且唯一的 className，以便通过 CSS 选择器选中，无论是否需要样式；
       7）对于使用类库中的组件，对于其在知识库中的<组件字段声明/>中的字段，根据其描述、做分配使用；
@@ -401,7 +401,7 @@ ${comPrompts.join('\n')}
       - 禁止出现直接引用标签的写法，例如<Tags[XX] property={'aa'}/>，正确的写法是应该如下形式 const XX = Tag[XX];<XX property={'aa'}/>;
       - 不要使用{/* */}这种注释方式，只能使用//注释方式；
       - 使用style.less时，务必使用'style.less'这个路径，禁止做其他发挥;
-      - 所有布局容器必须使用 mybricks 的 Container 组件，禁止使用 div，通过 CSS 实现布局；
+      - 所有块级容器一律使用 mybricks 的 Container 组件（禁止使用 div），通过 CSS 实现布局；
       - 所有来自三方库的组件必须带有 className 属性，值需语义化明确且唯一，无论是否需要样式，以便通过 CSS 选择器选中；
       - 所有与样式相关的内容都要写在style.less文件中，避免在runtime.jsx中通过style编写；
       - 各类动效、动画等，尽量使用css3的方式在style.less中实现，不要为此引入任何的额外类库；
@@ -442,7 +442,7 @@ ${comPrompts.join('\n')}
       - 插槽的样式中不要用虚线框；
       - 当用于提出例如“要适应容器尺寸”等要求时，这里的容器指的是模块的父容器，不是整个页面；
       - 不要使用:root作为selector；
-      - 禁止使用:global，style.less 不会被当作 CSS Module 处理，三方库组件的 className 直接使用类选择器即可，无需用 :global 包裹；
+      - 禁止使用 CSS Modules 的 :global 语法；
       - 所有容器类的样式必须包含position:relative；
       - 在任何时候，最外层容器的宽度与高度都要适应整个模块；
       - 不要做任何的假设，例如假设容器的宽度、高度等；
@@ -453,8 +453,9 @@ ${comPrompts.join('\n')}
     
     注意：
     1、注意上述编码方面的要求，严格遵守；
-    2、注意审视其他文件的修改，如果有修改，内容一并返回；
-    3、仅满足用户的需求即可，无需额外发挥；
+    2、输出 style.less 前必须自检：返回的 less 代码中不得出现 \`:global\`，否则会导致样式错误；
+    3、注意审视其他文件的修改，如果有修改，内容一并返回；
+    4、仅满足用户的需求即可，无需额外发挥；
   </当需要修改style.less文件时>
 
   <当需要修改config.js文件时>

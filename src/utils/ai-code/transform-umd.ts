@@ -100,6 +100,7 @@ export function transformTsx(code): Promise<{ transformCode: string, constituenc
                       constituency.push({
                         className: classNameNode.value.expression.property.name,
                         component: node.openingElement.name.name,
+                        source: componentToSource.get(node.openingElement.name.name),
                       })
                     }
                   }

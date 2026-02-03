@@ -1,8 +1,7 @@
 import classLibrarySelection from "./tools/classLibrarySelection"
 import developMyBricksModule from "./tools/developMyBricksModule";
-import { updateRender, updateStyle } from "../../../utils/ai-code/transform-umd";
+import answer from "./tools/answer";
 import { createWorkspace } from "./workspace";
-import { PromiseStack } from "../utils";
 
 export default function ({ context }) {
   console.log("[@vibeCoding - context]", context);
@@ -97,7 +96,8 @@ export default function ({ context }) {
                   }
                 });
               }
-            })
+            }),
+            answer()
           ],
           presetMessages: async () => {
             const content = await workspace.exportToMessage()

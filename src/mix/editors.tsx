@@ -4,6 +4,7 @@ import lowcodeViewCss from "./lowcodeView/index.lazy.less";
 import context from "./context";
 import { ANTD_KNOWLEDGES_MAP } from "./knowledges";
 import { parseLess, stringifyLess } from "./utils/transform/less";
+import { MYBRICKS_KNOWLEDGES_MAP } from "./context/constants";
 
 function evalConfigJsCompiled(code: string) {
   const evalStr = `
@@ -95,8 +96,14 @@ export default function (props) {
   } catch {}
 
   if (data.runtimeJsxConstituency) {
-    data.runtimeJsxConstituency.forEach(({ className, component }) => {
-      const knowledge: any = ANTD_KNOWLEDGES_MAP[component.toUpperCase()];
+    data.runtimeJsxConstituency.forEach(({ className, component, source }) => {
+      let knowledge: any = null;
+
+      if (source === "antd") {
+        knowledge = ANTD_KNOWLEDGES_MAP[component.toUpperCase()];
+      } else if (source === "mybricks") {
+        knowledge = MYBRICKS_KNOWLEDGES_MAP[component.toUpperCase()];
+      }
 
       if (knowledge?.editors) {
         Object.entries(knowledge.editors).forEach(([key, value]: any) => {
