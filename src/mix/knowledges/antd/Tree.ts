@@ -1,45 +1,55 @@
-import { getStyleOptions } from './../utils'
-
 export default {
   description: `树形控件`,
   editors: {
     ':root': {
       title: '树形控件',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['background']),
+          items: [
+            {
+              title: '样式',
+              options: ['background'],
+            }
+          ]
         }
       ]
     },
     '.ant-tree .ant-tree-switcher': {
       title: '节点开关',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['font']),
+          items: [
+            {
+              title: '样式',
+              options: ['font'],
+            }
+          ]
         }
       ]
     },
     '.ant-tree .ant-tree-node-content-wrapper': {
       title: '节点内容',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['font', 'padding']),
+          items: [
+            {
+              title: '样式',
+              options: ['font', 'padding'],
+            }
+          ]
         }
       ]
     },
     '.ant-tree .ant-tree-indent-unit': {
       title: '缩进',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['size']),
+          items: [
+            {
+              title: '样式',
+              options: ['size'],
+            }
+          ]
         }
       ]
     }

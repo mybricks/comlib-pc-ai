@@ -1,35 +1,42 @@
-import { getStyleOptions } from './../utils'
-
 export default {
   description: `下拉选择器`,
   editors: {
     ':root': {
       title: '下拉选择器',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['font', 'background', 'border']),
+          items: [
+            {
+              title: '样式',
+              options: ['font', 'background', 'border'],
+            }
+          ]
         }
       ]
     },
     // '.ant-select:not(.ant-select-disabled):hover .ant-select-selector': {
     //   title: '下拉选择器悬浮态',
-    //   items: [
+    //   style: [
     //     {
-    //       title: '样式',
-    //       type: 'style',
-    //       options: ['font', 'background', 'border'],
+    //       items: [
+    //         {
+    //           title: '样式',
+    //           options: ['font', 'background', 'border'],
+    //         }
+    //       ]
     //     }
     //   ]
     // },
     '.ant-select-item.ant-select-item-option': {
       title: '下拉项',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['font', 'background', 'padding']),
+          items: [
+            {
+              title: '样式',
+              options: ['font', 'background', 'padding'],
+            }
+          ]
         }
       ]
     }

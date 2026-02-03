@@ -1,28 +1,19 @@
-import { getStyleOptions } from './../utils'
-
 export default {
   description: `面包屑`,
   editors: {
-    ':root': {
-      title: '面包屑',
-      items: [
+    '.ant-breadcrumb-link': {
+      title: '链接',
+      style: [
         {
-          title: '字体样式',
-          type: 'style',
-          options: getStyleOptions(['background', 'padding', 'border']),
+          items: [
+            {
+              title: '样式',
+              options: ['font','background'],
+            }
+          ]
         }
       ]
     },
-    '.ant-breadcrumb li>a': {
-      title: '单项',
-      items: [
-        {
-          title: '字体样式',
-          type: 'style',
-          options: getStyleOptions(['font']),
-        }
-      ]
-    }
   },
   docs: require('./Breadcrumb.md').default
 }

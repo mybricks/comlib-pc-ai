@@ -3,11 +3,14 @@ export default {
   editors: {
     '.ant-progress-text[title]': {
       title: '进度文本',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          // options: ['font'],
+          items: [
+            {
+              title: '样式',
+              options: ['font'],
+            }
+          ]
         }
       ]
     },

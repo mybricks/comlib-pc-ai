@@ -1,15 +1,16 @@
-import { getStyleOptions } from './../utils'
-
 export default {
   description: `头像`,
   editors: {
     ':root': {
       title: '头像',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['background', 'border']),
+          items: [
+            {
+              title: '样式',
+              options: ['background', 'border'],
+            }
+          ]
         }
       ]
     }

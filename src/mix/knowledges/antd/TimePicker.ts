@@ -1,15 +1,16 @@
-import { getStyleOptions } from './../utils'
-
 export default {
   description: `时间选择器`,
   editors: {
     ':root': {
       title: '时间选择器',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['background', 'border', 'padding']),
+          items: [
+            {
+              title: '样式',
+              options: ['background', 'font', 'border', 'padding'],
+            }
+          ]
         }
       ]
     },

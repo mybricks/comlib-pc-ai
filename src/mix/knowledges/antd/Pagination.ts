@@ -1,65 +1,81 @@
-import { getStyleOptions } from './../utils'
-
 export default {
   description: `分页`,
   editors: {
     ':root': {
       title: '分页',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['font']),
+          items: [
+            {
+              title: '样式',
+              options: ['font'],
+            }
+          ]
         }
       ]
     },
     '.ant-pagination-item.ant-pagination-item-active a': {
       title: '当前页码',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['font', 'background', 'border']),
+          items: [
+            {
+              title: '样式',
+              options: ['font', 'background', 'border'],
+            }
+          ]
         }
       ]
     },
     '.ant-pagination-item:not(.ant-pagination-item-active) a': {
       title: '页码',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['font', 'background', 'border']),
+          items: [
+            {
+              title: '样式',
+              options: ['font', 'background', 'border'],
+            }
+          ]
         }
       ]
     },
     '.ant-pagination-options-size-changer .ant-select-selector': {
       title: '展示条数',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['padding', 'background', 'border']),
+          items: [
+            {
+              title: '样式',
+              options: ['padding', 'background', 'border'],
+            }
+          ]
         }
       ]
     },
     '.ant-pagination-next .ant-pagination-item-link': {
       title: '下一页',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['font', 'border']),
+          items: [
+            {
+              title: '样式',
+              options: ['font', 'border'],
+            }
+          ]
         }
       ]
     },
     '.ant-pagination-prev .ant-pagination-item-link': {
       title: '上一页',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['font', 'border']),
+          items: [
+            {
+              title: '样式',
+              options: ['font', 'border'],
+            }
+          ]
         }
       ]
     }

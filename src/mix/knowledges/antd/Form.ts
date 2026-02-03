@@ -4,11 +4,14 @@ export default {
     ':root': {
       title: '表单',
       com:'Form',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          // options: ['background', 'font'],
+          items: [
+            {
+              title: '样式',
+              options: ['background', 'font', 'border', 'padding'],
+            }
+          ]
         }
       ]
     }

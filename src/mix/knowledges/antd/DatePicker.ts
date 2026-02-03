@@ -1,25 +1,29 @@
-import { getStyleOptions } from './../utils'
-
 export default {
   description: `日期选择器`,
   editors: {
     ':root': {
       title: '日期选择器',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['background', 'border', 'padding']),
+          items: [
+            {
+              title: '样式',
+              options: ['background', 'font', 'border', 'padding'],
+            }
+          ]
         }
       ]
     },
     '.anticon-calendar': {
       title: '图标',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['font']),
+          items: [
+            {
+              title: '样式',
+              options: ['font'],
+            }
+          ]
         }
       ]
     }

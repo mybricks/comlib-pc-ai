@@ -1,5 +1,3 @@
-import { getStyleOptions } from './../utils'
-
 export default {
   description: `卡片`,
   editors: {

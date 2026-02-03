@@ -3,11 +3,14 @@ export default {
   editors: {
     ':root': {
       title: '二维码',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          // options: ['background', 'border', 'padding'],
+          items: [
+            {
+              title: '样式',
+              options: ['background', 'border', 'padding'],
+            }
+          ]
         }
       ]
     },
