@@ -120,7 +120,7 @@ export class Workspace {
 
     // 初始化知识库
     this.knowledgeBase = new KnowledgeBase({
-      name: '项目信息',
+      name: '项目和知识库',
       description: '包含当前组件代码和各类知识文档'
     });
 
@@ -248,7 +248,7 @@ export class Workspace {
     // 注册动态组件文档目录
     this.knowledgeBase.registerDynamicDirectory({
       id: 'library-component-docs',
-      name: '可使用的类库文档',
+      name: '允许使用的类库',
       description: '允许使用的各类三方库文档',
       weight: 85, // 第三高权重
       hidden: false
@@ -335,7 +335,7 @@ export class Workspace {
     return libs.forEach(async (lib) => {
       await this.knowledgeBase.openDynamicDocument({
         id: lib.replace('/', '-'),
-        title: lib,
+        title: `${lib}使用文档`,
         description: lib,
         content: getLibraryDoc(lib),
         directoryId: 'library-component-docs',

@@ -17,6 +17,20 @@ export default {
   - 还原图片，只通过runtime和less还原图片ui。
 `,
   },
+  editors: [
+    {
+      title: '常规/需求文档',
+      type: 'text',
+      value: {
+        get: ({ data }) => {
+          return data.document;
+        },
+        set: ({ data }, value) => {
+          data.document = value;
+        }
+      }
+    }
+  ]
 //   editors: {
 //     ":root": [
 //       {

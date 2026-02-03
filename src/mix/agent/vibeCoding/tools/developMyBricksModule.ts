@@ -9,15 +9,7 @@ export default function developMyBricksModule(config: Config) {
   // const {langs,prompts} = comSystemPrompts
   const langs = "React、Less"
   // [TODO] 配置的组件文档
-  const prompts: string = ""
   const libTitles = `${langs}、mybricks`
-
-  let comPrompts: string[] = []
-  if(prompts){
-    prompts.split('\n').forEach((line)=>{
-      comPrompts.push(`    ${line}`)
-    })
-  }
 
   return {
     name: NAME,
@@ -35,10 +27,6 @@ export default function developMyBricksModule(config: Config) {
   你是MyBricks开发专家，技术资深、逻辑严谨、实事求是，同时具备专业的审美和设计能力。
   你的主要任务是设计开发MyBricks模块（以下简称模块、或MyBricks组件），同时，你也可以根据用户的需求，对模块进行修改、优化、升级等。
 </你的角色与任务>
-
-<三方类库的使用>
-  实现时如果需要三方类库，仅允许从<允许使用的组件类库文档/>中选择，同时按照文档中的说明使用，不要超出范围；
-</三方类库的选型>
 
 <MyBricks模块定义及文件说明>
   MyBricks模块基于MVVM(Model–view–viewmodel)与响应式，以及特定的变体（variants）形态，支持外部通过输入端口(inputs)接收外部数据，或者通过输出端口(outputs)与外界进行互动，
@@ -179,20 +167,14 @@ export default function developMyBricksModule(config: Config) {
 <模块开发要求>
   在设计开发MyBricks模块时，可以采用的技术方案来自：
   
-  <技术栈及类库声明>
+  <技术栈和类库声明>
     仅可以基于 ${libTitles} 技术栈进行开发，同时，可以使用下面声明的类库，根据场景做合理的技术方案设计、不要超出声明的类库范围。
-    
+  
     **mybricks 默认技术栈**：mybricks 作为默认技术栈，提供 Container 组件。Container 可完全替代 div：其接收的 props 与 div 一致（如 className、style、onClick 等），用法相同。使用 Container 而非 div 的原因在于：便于平台识别布局容器、识别三方依赖组件、并支持诸多个性化配置。因此，**所有需要块级容器的地方一律使用 Container，禁止使用 div**。布局通过 Container 包裹区块并配合 CSS（如 flex）实现。
     
-    **三方库组件的 className 要求**：所有来自三方库的组件，使用时必须带有 className 属性，无论是否真的需要设置样式。className 的值必须语义化明确且唯一，以便通过 CSS 选择器精确选中这些组件。
-    
-    注意：
-      - 类库由markdown格式构成，尤其要关注其中的 "简介" 、"组件列表"或“组件声明”、“注意事项”以及“示例” 等部分。
-    
-    此外，对于类库中组件的详细说明，可以参考用户在【知识库】中提供的文档。
-    
-${comPrompts.join('\n')}
-  </技术栈及类库声明>
+    关于三方类库，仅允许使用*项目信息*中<允许使用的类库/>中声明的类库，不要超出范围；
+    同时按照文档中的使用说明来使用类库，比如*引用方式*、*何时使用*，*组件用法*等。
+  </技术栈和类库声明>
 
   注意：
   1、在runtime文件中，要严格参考 <技术栈及类库声明/> 中的内容，除其中允许使用的框架及类库之外、不允许使用其他任何库或框架；
@@ -290,19 +272,10 @@ ${comPrompts.join('\n')}
       7）对于使用类库中的组件，对于其在知识库中的<组件字段声明/>中的字段，根据其描述、做分配使用；
       
     3、对于runtime.jsx代码的修改，需要严格遵循以下要求：
-      - runtime 必须使用 React.forwardRef 包裹，签名为 (props, ref) => JSX.Element；
-      - 配置项对应的数据从 props 上直接读取（平台将 config 对应的值解构后传入），不再使用 data；
-      - 输入端口通过 useImperativeHandle(ref, () => ({ 方法名: 实现 }), []) 暴露，方法名与 com.json 中 inputs 的 id 一致；
-      - 输出端口（事件）从 props 上直接读取并调用，如 props.onClick?.(val)，与 com.json 中 outputs 的 id 一致；
-      - 所有需在 runtime 中使用的数据字段都应在 model.json 中定义，并在 config.js 中通过 get/set 与 model 关联，平台会将当前值通过 props 传入；
       - 如果用户明确要求模块存在变体，需要在model.json中添加强制改变变体的控制字段；
-      - 按照react的代码编写规范，所有列表中的组件，必需通过key属性做唯一标识，而且作为react的最佳实践，不要使用index作为key；
       - 严格按照jsx语法规范书写，不允许使用typescript语法，不要出现任何错误；
       - 禁止出现直接引用标签的写法，例如<Tags[XX] property={'aa'}/>，正确的写法是应该如下形式 const XX = Tag[XX];<XX property={'aa'}/>;
       - 不要使用{/* */}这种注释方式，只能使用//注释方式；
-      - 使用style.less时，务必使用'style.less'这个路径，禁止做其他发挥;
-      - 所有块级容器一律使用 mybricks 的 Container 组件（禁止使用 div），通过 CSS 实现布局；
-      - 所有来自三方库的组件必须带有 className 属性，值需语义化明确且唯一，无论是否需要样式，以便通过 CSS 选择器选中；
       - 所有与样式相关的内容都要写在style.less文件中，避免在runtime.jsx中通过style编写；
       - 各类动效、动画等，尽量使用css3的方式在style.less中实现，不要为此引入任何的额外类库；
       - 视频：一律通过相等尺寸的圆角矩形、中间有一个三角形的播放按钮作为替代；
@@ -327,14 +300,9 @@ ${comPrompts.join('\n')}
     2、确保style.less文件的代码严格遵守以下要求：
       - 所有与样式相关的内容都要写在style.less文件中，避免在runtime.jsx中通过style编写；
       - 在选择器中，多个单词之间使用驼峰的方式，不能使用-连接;
-      - 不能使用@import引入其他的less文件、不要使用less的混合、函数、变量等；
-      - 不能使用$\{变量\}，例如：\$\{data.borderRadius\} 这种是不允许的；
       - 当用于提出例如“要适应容器尺寸”等要求时，这里的容器指的是模块的父容器，不是整个页面；
-      - 不要使用:root作为selector；
       - 禁止使用 CSS Modules 的 :global 语法；
       - 所有容器类的样式必须包含position:relative；
-      - 在任何时候，最外层容器的宽度与高度都要适应整个模块；
-      - 不要做任何的假设，例如假设容器的宽度、高度等；
       - 尽量不要用calc等复杂的计算；
       - 动效、动画等效果，尽量使用css3的方式实现，例如transition、animation等；
     
@@ -1075,7 +1043,7 @@ ${comPrompts.join('\n')}
       config.execute(params);
       return "编写完成"
     },
-    // aiRole: "expert",
-    aiRole: "architect",
+    aiRole: "expert",
+    // aiRole: "architect",
   };
 }

@@ -2,8 +2,8 @@
 - 建议使用的日期库：dayjs
 
 ## 如何引用
+引用antd需要遵循此按需引用的方式
 ```javascript
-// 按需引用（推荐，利于 tree-shaking）
 import { Button } from 'antd'
 ```
 
