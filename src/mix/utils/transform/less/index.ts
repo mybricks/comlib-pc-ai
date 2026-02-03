@@ -1,7 +1,5 @@
 import { convertHyphenToCamel, convertCamelToHyphen } from "../../../../utils/string";
 
-const less = window.less;
-
 interface Rule {
   selectors?: {
     toCSS: () => string;
@@ -204,6 +202,7 @@ class Parse {
 }
 
 export const parseLess = (code: string) => {
+  const less = window.less;
   let cssObj: CSSObj = {};
 
   try {
