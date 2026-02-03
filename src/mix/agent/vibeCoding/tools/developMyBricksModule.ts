@@ -169,18 +169,19 @@ export default function developMyBricksModule(config: Config) {
   
   <技术栈和类库声明>
     仅可以基于 ${libTitles} 技术栈进行开发，同时，可以使用下面声明的类库，根据场景做合理的技术方案设计、不要超出声明的类库范围。
-  
-    **mybricks 默认技术栈**：mybricks 作为默认技术栈，提供 Container 组件。Container 可完全替代 div：其接收的 props 与 div 一致（如 className、style、onClick 等），用法相同。使用 Container 而非 div 的原因在于：便于平台识别布局容器、识别三方依赖组件、并支持诸多个性化配置。因此，**所有需要块级容器的地方一律使用 Container，禁止使用 div**。布局通过 Container 包裹区块并配合 CSS（如 flex）实现。
-    
-    关于三方类库，仅允许使用*项目信息*中<允许使用的类库/>中声明的类库，不要超出范围；
-    同时按照文档中的使用说明来使用类库，比如*引用方式*、*何时使用*，*组件用法*等。
+    1. 默认类库
+      - mybricks：提供 Container 组件。Container 可完全替代 div：其接收的 props 与 div 一致（如 className、style、onClick 等），用法相同。使用 Container 而非 div 的原因在于：便于平台识别布局容器、识别三方依赖组件、并支持诸多个性化配置。因此，**所有需要块级容器的地方一律使用 Container，禁止使用 div**。布局通过 Container 包裹区块并配合 CSS（如 flex）实现。
+    2. 三方类库：*项目信息*中<允许使用的类库/>中声明的类库；
+    > 关于三方类库：仅允许使用*项目信息*中<允许使用的类库/>中声明的类库，不要超出范围；
+      同时需要注意以下几点：
+      - 按照文档中的使用说明来使用类库，比如*引用方式*、*何时使用*，*组件用法*等。
+      - 所有来自三方库的组件必须带有语义化且唯一的 className，以便通过 CSS 选择器选中，无论是否需要设置样式；
   </技术栈和类库声明>
 
   注意：
   1、在runtime文件中，要严格参考 <技术栈及类库声明/> 中的内容，除其中允许使用的框架及类库之外、不允许使用其他任何库或框架；
   2、不允许对上述可以使用的库做假设、例如主观臆造不存在的组件等，只能基于事实上提供的组件及知识库中的属性、API说明进行开发；
-  3、所有来自三方库的组件必须带有语义化且唯一的 className，以便通过 CSS 选择器选中，无论是否需要设置样式；
-  4、你要完成的是中文场景下的开发任务，请仔细斟酌文案、用语，在各类文案表达中尽量使用中文，但是对于代码、技术术语等，可以使用英文。
+  3、你要完成的是中文场景下的开发任务，请仔细斟酌文案、用语，在各类文案表达中尽量使用中文，但是对于代码、技术术语等，可以使用英文。
 </模块开发要求>
 
 <按照以下情况分别处理>
@@ -478,6 +479,7 @@ export default function developMyBricksModule(config: Config) {
 
   整个过程中要注意：
   - 如果模块【源代码】内容有修改，务必通过before/after返回，而不是原来的 \`\`\`文件类型 file="文件名"的形式；
+  - 确保所有文件内容中禁止使用emoji等特殊字符；
   - 要确保 com.json 中声明的 inputs（id）与 runtime 中 useImperativeHandle 暴露的方法名一一对应，outputs（id）与 runtime 的 props 回调名一一对应；若使用插槽，与 props 中插槽用法一致；
   - 要确保 com.json 中声明的 id 与 runtime 中实际使用的方法名、props 回调名完全一致；
   - 对于model.json中的字段与slots、configs有关联的情况，例如根据model.json的字段对插槽做渲染，当model.json中的字段有变化时、要同步给到slots或configs的完整代码；

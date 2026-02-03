@@ -108,6 +108,24 @@ export default function ({ context }) {
             }),
             answer()
           ],
+          formatUserMessage: (text: string) => {
+            const style = aiComParams?.style ?? {};
+            const wUnit = typeof style.width === 'number' ? 'px' : '';
+            const hUnit = typeof style.height === 'number' ? 'px' : '';
+            const componentInfo =
+              style.widthFact != null && style.heightFact != null
+                ? `宽度为${style.width ?? ''}${wUnit}，实际渲染宽度为${style.widthFact}px；高度为${style.height ?? ''}${hUnit}，实际渲染高度为${style.heightFact}px`
+                : '暂无尺寸信息';
+
+            return `<当前组件的信息>
+组件信息：${componentInfo}
+
+</当前组件的信息>
+<用户消息>
+${text}
+</用户消息>
+`
+          },
           presetMessages: async () => {
             const content = await workspace.exportToMessage()
             return [
