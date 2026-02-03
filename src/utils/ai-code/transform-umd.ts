@@ -56,25 +56,10 @@ export function transformTsx(code): Promise<{ transformCode: string, constituenc
                 ImportDeclaration(path) {
                   const { node } = path;
                   const source = node.source.value
-                  const specifiers: string[] = []
-                  let isDefault = false
-                  let isNamespace = false
 
                   for (const spec of node.specifiers) {
-                    if (spec.type === 'ImportDefaultSpecifier') {
-                      // import css from 'style.less'
-                      specifiers.push(spec.local.name)
-                      isDefault = true
-                    } else if (spec.type === 'ImportNamespaceSpecifier') {
-                      // import * as X from 'xxx'
-                      specifiers.push(spec.local.name)
-                      isNamespace = true
-                    } else if (spec.type === 'ImportSpecifier') {
-                      // import { forwardRef, useCallback } from 'react'
-                      // spec.imported.name 是原始名，spec.local.name 是别名
+                    if (spec.type === 'ImportSpecifier') {
                       const name = spec.imported?.name ?? spec.local.name
-                      specifiers.push(name)
-
                       // [TODO] 目前默认引入组件都是解构的
                       if (source !== 'react') {
                         // react是默认的依赖，不处理
@@ -82,8 +67,6 @@ export function transformTsx(code): Promise<{ transformCode: string, constituenc
                       }
                     }
                   }
-
-                  // imports.push({ source, specifiers, isDefault, isNamespace })
                 },
                 JSXElement(path) {
                   const { node } = path;
@@ -94,8 +77,9 @@ export function transformTsx(code): Promise<{ transformCode: string, constituenc
 
                   const classNameNode = node.openingElement.attributes.find((a) => a.name.name === "className")
 
-                  if (classNameNode) {
-                    const cn = classNameNode.value.expression.property.name;
+                  const cn = classNameNode?.value?.expression?.property?.name;
+
+                  if (cn) {
                     dataLocValueObject.cn = cn
 
                     constituency.push({
@@ -143,7 +127,6 @@ export function transformTsx(code): Promise<{ transformCode: string, constituenc
               }
             };
           }
-          //transformImportPlugin()
         ]
       }
 
