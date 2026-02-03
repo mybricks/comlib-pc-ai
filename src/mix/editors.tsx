@@ -4,7 +4,8 @@ import lowcodeViewCss from "./lowcodeView/index.lazy.less";
 import context from "./context";
 import { ANTD_KNOWLEDGES_MAP } from "./knowledges";
 import { parseLess, stringifyLess } from "./utils/transform/less";
-import { MYBRICKS_KNOWLEDGES_MAP } from "./context/constants";
+import { deepClone } from "./utils/normal";
+import { MYBRICKS_KNOWLEDGES_MAP, HTML_KNOWLEDGES_MAP } from "./context/constants";
 
 function evalConfigJsCompiled(code: string) {
   const evalStr = `
@@ -60,6 +61,7 @@ export default function (props) {
       })
 
       focusAreaConfigs[key] = {
+        ...value,
         items,
       }
 
@@ -103,10 +105,13 @@ export default function (props) {
         knowledge = ANTD_KNOWLEDGES_MAP[component.toUpperCase()];
       } else if (source === "mybricks") {
         knowledge = MYBRICKS_KNOWLEDGES_MAP[component.toUpperCase()];
+      } else if (source === "html") {
+        knowledge = HTML_KNOWLEDGES_MAP[component.toUpperCase()];
       }
 
       if (knowledge?.editors) {
-        Object.entries(knowledge.editors).forEach(([key, value]: any) => {
+        Object.entries(knowledge.editors).forEach(([key, oriValue]: any) => {
+          const value = deepClone(oriValue);
           if (value.style?.length) {
             value.style.forEach((style) => {
               style.items?.forEach((item) => {
@@ -115,13 +120,14 @@ export default function (props) {
                     const comId = props.model?.runtime?.id || props.id;
                     const aiComParams = context.getAiComParams(comId);
                     const cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
+                    const selector = params.selector;
 
-                    if (!cssObj[params.selector]) {
-                      cssObj[params.selector] = {};
+                    if (!cssObj[selector]) {
+                      cssObj[selector] = {};
                     }
 
                     Object.entries(value).forEach(([key, value]) => {
-                      cssObj[params.selector][key] = value;
+                      cssObj[selector][key] = value;
                     })
 
                     const cssStr = stringifyLess(cssObj);
@@ -132,18 +138,24 @@ export default function (props) {
             })
           }
 
-          if (key === ":root") {
-            if (!focusAreaConfigs[`.${className}`]) {
-              focusAreaConfigs[`.${className}`] = value;
-            } else {
-              focusAreaConfigs[`.${className}`].style = value.style;
-            }
+          let selector = key === ":root" ? `.${className}` : `.${className} ${key}`;
+
+          if (!focusAreaConfigs[selector]) {
+            focusAreaConfigs[selector] = value;
           } else {
-            if (!focusAreaConfigs[`.${className} ${key}`]) {
-              focusAreaConfigs[`.${className} ${key}`] = value;
-            } else {
-              focusAreaConfigs[`.${className} ${key}`].style = value;
-            }
+            focusAreaConfigs[selector].style = value.style;
+          }
+          if (!focusAreaConfigs[selector].items && !focusAreaConfigs[selector].style?.length) {
+            // 没有配置项并且没有style，添加默认的空style编辑，保证是一个选区
+            focusAreaConfigs[selector].style = [
+              {
+                items: []
+              }
+            ]
+          }
+
+          if (!focusAreaConfigs[selector].title) {
+            focusAreaConfigs[selector].title = selector;
           }
         })
       }

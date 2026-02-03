@@ -215,7 +215,7 @@ export default function developMyBricksModule(config: Config) {
 
   2、区块拆分及总体布局，按照以下步骤展开：
     1）按照自上而下、从左向右的方式分析拆解区块；
-    2）分析这些区块的总体布局：一律使用 Container 组件包裹各区块（禁止使用 div），通过 CSS（如 flex）实现先行后列的排列；
+    2）分析这些区块的总体布局：按照先行后列的方式进行规划；
     3）分析总体的响应式情况：哪些区块需要固定宽高、哪些区块需要随着总体宽度或高度变化如何变化；
   
   3、详细分析各个区块以及子元素，按照以下要点展开：
@@ -240,7 +240,7 @@ export default function developMyBricksModule(config: Config) {
 
   5、详细分析各个区块的技术方案，按照以下要点展开：
     - 变体分析：如果用户明确要求模块存在变体，分析变体的内容、以及在model.json中对应的强制改变变体的字段、configs.js中对于强制改变变体的配置项等；
-    - 布局方案：所有块级容器均使用 Container（与 div 的 props 一致，禁止使用 div），通过 CSS 控制排列、对齐、间距等；
+    - 布局方案：区块如何实现布局，注意事项有哪些；
     - 关键属性分析：区块对于所采用组件的关键属性，要包含在知识库中的<组件字段声明/>，以及考虑例如尺寸（size）、风格等，结合上面对样式的分析、组件需要做哪些配置等，一一给出方案；三方库组件必须分配语义化且唯一的 className；
     - 选区分析：返回所有有意义的选区（对于使用某类库中的组件，参考其在 知识库 中的 组件的选区声明），以便用户可以更方便的进行编辑；
     
@@ -267,16 +267,17 @@ export default function developMyBricksModule(config: Config) {
       1）根据用户的需求，对runtime.jsx文件中的内容进行修改；
       2）按照react的代码编写规范，所有列表中的组件，必需通过key属性做唯一标识，而且作为react的最佳实践，不要使用index作为key；
       3）对于模块的JSX部分，对于类库中的组件本身是root组件的情况、不必再用一个常规容器包裹；
-      4）所有块级容器一律使用 mybricks 的 Container 组件（Container 与 div 的 props 一致，可完全替代 div；禁止使用 div），通过 CSS 实现布局；
-      5）JSX部分最外层容器宽高应为100%以适应整个模块，不要做任何的假设，例如假设容器的宽度、高度等；
-      6）对于使用类库中的组件，必须为其设置语义化明确且唯一的 className，以便通过 CSS 选择器选中，无论是否需要样式；
-      7）对于使用类库中的组件，对于其在知识库中的<组件字段声明/>中的字段，根据其描述、做分配使用；
+      4）JSX部分最外层容器宽高应为100%以适应整个模块，不要做任何的假设，例如假设容器的宽度、高度等；
+      5）对于使用类库中的组件，必须为其设置语义化明确且唯一的 className，以便通过 CSS 选择器选中，无论是否需要样式；
+      6）对于使用类库中的组件，对于其在知识库中的<组件字段声明/>中的字段，根据其描述、做分配使用；
       
     3、对于runtime.jsx代码的修改，需要严格遵循以下要求：
       - 如果用户明确要求模块存在变体，需要在model.json中添加强制改变变体的控制字段；
       - 严格按照jsx语法规范书写，不允许使用typescript语法，不要出现任何错误；
       - 禁止出现直接引用标签的写法，例如<Tags[XX] property={'aa'}/>，正确的写法是应该如下形式 const XX = Tag[XX];<XX property={'aa'}/>;
       - 不要使用{/* */}这种注释方式，只能使用//注释方式；
+      - 使用style.less时，务必使用'style.less'这个路径，禁止做其他发挥;
+      - 所有来自三方库的组件必须带有 className 属性，值需语义化明确且唯一，无论是否需要样式，以便通过 CSS 选择器选中；
       - 所有与样式相关的内容都要写在style.less文件中，避免在runtime.jsx中通过style编写；
       - 各类动效、动画等，尽量使用css3的方式在style.less中实现，不要为此引入任何的额外类库；
       - 视频：一律通过相等尺寸的圆角矩形、中间有一个三角形的播放按钮作为替代；
@@ -698,7 +699,6 @@ export default function developMyBricksModule(config: Config) {
   \`\`\`after file="runtime.jsx"
   import css from 'style.less';
   import { forwardRef, useCallback } from 'react';
-  import { Container } from 'mybricks';
   import { Button } from 'xy-ui';
     
   export default forwardRef(function (props, ref) {
@@ -708,11 +708,11 @@ export default function developMyBricksModule(config: Config) {
     }, [onClick])
     
     return (
-      <Container className={css.viewContainer}>
+      <div className={css.viewContainer}>
         {btns.map((btn, index)=>{
           return <Button className={css.btn} key={index} onClick={e=>click(index)}>{btn.text}</Button>
         })}
-      </Container>
+      </div>
     )
   });
   \`\`\`
@@ -775,7 +775,6 @@ export default function developMyBricksModule(config: Config) {
   \`\`\`after file="runtime.jsx"
   import { forwardRef, useImperativeHandle, useCallback, useState } from 'react';
   import css from 'style.less';
-  import { Container } from 'mybricks';
   import { Button } from 'xy-ui';
   
   export default forwardRef(function (props, ref) {
@@ -791,11 +790,11 @@ export default function developMyBricksModule(config: Config) {
     }, [onClick, logger])
   
     return (
-      <Container className={css.btnView}>
+      <div className={css.btnView}>
         {btns.map((btn,idx)=>{//这个例子中，循环中每个组件使用的key属性是btn.id，而非index
           return <Button className={css.btn} key={btn.id} onClick={e=>click(idx)}>{btn.text}</Button>
         })}
-      </Container>
+      </div>
     )
   });
   \`\`\`
@@ -914,7 +913,6 @@ export default function developMyBricksModule(config: Config) {
   
   \`\`\`after file="runtime.jsx"
   import { forwardRef, useCallback } from 'react';
-  import { Container } from 'mybricks';
   export default forwardRef(function (props, ref) {
     const { onSearch } = props;
     const search = useCallback((e)=>{
@@ -923,15 +921,15 @@ export default function developMyBricksModule(config: Config) {
   \`\`\`
   
   \`\`\`before file="runtime.jsx"
-    <Container className={css.searchWrap}>
+    <div className={css.searchWrap}>
       <Search className={css.search}/>
-    </Container>
+    </div>
   \`\`\`
   
   \`\`\`after file="runtime.jsx"
-    <Container className={css.searchWrap}>
+    <div className={css.searchWrap}>
       <Search className={css.search} onSearch={search}/>
-    </Container>
+    </div>
   \`\`\`
   
   \`\`\`before file="com.json"

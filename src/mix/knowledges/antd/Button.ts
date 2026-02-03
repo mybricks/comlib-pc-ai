@@ -8,6 +8,17 @@ export default {
         {
           items: [
             {
+              type: '_resizer',
+              value: {
+                get() {
+                  debugger
+                },
+                set(ctx, val,status) {
+                  console.log(val,status)
+                }
+              }
+            },
+            {
               title: '样式',
               options: ['background', 'border'],
             }

@@ -95,14 +95,31 @@ export function transformTsx(code): Promise<{ transformCode: string, constituenc
                   const classNameNode = node.openingElement.attributes.find((a) => a.name.name === "className")
 
                   if (classNameNode) {
-                    dataLocValueObject.cn = classNameNode.value.expression.property.name;
-                    if (componentToSource.has(node.openingElement.name.name)) {
-                      constituency.push({
-                        className: classNameNode.value.expression.property.name,
-                        component: node.openingElement.name.name,
-                        source: componentToSource.get(node.openingElement.name.name),
-                      })
-                    }
+                    const cn = classNameNode.value.expression.property.name;
+                    dataLocValueObject.cn = cn
+
+                    constituency.push({
+                      className: cn,
+                      component: node.openingElement.name.name,
+                      // 除了三方库，就是html
+                      source: componentToSource.get(node.openingElement.name.name) || "html",
+                    })
+
+                    node.openingElement.attributes.push({
+                      type: 'JSXAttribute',
+                      name: {
+                        type: 'JSXIdentifier',
+                        name: 'data-cn',
+                      },
+                      value: {
+                        type: 'StringLiteral',
+                        value: cn,
+                        extra: { 
+                          raw: `"${cn}"`,
+                          rawValue: cn
+                        }
+                      }
+                    })
                   }
 
                   const dataLocValue = JSON.stringify(dataLocValueObject)
@@ -121,25 +138,7 @@ export function transformTsx(code): Promise<{ transformCode: string, constituenc
                         rawValue: dataLocValue
                       }
                     }
-                  })
-
-                  const comId = uuid();
-
-                  node.openingElement.attributes.push({
-                    type: 'JSXAttribute',
-                    name: {
-                      type: 'JSXIdentifier',
-                      name: 'data-com-id',
-                    },
-                    value: {
-                      type: 'StringLiteral',
-                      value: comId,
-                      extra: { 
-                        raw: `"${comId}"`,
-                        rawValue: comId
-                      }
-                    }
-                  })
+                  })                  
                 }
               }
             };
