@@ -1043,7 +1043,7 @@ export default function developMyBricksModule(config: Config) {
       config.execute(params);
       return "编写完成"
     },
-    aiRole: "expert",
-    // aiRole: "architect",
+    // aiRole: "expert",
+    aiRole: "architect",
   };
 }
