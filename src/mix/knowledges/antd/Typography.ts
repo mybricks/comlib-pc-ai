@@ -1,15 +1,16 @@
-import { getStyleOptions } from './../utils'
-
 export default {
   description: `文本段落`,
   editors: {
-    ':root': {
+    '.ant-typography': {
       title: '文本段落',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['font', 'background', 'border']),
+          items: [
+            {
+              title: '样式',
+              options: ['font', 'background', 'border'],
+            }
+          ]
         }
       ]
     },

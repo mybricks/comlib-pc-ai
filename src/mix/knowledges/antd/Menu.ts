@@ -1,35 +1,42 @@
-import { getStyleOptions } from './../utils'
-
 export default {
   description: `导航菜单`,
   editors: {
     ':root': {
       title: '导航菜单',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['font', 'background', 'border']),
+          items: [
+            {
+              title: '样式',
+              options: ['font', 'background', 'border'],
+            }
+          ]
         }
       ]
     },
     '.ant-menu-item.ant-menu-item-disabled': {
       title: '菜单项（禁用）',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['font', 'background', 'padding']),
+          items: [
+            {
+              title: '样式',
+              options: ['font', 'background', 'padding'],
+            }
+          ]
         }
       ]
     },
     '.ant-menu-item:not(.ant-menu-item-disabled)': {
       title: '菜单项',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['font', 'background', 'padding']),
+          items: [
+            {
+              title: '样式',
+              options: ['font', 'background', 'padding'],
+            }
+          ]
         }
       ]
     }
