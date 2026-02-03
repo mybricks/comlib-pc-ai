@@ -1,4 +1,4 @@
-import classLibrarySelection from "./tools/classLibrarySelection"
+import classLibrarySelection from "./tools/loadExtraComponentDocs"
 import developMyBricksModule from "./tools/developMyBricksModule";
 import { updateRender, updateStyle } from "../../../utils/ai-code/transform-umd";
 import { createWorkspace } from "./workspace";
@@ -25,9 +25,18 @@ export default function ({ context }) {
         libraryDocs: [] // 备用的类库文档（可选）
       });
 
+      const extraParams = aiComParams.data.document ? {
+        message: `参考图片一比一还原这个局部区域，当前组件需要完成的内容为页面中的局部部分，具体要还原的区域可以参考
+<需求文档>
+  ${aiComParams.data.document}
+</需求文档>`,
+        attachments: (window as any).myai_attachments ?? [],
+      } : {}
+
       return new Promise((resolve, reject) => {
         rxai.requestAI({
           ...params,
+          ...extraParams,
           emits: {
             write: () => { },
             complete: () => {
@@ -42,13 +51,13 @@ export default function ({ context }) {
           },
           // 需求分析、重构（从0-1）、修改
           tools: [
-            classLibrarySelection({
-              librarySummaryDoc: workspace.getAvailableLibraryInfo() || '',
-              fileFormat: context.plugins.aiService.fileFormat,
-              onOpenLibraryDoc: (libs) => {
-                workspace.openLibraryDoc(libs)
-              }
-            }),
+            // classLibrarySelection({
+            //   librarySummaryDoc: workspace.getAvailableLibraryInfo() || '',
+            //   fileFormat: context.plugins.aiService.fileFormat,
+            //   onOpenLibraryDoc: (libs) => {
+            //     workspace.openLibraryDoc(libs)
+            //   }
+            // }),
             developMyBricksModule({
               execute(params) {
                 console.log("[@开发模块 - execute]", params);

@@ -12,6 +12,8 @@ import iconPrompt from "./../../../prompts/icon-summary.md"
 
 import { ANTD_KNOWLEDGES_MAP, ECHARTS_KNOWLEDGES_MAP } from '../../../knowledges'
 
+import { getLibraryDoc } from './../../../avaliableLibraries'
+
 function getLibraryDocumentation() {
   return antdPrompt + `\n\n` + echartsPrompt;
 }
@@ -234,11 +236,20 @@ export class Workspace {
    * 提供所有可用的类库文档（markdown格式）
    */
   private registerLibraryDocsProvider() {
+    // // 注册动态组件文档目录
+    // this.knowledgeBase.registerDynamicDirectory({
+    //   id: 'library-component-docs',
+    //   name: '组件使用文档',
+    //   description: '组件级别的补充文档',
+    //   weight: 85, // 第三高权重
+    //   hidden: false
+    // });
+
     // 注册动态组件文档目录
     this.knowledgeBase.registerDynamicDirectory({
       id: 'library-component-docs',
-      name: '组件使用文档',
-      description: '组件级别的补充文档',
+      name: '可使用的类库文档',
+      description: '允许使用的各类三方库文档',
       weight: 85, // 第三高权重
       hidden: false
     });
@@ -294,22 +305,40 @@ export class Workspace {
       });
     } catch (error) {
     }
+
+    try {
+      await this.openLibraryDoc(['antd', '@ant-design/icons', 'dayjs'])
+    } catch (error) {
+      
+    }
   }
 
-  /**
-   * 打开类库文档
-   */
-  async openLibraryDoc(libs: any[] = []) {
-    const componentKnowledges = loadKnowledge(libs)
+  // /**
+  //  * 打开类库文档
+  //  */
+  // async openLibraryDoc(libs: any[] = []) {
+  //   const componentKnowledges = loadKnowledge(libs)
 
-    componentKnowledges.forEach(async (componentKnowledge) => {
+  //   componentKnowledges.forEach(async (componentKnowledge) => {
+  //     await this.knowledgeBase.openDynamicDocument({
+  //       id: `component-doc-${componentKnowledge?.lib}.${componentKnowledge.item}`,
+  //       title: componentKnowledge?.item,
+  //       description: componentKnowledge?.knowledge?.description,
+  //       content: componentKnowledge?.knowledge?.docs,
+  //       directoryId: 'library-component-docs',
+  //       extname: '.md'
+  //     });
+  //   });
+  // }
+
+  async openLibraryDoc(libs: string[] = []) {
+    return libs.forEach(async (lib) => {
       await this.knowledgeBase.openDynamicDocument({
-        id: `component-doc-${componentKnowledge?.lib}.${componentKnowledge.item}`,
-        title: componentKnowledge?.item,
-        description: componentKnowledge?.knowledge?.description,
-        content: componentKnowledge?.knowledge?.docs,
+        id: lib.replace('/', '-'),
+        title: lib,
+        description: lib,
+        content: getLibraryDoc(lib),
         directoryId: 'library-component-docs',
-        extname: '.md'
       });
     });
   }
