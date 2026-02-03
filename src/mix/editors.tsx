@@ -4,7 +4,8 @@ import lowcodeViewCss from "./lowcodeView/index.lazy.less";
 import context from "./context";
 import { ANTD_KNOWLEDGES_MAP } from "./knowledges";
 import { parseLess, stringifyLess } from "./utils/transform/less";
-import { MYBRICKS_KNOWLEDGES_MAP } from "./context/constants";
+import { deepClone } from "./utils/normal";
+import { MYBRICKS_KNOWLEDGES_MAP, HTML_KNOWLEDGES_MAP } from "./context/constants";
 
 function evalConfigJsCompiled(code: string) {
   const evalStr = `
@@ -104,10 +105,13 @@ export default function (props) {
         knowledge = ANTD_KNOWLEDGES_MAP[component.toUpperCase()];
       } else if (source === "mybricks") {
         knowledge = MYBRICKS_KNOWLEDGES_MAP[component.toUpperCase()];
+      } else if (source === "html") {
+        knowledge = HTML_KNOWLEDGES_MAP[component.toUpperCase()];
       }
 
       if (knowledge?.editors) {
-        Object.entries(knowledge.editors).forEach(([key, value]: any) => {
+        Object.entries(knowledge.editors).forEach(([key, oriValue]: any) => {
+          const value = deepClone(oriValue);
           if (value.style?.length) {
             value.style.forEach((style) => {
               style.items?.forEach((item) => {
@@ -148,6 +152,10 @@ export default function (props) {
                 items: []
               }
             ]
+          }
+
+          if (!focusAreaConfigs[selector].title) {
+            focusAreaConfigs[selector].title = selector;
           }
         })
       }
