@@ -38,7 +38,7 @@ class Context {
         updateRender({ data: aiComParams.data }, content);
         break;
       case "style.less":
-        updateStyle({ data: aiComParams.data }, content);
+        updateStyle({ id, data: aiComParams.data }, content);
         break;
       case "config.js":
         aiComParams.data.configJsCompiled = encodeURIComponent(content);

@@ -141,6 +141,12 @@ export default function LowcodeView(params: Params) {
     clearFileIfDataChanged("com.json");
   }, [params.data?.componentConfig]);
 
+  useEffect(() => {
+    return ()=>{
+      debugger
+    }
+  }, []);
+
   return (
     <>
       <div className={css['lowcode-view-toolbar']}>

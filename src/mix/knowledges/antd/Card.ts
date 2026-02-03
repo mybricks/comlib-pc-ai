@@ -5,90 +5,117 @@ export default {
   editors: {
     ':root': {
       title: '卡片',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['background', 'font', 'scroll']),
+          items: [
+            {
+              title: '样式',
+              options: ['background', 'font', 'scroll'],
+            }
+          ]
         }
       ]
     },
     '.ant-card-head': {
       title: '头部',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['background', 'padding', 'border']),
+          items: [
+            {
+              title: '样式',
+              options: ['background', 'padding', 'border'],
+            }
+          ]
         }
       ]
     },
     '.ant-card-head-title': {
       title: '标题',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['background', 'font', 'padding']),
+          items: [
+            {
+              title: '样式',
+              options: ['background', 'font', 'padding'],
+            }
+          ]
         }
       ]
     },
     '.ant-card-body': {
       title: '内容',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['padding']),
+          items: [
+            {
+              title: '样式',
+              options: ['padding'],
+            }
+          ]
         }
       ]
     },
     '.ant-card-extra': {
       title: '额外元素',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
+          items: [
+            {
+              title: '样式',
+            }
+          ]
         }
       ]
     },
     '.ant-card-cover': {
       title: '封面',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['background', 'border', 'padding']),
+          items: [
+            {
+              title: '样式',
+              options: ['background', 'border', 'padding'],
+            }
+          ]
         }
       ]
     },
     '.ant-card-meta-avatar .ant-avatar': {
       title: '头像',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['border']),
+          items: [
+            {
+              title: '样式',
+              options: ['border'],
+            }
+          ]
         }
       ]
     },
     '.ant-card-meta-title': {
       title: '内容标题',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['font', 'border']),
+          items: [
+            {
+              title: '样式',
+              options: ['font', 'border'],
+            }
+          ]
         }
       ]
     },
     '.ant-card-meta-description': {
       title: '内容描述',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['font', 'border']),
+          items: [
+            {
+              title: '样式',
+              options: ['font', 'border'],
+            }
+          ]
         }
       ]
     }

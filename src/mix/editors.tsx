@@ -2,6 +2,9 @@ import React from 'react';
 import LowcodeView from "./lowcodeView";
 import lowcodeViewCss from "./lowcodeView/index.lazy.less";
 import context from "./context";
+import { ANTD_KNOWLEDGES_MAP } from "./knowledges";
+import { parseLess, stringifyLess } from "./utils/transform/less";
+import { MYBRICKS_KNOWLEDGES_MAP } from "./context/constants";
 
 function evalConfigJsCompiled(code: string) {
   const evalStr = `
@@ -9,7 +12,7 @@ function evalConfigJsCompiled(code: string) {
     ${code.replace('export default', 'result =')};
     result; // 最后一行返回结果
   `;
-  
+
   try {
     return eval(evalStr);
   } catch (error) {
@@ -25,9 +28,7 @@ function detectJsonIndent(jsonStr: string): string | number {
 }
 
 export default function (props) {
-  console.log("[@editors - props]", props);
-
-  if (!props) {
+  if (!props?.data) {
     return {};
   }
 
@@ -94,6 +95,63 @@ export default function (props) {
     }
   } catch {}
 
+  if (data.runtimeJsxConstituency) {
+    data.runtimeJsxConstituency.forEach(({ className, component, source }) => {
+      let knowledge: any = null;
+
+      if (source === "antd") {
+        knowledge = ANTD_KNOWLEDGES_MAP[component.toUpperCase()];
+      } else if (source === "mybricks") {
+        knowledge = MYBRICKS_KNOWLEDGES_MAP[component.toUpperCase()];
+      }
+
+      if (knowledge?.editors) {
+        Object.entries(knowledge.editors).forEach(([key, value]: any) => {
+          if (value.style?.length) {
+            value.style.forEach((style) => {
+              style.items?.forEach((item) => {
+                item.valueProxy = {
+                  set(params, value) {
+                    const comId = props.model?.runtime?.id || props.id;
+                    const aiComParams = context.getAiComParams(comId);
+                    const cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
+
+                    if (!cssObj[params.selector]) {
+                      cssObj[params.selector] = {};
+                    }
+
+                    Object.entries(value).forEach(([key, value]) => {
+                      cssObj[params.selector][key] = value;
+                    })
+
+                    const cssStr = stringifyLess(cssObj);
+                    context.updateFile(comId, { fileName: 'style.less', content: cssStr })
+                  }
+                }
+              })
+            })
+          }
+
+          if (key === ":root") {
+            if (!focusAreaConfigs[`.${className}`]) {
+              focusAreaConfigs[`.${className}`] = value;
+            } else {
+              focusAreaConfigs[`.${className}`].style = value.style;
+            }
+          } else {
+            if (!focusAreaConfigs[`.${className} ${key}`]) {
+              focusAreaConfigs[`.${className} ${key}`] = value;
+            } else {
+              focusAreaConfigs[`.${className} ${key}`].style = value;
+            }
+          }
+        })
+      }
+    })
+  }
+
+  context.setAiComParams(props.id, props);
+
   return {
     ...focusAreaConfigs,
     /** 可调整宽高 */
@@ -101,12 +159,11 @@ export default function (props) {
       options: ['width', 'height'],
     },
     /** 代码编辑器面板 */
-   '@lowcode':{
+    '@lowcode':{
       render(params, plugins){
-        context.setAiComParams(params.model.runtime.id, params);
         context.plugins = plugins;
         context.createVibeCodingAgent({ register: plugins.aiService.registerAgent })
-  
+
         return (
           <LowcodeView {...params}/>
         )

@@ -6,10 +6,10 @@ import {copyToClipboard} from './../index'
 
 import css from './runtime-card.less'
 
-const IdlePlaceholder = ({title = 'AI 图表', orgName = 'MyBricks', examples = []}) => {
+const IdlePlaceholder = ({title = 'AI 图表', orgName = 'MyBricks', examples = []}: any) => {
   const copy = useCallback((text) => {
     copyToClipboard(text).then((res) => {
-      window.antd?.message?.success?.("复制成功") || alert('复制成功')
+      (window as any).antd?.message?.success?.("复制成功") || alert('复制成功')
       // antd?.message
       //   ? antd?.message.success('复制成功')
       //   : alert('复制成功')
@@ -60,6 +60,12 @@ interface AIRuntimeProps {
   /** 组件运行时的依赖 */
   dependencies?: Record<string, any>,
   wrapper?: FunctionComponent<{ children: ReactElement, env: any, canvasContainer: any }>,
+}
+
+const mybricks = {
+  Container: ({ children, ...props}) => {
+    return <div {...props}>{children}</div>
+  }
 }
 
 export const genAIRuntime = ({title, orgName, examples, dependencies, wrapper}: AIRuntimeProps) =>
@@ -115,7 +121,7 @@ export const genAIRuntime = ({title, orgName, examples, dependencies, wrapper}: 
             ...(dependencies ?? {}),
             'react': React,
             '@ant-design/icons': icons,
-            'mybricks': env.mybricksSdk,
+            'mybricks': mybricks,
           }}
           inMybricksGeoWebview={!!canvasContainer}
         />

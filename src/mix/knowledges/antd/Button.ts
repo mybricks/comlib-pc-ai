@@ -1,15 +1,19 @@
 import { getStyleOptions } from './../utils'
 
+//每个区块都有内部的状态管理（data）
+
 export default {
   description: `按钮组件`,
   editors: {
     ':root': {
-      title: '按钮',
-      items: [
+      style: [
         {
-          title: '样式',
-          type: 'style',
-          options: getStyleOptions(['background', 'font', 'border']),
+          items: [
+            {
+              title: '样式',
+              options: ['background', 'font', 'border'],
+            }
+          ]
         }
       ]
     },

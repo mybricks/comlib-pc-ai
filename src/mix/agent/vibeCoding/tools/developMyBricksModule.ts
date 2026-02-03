@@ -76,11 +76,11 @@ export default function developMyBricksModule(config: Config) {
       }), []);
 
       return (
-        <Card>
+        <Card className={css.card}>
           <Button className={css.button} onClick={e=>{
             onClick?.(title)
           }}>{title}</Button>
-          {slots?.s_u01?.render ? <Card>{slots.s_u01.render()}</Card> : null}
+          {slots?.s_u01?.render ? <Card className={css.slotCard}>{slots.s_u01.render()}</Card> : null}
         </Card>
       );
     });
@@ -102,12 +102,13 @@ export default function developMyBricksModule(config: Config) {
     - 插槽：若平台提供插槽，则通过 props 传入（如 props.slots），使用方式以平台为准，如 props.slots?.插槽id?.render()。
   - 输入端口（原 inputs）：不再通过 props 接收，改用 React 标准写法 useImperativeHandle(ref, () => ({ 方法名: 实现 }), [])，方法名与 com.json 中 inputs 的 id 一致（如 setTitle），外部通过 ref.current.setTitle(val) 调用。
   
-  3、style.less文件，为当前模块的样式代码,例如：
+  3、style.less文件，为当前模块的样式代码。**重要**：style.less 在构建后最终不会被做 CSS Module 处理，类名会按原样输出到最终 CSS，因此无需、也不应使用 CSS Module 相关写法。例如：
   \`\`\`less file="style.less"
     //style.less文件中的样式代码
   \`\`\`
   
   style.less文件的注意事项：
+   - 禁止使用 CSS Modules 的 :global 语法；
    - less文件，作为容器类的模块，最外层容器宽高应为100%以适应整个模块，不要做任何的假设，例如假设容器的宽度、高度等；
    - 不能使用 :root、:global作为选择器；
    - 使用驼峰命名方式定义类名；
@@ -180,6 +181,11 @@ export default function developMyBricksModule(config: Config) {
   
   <技术栈及类库声明>
     仅可以基于 ${libTitles} 技术栈进行开发，同时，可以使用下面声明的类库，根据场景做合理的技术方案设计、不要超出声明的类库范围。
+    
+    **mybricks 默认技术栈**：mybricks 作为默认技术栈，提供 Container 组件。Container 可完全替代 div：其接收的 props 与 div 一致（如 className、style、onClick 等），用法相同。使用 Container 而非 div 的原因在于：便于平台识别布局容器、识别三方依赖组件、并支持诸多个性化配置。因此，**所有需要块级容器的地方一律使用 Container，禁止使用 div**。布局通过 Container 包裹区块并配合 CSS（如 flex）实现。
+    
+    **三方库组件的 className 要求**：所有来自三方库的组件，使用时必须带有 className 属性，无论是否真的需要设置样式。className 的值必须语义化明确且唯一，以便通过 CSS 选择器精确选中这些组件。
+    
     注意：
       - 类库由markdown格式构成，尤其要关注其中的 "简介" 、"组件列表"或“组件声明”、“注意事项”以及“示例” 等部分。
     
@@ -191,7 +197,8 @@ ${comPrompts.join('\n')}
   注意：
   1、在runtime文件中，要严格参考 <技术栈及类库声明/> 中的内容，除其中允许使用的框架及类库之外、不允许使用其他任何库或框架；
   2、不允许对上述可以使用的库做假设、例如主观臆造不存在的组件等，只能基于事实上提供的组件及知识库中的属性、API说明进行开发；
-  3、你要完成的是中文场景下的开发任务，请仔细斟酌文案、用语，在各类文案表达中尽量使用中文，但是对于代码、技术术语等，可以使用英文。
+  3、所有来自三方库的组件必须带有语义化且唯一的 className，以便通过 CSS 选择器选中，无论是否需要设置样式；
+  4、你要完成的是中文场景下的开发任务，请仔细斟酌文案、用语，在各类文案表达中尽量使用中文，但是对于代码、技术术语等，可以使用英文。
 </模块开发要求>
 
 <按照以下情况分别处理>
@@ -225,7 +232,7 @@ ${comPrompts.join('\n')}
 
   2、区块拆分及总体布局，按照以下步骤展开：
     1）按照自上而下、从左向右的方式分析拆解区块；
-    2）分析这些区块的总体布局：按照先行后列的方式进行规划；
+    2）分析这些区块的总体布局：一律使用 Container 组件包裹各区块（禁止使用 div），通过 CSS（如 flex）实现先行后列的排列；
     3）分析总体的响应式情况：哪些区块需要固定宽高、哪些区块需要随着总体宽度或高度变化如何变化；
   
   3、详细分析各个区块以及子元素，按照以下要点展开：
@@ -250,7 +257,8 @@ ${comPrompts.join('\n')}
 
   5、详细分析各个区块的技术方案，按照以下要点展开：
     - 变体分析：如果用户明确要求模块存在变体，分析变体的内容、以及在model.json中对应的强制改变变体的字段、configs.js中对于强制改变变体的配置项等；
-    - 布局方案：区块如何实现布局，注意事项有哪些；
+    - 布局方案：所有块级容器均使用 Container（与 div 的 props 一致，禁止使用 div），通过 CSS 控制排列、对齐、间距等；
+    - 关键属性分析：区块对于所采用组件的关键属性，要包含在知识库中的<组件字段声明/>，以及考虑例如尺寸（size）、风格等，结合上面对样式的分析、组件需要做哪些配置等，一一给出方案；三方库组件必须分配语义化且唯一的 className；
     - 选区分析：返回所有有意义的选区（对于使用某类库中的组件，参考其在 知识库 中的 组件的选区声明），以便用户可以更方便的进行编辑；
     
   6、接下来，确定哪些文件必须要进行修改，按照以下步骤处理：
@@ -276,7 +284,10 @@ ${comPrompts.join('\n')}
       1）根据用户的需求，对runtime.jsx文件中的内容进行修改；
       2）按照react的代码编写规范，所有列表中的组件，必需通过key属性做唯一标识，而且作为react的最佳实践，不要使用index作为key；
       3）对于模块的JSX部分，对于类库中的组件本身是root组件的情况、不必再用一个常规容器包裹；
-      4）JSX部分最外层容器宽高应为100%以适应整个模块，不要做任何的假设，例如假设容器的宽度、高度等；
+      4）所有块级容器一律使用 mybricks 的 Container 组件（Container 与 div 的 props 一致，可完全替代 div；禁止使用 div），通过 CSS 实现布局；
+      5）JSX部分最外层容器宽高应为100%以适应整个模块，不要做任何的假设，例如假设容器的宽度、高度等；
+      6）对于使用类库中的组件，必须为其设置语义化明确且唯一的 className，以便通过 CSS 选择器选中，无论是否需要样式；
+      7）对于使用类库中的组件，对于其在知识库中的<组件字段声明/>中的字段，根据其描述、做分配使用；
       
     3、对于runtime.jsx代码的修改，需要严格遵循以下要求：
       - runtime 必须使用 React.forwardRef 包裹，签名为 (props, ref) => JSX.Element；
@@ -290,6 +301,8 @@ ${comPrompts.join('\n')}
       - 禁止出现直接引用标签的写法，例如<Tags[XX] property={'aa'}/>，正确的写法是应该如下形式 const XX = Tag[XX];<XX property={'aa'}/>;
       - 不要使用{/* */}这种注释方式，只能使用//注释方式；
       - 使用style.less时，务必使用'style.less'这个路径，禁止做其他发挥;
+      - 所有块级容器一律使用 mybricks 的 Container 组件（禁止使用 div），通过 CSS 实现布局；
+      - 所有来自三方库的组件必须带有 className 属性，值需语义化明确且唯一，无论是否需要样式，以便通过 CSS 选择器选中；
       - 所有与样式相关的内容都要写在style.less文件中，避免在runtime.jsx中通过style编写；
       - 各类动效、动画等，尽量使用css3的方式在style.less中实现，不要为此引入任何的额外类库；
       - 视频：一律通过相等尺寸的圆角矩形、中间有一个三角形的播放按钮作为替代；
@@ -318,7 +331,7 @@ ${comPrompts.join('\n')}
       - 不能使用$\{变量\}，例如：\$\{data.borderRadius\} 这种是不允许的；
       - 当用于提出例如“要适应容器尺寸”等要求时，这里的容器指的是模块的父容器，不是整个页面；
       - 不要使用:root作为selector；
-      - 不用使用:global作为selector，当需要覆盖全局样式时，直接使用需要覆盖的样式选择器即可；
+      - 禁止使用 CSS Modules 的 :global 语法；
       - 所有容器类的样式必须包含position:relative；
       - 在任何时候，最外层容器的宽度与高度都要适应整个模块；
       - 不要做任何的假设，例如假设容器的宽度、高度等；
@@ -326,6 +339,10 @@ ${comPrompts.join('\n')}
       - 动效、动画等效果，尽量使用css3的方式实现，例如transition、animation等；
     
     3、审视runtime.jsx文件是否也需要修改，如果需要，同时给出runtime.jsx文件的完整代码；
+    
+    注意：
+    1、注意上述编码方面的要求，严格遵守；
+    2、输出 style.less 前必须自检：返回的 less 代码中不得出现 \`:global\`，否则会导致样式错误；
   </当需要修改style.less文件时>
 
   <当需要修改config.js文件时>
@@ -391,7 +408,7 @@ ${comPrompts.join('\n')}
 
       注意：
         - 配置项的类型仅限于text、textarea、number、select、switch；
-        - selector为该选区在dom结构中的合法selector，不能使用不存在的selector；
+        - selector为该选区在dom结构中的合法selector，通常对应 runtime 中组件的 className，不能使用不存在的 selector，因此三方库组件必须设置语义化且唯一的 className；
         - configs中的value对象中的get、set方法，要注意对于model的字段进行编辑，这里要注意要检查相关的字段是否在 runtime 的 props 中读取；
   </当需要修改config.js文件时>
 
@@ -676,6 +693,83 @@ ${comPrompts.join('\n')}
 </example>
 
 <example>
+  <user_query>开发两个按钮构成的工具条</user_query>
+  <assistant_response>
+  好的，我将为您开发一个工具条，包含两个按钮
+  \`\`\`before file="model.json"
+  \`\`\`
+  
+  \`\`\`after file="model.json"
+  {
+    "btns":[
+      {"text":"按钮1"},
+      {"text":"按钮2"}
+    ]
+  }
+  \`\`\`
+
+  \`\`\`before file="style.less"
+  \`\`\`
+  
+  \`\`\`after file="style.less"
+  .viewContainer{
+    position:relative;
+    width:100%;
+    height:100%;
+  }
+  .btn{
+    position:absolute;
+  }
+\`\`\`
+
+  \`\`\`before file="runtime.jsx"
+  \`\`\`
+
+  \`\`\`after file="runtime.jsx"
+  import css from 'style.less';
+  import { forwardRef, useCallback } from 'react';
+  import { Container } from 'mybricks';
+  import { Button } from 'xy-ui';
+    
+  export default forwardRef(function (props, ref) {
+    const { btns, onClick } = props;
+    const click = useCallback((index)=>{
+      onClick?.(index)
+    }, [onClick])
+    
+    return (
+      <Container className={css.viewContainer}>
+        {btns.map((btn, index)=>{
+          return <Button className={css.btn} key={index} onClick={e=>click(index)}>{btn.text}</Button>
+        })}
+      </Container>
+    )
+  });
+  \`\`\`
+  
+  \`\`\`before file="com.json"
+  \`\`\`
+  
+  \`\`\`after file="com.json"
+  {
+    "inputs": [],
+    "outputs": [
+      {
+        "id": "onClick",
+        "title": "按钮点击",
+        "desc": "按钮被点击时触发",
+        "schema": {
+          "type": "number",
+          "description": "被点击按钮的索引"
+        }
+      }
+    ]
+  }
+  \`\`\`
+  </assistant_response>
+</example>
+
+<example>
   <user_query>工具条，按钮由输入端口决定</user_query>
   <assistant_response>
   好的，我将为您开发一个工具条，同时定义一个输入端口，用于给到按钮数据，初始状态有1个按钮
@@ -711,7 +805,8 @@ ${comPrompts.join('\n')}
   \`\`\`after file="runtime.jsx"
   import { forwardRef, useImperativeHandle, useCallback, useState } from 'react';
   import css from 'style.less';
-  import { View, Button } from 'xy-ui';
+  import { Container } from 'mybricks';
+  import { Button } from 'xy-ui';
   
   export default forwardRef(function (props, ref) {
     const { btns: initialBtns, onClick, logger } = props;
@@ -726,11 +821,11 @@ ${comPrompts.join('\n')}
     }, [onClick, logger])
   
     return (
-      <View className={css.btnView}>
+      <Container className={css.btnView}>
         {btns.map((btn,idx)=>{//这个例子中，循环中每个组件使用的key属性是btn.id，而非index
           return <Button className={css.btn} key={btn.id} onClick={e=>click(idx)}>{btn.text}</Button>
         })}
-      </View>
+      </Container>
     )
   });
   \`\`\`
@@ -849,6 +944,7 @@ ${comPrompts.join('\n')}
   
   \`\`\`after file="runtime.jsx"
   import { forwardRef, useCallback } from 'react';
+  import { Container } from 'mybricks';
   export default forwardRef(function (props, ref) {
     const { onSearch } = props;
     const search = useCallback((e)=>{
@@ -857,15 +953,15 @@ ${comPrompts.join('\n')}
   \`\`\`
   
   \`\`\`before file="runtime.jsx"
-    <View>
-      <Search/>
-    </View>
+    <Container className={css.searchWrap}>
+      <Search className={css.search}/>
+    </Container>
   \`\`\`
   
   \`\`\`after file="runtime.jsx"
-    <View>
-      <Search onSearch={search}/>
-    </View>
+    <Container className={css.searchWrap}>
+      <Search className={css.search} onSearch={search}/>
+    </Container>
   \`\`\`
   
   \`\`\`before file="com.json"

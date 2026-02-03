@@ -69,7 +69,7 @@ interface AIJsxProps {
   outputs: any;
 }
 
-export const AIJsxRuntime = ({ id, env, styleCode, renderCode, data, inputs, outputs, errorInfo, placeholder = 'AI组件', dependencies = {}, inMybricksGeoWebview } : AIJsxProps) => {
+export const AIJsxRuntime = ({ id, env, styleCode, renderCode, data, inputs, outputs, errorInfo, placeholder = 'AI组件', dependencies = {}, inMybricksGeoWebview } : any) => {
   const ref = useRef<any>(null);
   const appendCssApi = useMemo<CssApi>(() => {
     if (inMybricksGeoWebview && env.canvas?.css) {
@@ -161,7 +161,7 @@ export const AIJsxRuntime = ({ id, env, styleCode, renderCode, data, inputs, out
       try {
         const oriCode = decodeURIComponent(renderCode);
 
-        const Com = runRender(oriCode, {
+        const Com: any = runRender(oriCode, {
           'react': React,
           'mybricks': env.mybricksSdk,
           'dayjs': dayjs,
