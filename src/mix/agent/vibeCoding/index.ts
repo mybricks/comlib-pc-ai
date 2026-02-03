@@ -84,7 +84,7 @@ export default function ({ context }) {
                   const matchedFiles = files.filter((file: any) => file.fileName === fileName);
                   if (matchedFiles.length === 1) {
                     context.updateFile(focus.comId, { fileName, content: matchedFiles[0].content })
-                  } else if (matchedFiles.length === 2) {
+                  } else if (matchedFiles.length > 1) {
                     let current = decodeURIComponent(aiComParams.data[dataKey] || '');
                     for (let i = 0; i < matchedFiles.length; i+=2) {
                       const before = matchedFiles[i];
