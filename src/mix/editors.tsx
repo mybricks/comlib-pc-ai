@@ -115,23 +115,47 @@ export default function (props) {
           if (value.style?.length) {
             value.style.forEach((style) => {
               style.items?.forEach((item) => {
-                item.valueProxy = {
-                  set(params, value) {
-                    const comId = props.model?.runtime?.id || props.id;
-                    const aiComParams = context.getAiComParams(comId);
-                    const cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
-                    const selector = params.selector;
-
-                    if (!cssObj[selector]) {
-                      cssObj[selector] = {};
+                if (item.type === '_resizer') {
+                  let cssObj = {};
+                  let cssObjKey = ""
+                  item.value = {
+                    get() {
+                      console.log("[@_resizer -get]");
+                    },
+                    set(params, value, status) {
+                      if (status.state === 'start') {
+                        const { cn } = JSON.parse(params.focusArea.dataset.loc);
+                        const aiComParams = context.getAiComParams(params.id);
+                        cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
+                        cssObjKey = `.${cn}`;
+                      } else if (status.state === 'ing') {
+                        Object.entries(value).forEach(([key, value]) => {
+                          cssObj[cssObjKey][key] = `${value}px`;
+                        })
+                        const cssStr = stringifyLess(cssObj);
+                        context.updateFile(params.id, { fileName: 'style.less', content: cssStr })
+                      }
                     }
-
-                    Object.entries(value).forEach(([key, value]) => {
-                      cssObj[selector][key] = value;
-                    })
-
-                    const cssStr = stringifyLess(cssObj);
-                    context.updateFile(comId, { fileName: 'style.less', content: cssStr })
+                  }
+                } else {
+                  item.valueProxy = {
+                    set(params, value) {
+                      const comId = props.model?.runtime?.id || props.id;
+                      const aiComParams = context.getAiComParams(comId);
+                      const cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
+                      const selector = params.selector;
+  
+                      if (!cssObj[selector]) {
+                        cssObj[selector] = {};
+                      }
+  
+                      Object.entries(value).forEach(([key, value]) => {
+                        cssObj[selector][key] = value;
+                      })
+  
+                      const cssStr = stringifyLess(cssObj);
+                      context.updateFile(comId, { fileName: 'style.less', content: cssStr })
+                    }
                   }
                 }
               })
