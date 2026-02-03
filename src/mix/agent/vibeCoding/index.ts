@@ -100,6 +100,13 @@ export default function ({ context }) {
                       }
 
                       current = current.replace(before.content, after.content)
+
+                      console.log("[@updateFile]", {
+                        fileName,
+                        current,
+                        after: after.content,
+                        before: before.content,
+                      })
                     }
                     context.updateFile(focus.comId, { fileName, content: current })
                   }

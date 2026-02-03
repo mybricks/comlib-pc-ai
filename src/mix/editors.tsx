@@ -60,6 +60,7 @@ export default function (props) {
       })
 
       focusAreaConfigs[key] = {
+        ...value,
         items,
       }
 
@@ -115,13 +116,14 @@ export default function (props) {
                     const comId = props.model?.runtime?.id || props.id;
                     const aiComParams = context.getAiComParams(comId);
                     const cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
+                    const selector = params.selector;
 
-                    if (!cssObj[params.selector]) {
-                      cssObj[params.selector] = {};
+                    if (!cssObj[selector]) {
+                      cssObj[selector] = {};
                     }
 
                     Object.entries(value).forEach(([key, value]) => {
-                      cssObj[params.selector][key] = value;
+                      cssObj[selector][key] = value;
                     })
 
                     const cssStr = stringifyLess(cssObj);
@@ -132,18 +134,20 @@ export default function (props) {
             })
           }
 
-          if (key === ":root") {
-            if (!focusAreaConfigs[`.${className}`]) {
-              focusAreaConfigs[`.${className}`] = value;
-            } else {
-              focusAreaConfigs[`.${className}`].style = value.style;
-            }
+          let selector = key === ":root" ? `.${className}` : `.${className} ${key}`;
+
+          if (!focusAreaConfigs[selector]) {
+            focusAreaConfigs[selector] = value;
           } else {
-            if (!focusAreaConfigs[`.${className} ${key}`]) {
-              focusAreaConfigs[`.${className} ${key}`] = value;
-            } else {
-              focusAreaConfigs[`.${className} ${key}`].style = value;
-            }
+            focusAreaConfigs[selector].style = value.style;
+          }
+          if (!focusAreaConfigs[selector].items && !focusAreaConfigs[selector].style?.length) {
+            // 没有配置项并且没有style，添加默认的空style编辑，保证是一个选区
+            focusAreaConfigs[selector].style = [
+              {
+                items: []
+              }
+            ]
           }
         })
       }
