@@ -53,7 +53,8 @@ export const HTML_KNOWLEDGES_MAP = {
             items: [
               {
                 title: '样式',
-                options: ['background', 'border', 'padding', 'margin']
+                autoOptions: true,
+                // options: ['background', 'border', 'padding', 'margin']
               }
             ]
           }

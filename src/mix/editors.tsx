@@ -215,6 +215,8 @@ export default function (props) {
 
   context.setAiComParams(props.id, props);
 
+  console.log("[@focusAreaConfigs]", focusAreaConfigs)
+
   return {
     ...focusAreaConfigs,
     /** 可调整宽高 */
