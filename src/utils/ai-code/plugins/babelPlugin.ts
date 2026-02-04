@@ -130,7 +130,7 @@ function extractCssClassNames(node: any): string[] {
 function findRelyAndSource(relyName, importRelyMap) {
   const value = importRelyMap.get(relyName);
   if (value == null) {
-    return { relyName, source: null };
+    return { relyName, source: "html" };
   }
   // value 可能是 source（直接 import），也可能是另一个 relyName（解构自 Typography.Text）
   const nextValue = importRelyMap.get(value);

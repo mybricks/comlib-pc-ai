@@ -50,8 +50,12 @@ export const HTML_KNOWLEDGES_MAP = {
       ":root": {
         style: [
           {
-            title: '样式',
-            options: ['background', 'border', 'padding', 'margin']
+            items: [
+              {
+                title: '样式',
+                options: ['background', 'border', 'padding', 'margin']
+              }
+            ]
           }
         ]
       }
