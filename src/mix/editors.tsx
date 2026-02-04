@@ -121,88 +121,87 @@ export default function (props) {
               const styleItems: any[] = style.items;
               const items: any = [];
               styleItems?.forEach((item) => {
-                if (item.type === '_resizer') {
-                  let cssObj = {};
-                  let cssObjKey = ""
+                className.forEach((className) => {
                   items.push({
                     ...item,
-                    value: {
-                      get() {
-                        console.log("[@_resizer -get]");
-                      },
-                      set(params, value, status) {
-                        if (status.state === 'start') {
-                          let { cn } = JSON.parse(params.focusArea.dataset.loc);
-                          if (typeof cn === 'string') {
-                            // [TODO] 兼容，后续去除
-                            cn = [cn]
-                          }
-                          cn = cn[0]
-                          const aiComParams = context.getAiComParams(params.id);
-                          cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
-                          cssObjKey = `.${cn}`;
-                        } else if (status.state === 'ing') {
-                          Object.entries(value).forEach(([key, value]) => {
-                            cssObj[cssObjKey][key] = `${value}px`;
-                          })
-                          const cssStr = stringifyLess(cssObj);
-                          context.updateFile(params.id, { fileName: 'style.less', content: cssStr })
+                    valueProxy: {
+                      set(params, value) {
+                        const comId = props.model?.runtime?.id || props.id;
+                        const aiComParams = context.getAiComParams(comId);
+                        const cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
+                        const selector = params.selector;
+    
+                        if (!cssObj[selector]) {
+                          cssObj[selector] = {};
                         }
+    
+                        Object.entries(value).forEach(([key, value]) => {
+                          cssObj[selector][key] = value;
+                        })
+    
+                        const cssStr = stringifyLess(cssObj);
+                        context.updateFile(comId, { fileName: 'style.less', content: cssStr })
                       }
-                    }
+                    },
+                    target: `.${className}${item.target || ""}`,
+                    domTarget: `.${className}`
                   })
-                } else {
-                  className.forEach((className) => {
-                    items.push({
-                      ...item,
-                      valueProxy: {
-                        set(params, value) {
-                          const comId = props.model?.runtime?.id || props.id;
-                          const aiComParams = context.getAiComParams(comId);
-                          const cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
-                          const selector = params.selector;
-      
-                          if (!cssObj[selector]) {
-                            cssObj[selector] = {};
-                          }
-      
-                          Object.entries(value).forEach(([key, value]) => {
-                            cssObj[selector][key] = value;
-                          })
-      
-                          const cssStr = stringifyLess(cssObj);
-                          context.updateFile(comId, { fileName: 'style.less', content: cssStr })
-                        }
-                      },
-                      target: `.${className}${item.target || ""}`,
-                      domTarget: `.${className}`
-                    })
-                  })
-                }
+                })
               })
               style.items = items;
             })
           }
 
-          let selector = key === ":root" ? `.${className[0]}` : `.${className[0]} ${key}`;
+          const mergeItems: any = [];
 
-          if (!focusAreaConfigs[selector]) {
-            focusAreaConfigs[selector] = value;
-          } else {
-            focusAreaConfigs[selector].style = value.style;
-          }
-          if (!focusAreaConfigs[selector].items && !focusAreaConfigs[selector].style?.length) {
-            // 没有配置项并且没有style，添加默认的空style编辑，保证是一个选区
-            focusAreaConfigs[selector].style = [
-              {
-                items: []
+          if (value.items?.length) {
+            value.items.forEach((item) => {
+              if (item.type === '_resizer') {
+                let cssObj = {};
+                let cssObjKey = ""
+                mergeItems.push({
+                  ...item,
+                  value: {
+                    get() {
+                      console.log("[@_resizer -get]");
+                    },
+                    set(params, value, status) {
+                      if (status.state === 'start') {
+                        let { cn } = JSON.parse(params.focusArea.dataset.loc);
+                        if (typeof cn === 'string') {
+                          // [TODO] 兼容，后续去除
+                          cn = [cn]
+                        }
+                        cn = cn[0]
+                        const aiComParams = context.getAiComParams(params.id);
+                        cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
+                        cssObjKey = `.${cn}`;
+                      } else if (status.state === 'ing') {
+                        Object.entries(value).forEach(([key, value]) => {
+                          cssObj[cssObjKey][key] = `${value}px`;
+                        })
+                        const cssStr = stringifyLess(cssObj);
+                        context.updateFile(params.id, { fileName: 'style.less', content: cssStr })
+                      }
+                    }
+                  }
+                })
               }
-            ]
+            })
           }
 
-          if (!focusAreaConfigs[selector].title) {
-            focusAreaConfigs[selector].title = selector;
+          const selector = key === ":root" ? `.${className[0]}` : `.${className[0]} ${key}`;
+          const config = focusAreaConfigs[selector] ?? (focusAreaConfigs[selector] = value);
+
+          if (config !== value) config.style = value.style;
+
+          // 没有配置项且没有 style 时，添加默认空 style 编辑，保证是一个选区
+          if (!config.items && !config.style?.length) {
+            config.style = [{ items: [] }];
           }
+
+          config.title ??= selector;
+          config.items = config.items ? [...config.items, ...mergeItems] : mergeItems;
         })
       }
     })

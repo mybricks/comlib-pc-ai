@@ -4,12 +4,14 @@ export default {
   description: `按钮组件`,
   editors: {
     ':root': {
+      items: [
+        {
+          type: '_resizer',
+        },
+      ],
       style: [
         {
           items: [
-            {
-              type: '_resizer',
-            },
             {
               title: '样式',
               options: ['font', 'background', 'border'],
