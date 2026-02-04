@@ -17,6 +17,8 @@ export default function ({ context }) {
       console.log("[@request - focus]", focus);
       console.log("[aiComParams]", aiComParams);
 
+      params?.onProgress?.("start");
+
       // 创建workspace实例
       const workspace = createWorkspace({
         comId: focus.comId,
