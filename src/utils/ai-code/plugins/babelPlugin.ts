@@ -1,81 +1,87 @@
 import * as types from "./types";
 
-export default function({ constituency }) {
+export default function ({ constituency }) {
   return function () {
     const importRelyMap = new Map();
 
     return {
       visitor: {
         ImportDeclaration(path) {
-          const { node } = path;
-          node.specifiers.forEach((specifier) => {
-            if (types.isImportSpecifier(specifier)) {
-              importRelyMap.set(specifier.local.name, node.source.value);
-            }
-          })
+          try {
+            const { node } = path;
+            node.specifiers.forEach((specifier) => {
+              if (types.isImportSpecifier(specifier)) {
+                importRelyMap.set(specifier.local.name, node.source.value);
+              }
+            })
+          } catch { }
         },
         VariableDeclarator(path) {
-          const { id, init } = path.node;
-          if (types.isIdentifier(id) && types.isMemberExpression(init)) {
-            const name = path.node.id?.name;
-            const relyName = path.node.init?.object?.loc?.identifierName;
-            importRelyMap.set(name, relyName);
-          }
+          try {
+            const { id, init } = path.node;
+            if (types.isIdentifier(id) && types.isMemberExpression(init)) {
+              const name = path.node.id?.name;
+              const relyName = path.node.init?.object?.loc?.identifierName;
+              importRelyMap.set(name, relyName);
+            }
+          } catch { }
         },
         JSXElement(path) {
-          const { node } = path;
-          const dataLocValueObject: any = {
-            jsx:{start:node.start,end:node.end},
-            tag:{end:node.openingElement.end},
-          }
-          const classNameAttr = node.openingElement.attributes.find((a) => a.name.name === "className");
-          const classNameExpr = classNameAttr?.value?.type === "JSXExpressionContainer" ? classNameAttr.value.expression : null;
-          const cnList = [...new Set(extractCssClassNames(classNameExpr))];
+          try {
+            const { node } = path;
+            const dataLocValueObject: any = {
+              jsx: { start: node.start, end: node.end },
+              tag: { end: node.openingElement.end },
+            }
+            const classNameAttr = node.openingElement.attributes.find((a) => a.name?.name === "className");
+            const classNameExpr = classNameAttr?.value?.type === "JSXExpressionContainer" ? classNameAttr.value.expression : null;
+            const cnList = [...new Set(extractCssClassNames(classNameExpr))];
 
-          if (cnList.length > 0) {
-            dataLocValueObject.cn = cnList
-            const { relyName, source } = findRelyAndSource(node.openingElement.name.name, importRelyMap);
+            if (cnList.length > 0) {
+              dataLocValueObject.cn = cnList
+              const { relyName, source } = findRelyAndSource(node.openingElement.name.name, importRelyMap);
 
-            constituency.push({
-              className: cnList,
-              component: relyName,
-              source,
-            })
-  
+              constituency.push({
+                className: cnList,
+                component: relyName,
+                source,
+              })
+
+              node.openingElement.attributes.push({
+                type: 'JSXAttribute',
+                name: {
+                  type: 'JSXIdentifier',
+                  name: 'data-cn',
+                },
+                value: {
+                  type: 'StringLiteral',
+                  value: cnList.join(' '),
+                  extra: {
+                    raw: `"${cnList.join(' ')}"`,
+                    rawValue: cnList.join(' ')
+                  }
+                }
+              })
+            }
+
+            const dataLocValue = JSON.stringify(dataLocValueObject)
+
             node.openingElement.attributes.push({
               type: 'JSXAttribute',
               name: {
                 type: 'JSXIdentifier',
-                name: 'data-cn',
+                name: 'data-loc',
               },
               value: {
                 type: 'StringLiteral',
-                value: cnList.join(' '),
-                extra: { 
-                  raw: `"${cnList.join(' ')}"`,
-                  rawValue: cnList.join(' ')
+                value: dataLocValue,
+                extra: {
+                  raw: `"${dataLocValue}"`,
+                  rawValue: dataLocValue
                 }
               }
             })
-          }
-  
-          const dataLocValue = JSON.stringify(dataLocValueObject)
-  
-          node.openingElement.attributes.push({
-            type: 'JSXAttribute',
-            name: {
-              type: 'JSXIdentifier',
-              name: 'data-loc',
-            },
-            value: {
-              type: 'StringLiteral',
-              value: dataLocValue,
-              extra: { 
-                raw: `"${dataLocValue}"`,
-                rawValue: dataLocValue
-              }
-            }
-          })                  
+          } catch { }
         },
         Program: {
           exit() {
