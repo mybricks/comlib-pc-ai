@@ -28,14 +28,18 @@ export default function({ constituency }) {
             jsx:{start:node.start,end:node.end},
             tag:{end:node.openingElement.end},
           }
-          const cn = node.openingElement.attributes.find((a) => a.name.name === "className")?.value?.expression?.property?.name;
+          const classNameAttr = node.openingElement.attributes.find((a) => a.name.name === "className");
+          const classNameExpr = classNameAttr?.value?.type === "JSXExpressionContainer" ? classNameAttr.value.expression : null;
+          const cnList = [...new Set(extractCssClassNames(classNameExpr))];
   
-          if (cn) {
-            dataLocValueObject.cn = cn
+          console.log("[@cnList]", cnList)
+
+          if (cnList.length > 0) {
+            dataLocValueObject.cn = cnList
             const { relyName, source } = findRelyAndSource(node.openingElement.name.name, importRelyMap);
 
             constituency.push({
-              className: cn,
+              className: cnList,
               component: relyName,
               source,
             })
@@ -48,10 +52,10 @@ export default function({ constituency }) {
               },
               value: {
                 type: 'StringLiteral',
-                value: cn,
+                value: cnList.join(' '),
                 extra: { 
-                  raw: `"${cn}"`,
-                  rawValue: cn
+                  raw: `"${cnList.join(' ')}"`,
+                  rawValue: cnList.join(' ')
                 }
               }
             })
@@ -84,6 +88,45 @@ export default function({ constituency }) {
       }
     };
   }
+}
+
+/**
+ * 从 className 表达式中提取所有 css.xxx 的 xxx 值
+ * 支持：css.button、`${css.button} ${css.submit}`、条件表达式中的 css.disabled 等
+ */
+function extractCssClassNames(node: any): string[] {
+  const result: string[] = [];
+  if (!node) return result;
+
+  if (node.type === "MemberExpression") {
+    const obj = node.object;
+    const prop = node.property;
+    if (obj?.type === "Identifier" && obj.name === "css" && prop?.type === "Identifier") {
+      result.push(prop.name);
+    }
+    return result;
+  }
+
+  if (node.type === "TemplateLiteral") {
+    for (const expr of node.expressions || []) {
+      result.push(...extractCssClassNames(expr));
+    }
+    return result;
+  }
+
+  if (node.type === "ConditionalExpression") {
+    result.push(...extractCssClassNames(node.consequent));
+    result.push(...extractCssClassNames(node.alternate));
+    return result;
+  }
+
+  if (node.type === "LogicalExpression") {
+    result.push(...extractCssClassNames(node.left));
+    result.push(...extractCssClassNames(node.right));
+    return result;
+  }
+
+  return result;
 }
 
 function findRelyAndSource(relyName, importRelyMap) {

@@ -99,6 +99,10 @@ export default function (props) {
 
   if (data.runtimeJsxConstituency) {
     data.runtimeJsxConstituency.forEach(({ className, component, source }) => {
+      if (typeof className === 'string') {
+        // [TODO] 兼容，后续去除
+        className = [className]
+      }
       let knowledge: any = null;
 
       if (source === "antd") {
@@ -114,55 +118,73 @@ export default function (props) {
           const value = deepClone(oriValue);
           if (value.style?.length) {
             value.style.forEach((style) => {
-              style.items?.forEach((item) => {
+              const styleItems: any[] = style.items;
+              const items: any = [];
+              styleItems?.forEach((item) => {
                 if (item.type === '_resizer') {
                   let cssObj = {};
                   let cssObjKey = ""
-                  item.value = {
-                    get() {
-                      console.log("[@_resizer -get]");
-                    },
-                    set(params, value, status) {
-                      if (status.state === 'start') {
-                        const { cn } = JSON.parse(params.focusArea.dataset.loc);
-                        const aiComParams = context.getAiComParams(params.id);
-                        cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
-                        cssObjKey = `.${cn}`;
-                      } else if (status.state === 'ing') {
-                        Object.entries(value).forEach(([key, value]) => {
-                          cssObj[cssObjKey][key] = `${value}px`;
-                        })
-                        const cssStr = stringifyLess(cssObj);
-                        context.updateFile(params.id, { fileName: 'style.less', content: cssStr })
+                  items.push({
+                    ...item,
+                    value: {
+                      get() {
+                        console.log("[@_resizer -get]");
+                      },
+                      set(params, value, status) {
+                        if (status.state === 'start') {
+                          let { cn } = JSON.parse(params.focusArea.dataset.loc);
+                          if (typeof cn === 'string') {
+                            // [TODO] 兼容，后续去除
+                            cn = [cn]
+                          }
+                          cn = cn[0]
+                          const aiComParams = context.getAiComParams(params.id);
+                          cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
+                          cssObjKey = `.${cn}`;
+                        } else if (status.state === 'ing') {
+                          Object.entries(value).forEach(([key, value]) => {
+                            cssObj[cssObjKey][key] = `${value}px`;
+                          })
+                          const cssStr = stringifyLess(cssObj);
+                          context.updateFile(params.id, { fileName: 'style.less', content: cssStr })
+                        }
                       }
                     }
-                  }
+                  })
                 } else {
-                  item.valueProxy = {
-                    set(params, value) {
-                      const comId = props.model?.runtime?.id || props.id;
-                      const aiComParams = context.getAiComParams(comId);
-                      const cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
-                      const selector = params.selector;
-  
-                      if (!cssObj[selector]) {
-                        cssObj[selector] = {};
-                      }
-  
-                      Object.entries(value).forEach(([key, value]) => {
-                        cssObj[selector][key] = value;
-                      })
-  
-                      const cssStr = stringifyLess(cssObj);
-                      context.updateFile(comId, { fileName: 'style.less', content: cssStr })
-                    }
-                  }
+                  className.forEach((className) => {
+                    items.push({
+                      ...item,
+                      valueProxy: {
+                        set(params, value) {
+                          const comId = props.model?.runtime?.id || props.id;
+                          const aiComParams = context.getAiComParams(comId);
+                          const cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
+                          const selector = params.selector;
+      
+                          if (!cssObj[selector]) {
+                            cssObj[selector] = {};
+                          }
+      
+                          Object.entries(value).forEach(([key, value]) => {
+                            cssObj[selector][key] = value;
+                          })
+      
+                          const cssStr = stringifyLess(cssObj);
+                          context.updateFile(comId, { fileName: 'style.less', content: cssStr })
+                        }
+                      },
+                      target: `.${className}${item.target || ""}`,
+                      domTarget: `.${className}`
+                    })
+                  })
                 }
               })
+              style.items = items;
             })
           }
 
-          let selector = key === ":root" ? `.${className}` : `.${className} ${key}`;
+          let selector = key === ":root" ? `.${className[0]}` : `.${className[0]} ${key}`;
 
           if (!focusAreaConfigs[selector]) {
             focusAreaConfigs[selector] = value;

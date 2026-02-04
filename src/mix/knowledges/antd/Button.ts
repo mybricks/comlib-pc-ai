@@ -12,7 +12,7 @@ export default {
             },
             {
               title: '样式',
-              options: ['background', 'border'],
+              options: ['font', 'background', 'border'],
             }
           ]
         }
