@@ -128,6 +128,7 @@ export default function (props) {
               const items: any = [];
               styleItems?.forEach((item) => {
                 className.forEach((className) => {
+                  const selector = key === ":root" ? `.${className}` : `.${className} ${key}`;
                   items.push({
                     ...item,
                     valueProxy: {
@@ -149,8 +150,8 @@ export default function (props) {
                         context.updateFile(comId, { fileName: 'style.less', content: cssStr })
                       }
                     },
-                    target: `.${className}${item.target || ""}`,
-                    domTarget: `.${className}`
+                    target: `${selector}${item.target || ""}`,
+                    domTarget: `${selector}`
                   })
                 })
               })
