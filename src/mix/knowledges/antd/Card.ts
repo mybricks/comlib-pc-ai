@@ -14,109 +14,20 @@ export default {
         }
       ]
     },
-    '.ant-card-head': {
-      title: '头部',
-      style: [
-        {
-          items: [
-            {
-              title: '样式',
-              options: ['background', 'padding', 'border'],
-            }
-          ]
-        }
-      ]
-    },
-    '.ant-card-head-title': {
-      title: '标题',
-      style: [
-        {
-          items: [
-            {
-              title: '样式',
-              options: ['background', 'font', 'padding'],
-            }
-          ]
-        }
-      ]
-    },
-    '.ant-card-body': {
-      title: '内容',
-      style: [
-        {
-          items: [
-            {
-              title: '样式',
-              options: ['padding'],
-            }
-          ]
-        }
-      ]
-    },
-    '.ant-card-extra': {
-      title: '额外元素',
-      style: [
-        {
-          items: [
-            {
-              title: '样式',
-            }
-          ]
-        }
-      ]
-    },
-    '.ant-card-cover': {
-      title: '封面',
-      style: [
-        {
-          items: [
-            {
-              title: '样式',
-              options: ['background', 'border', 'padding'],
-            }
-          ]
-        }
-      ]
-    },
-    '.ant-card-meta-avatar .ant-avatar': {
-      title: '头像',
-      style: [
-        {
-          items: [
-            {
-              title: '样式',
-              options: ['border'],
-            }
-          ]
-        }
-      ]
-    },
-    '.ant-card-meta-title': {
-      title: '内容标题',
-      style: [
-        {
-          items: [
-            {
-              title: '样式',
-              options: ['font', 'border'],
-            }
-          ]
-        }
-      ]
-    },
-    '.ant-card-meta-description': {
-      title: '内容描述',
-      style: [
-        {
-          items: [
-            {
-              title: '样式',
-              options: ['font', 'border'],
-            }
-          ]
-        }
-      ]
+    '.ant-card-head-title':  {
+        title:'卡片标题',
+        style: [
+          {
+            items: [
+              {
+                  title: '样式',
+                  options: ['font', 'background', 'padding']
+              }
+            ]
+          }
+        ]
     }
+    
   },
   docs: `
 通用属性参考：[通用属性](/docs/react/common-props)
