@@ -99,6 +99,12 @@ export default function (props) {
 
   if (data.runtimeJsxConstituency) {
     data.runtimeJsxConstituency.forEach(({ className, component, source }) => {
+
+      if (!component) {
+        console.error("[@依赖分析错误]", data.runtimeJsxConstituency)
+        return;
+      }
+
       if (typeof className === 'string') {
         // [TODO] 兼容，后续去除
         className = [className]
