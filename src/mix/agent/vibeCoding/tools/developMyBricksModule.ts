@@ -291,6 +291,8 @@ export default function developMyBricksModule(config: Config) {
     5、判断是否需要修改style.less文件；
     
     6、判断是否需要修改com.json文件：
+      - 若需求未明确要求输入端口或输出端口，不要修改 com.json，runtime 中也不要使用 useImperativeHandle 或 props 回调；
+      - 若需求明确要求，则：runtime 中通过 useImperativeHandle 暴露的方法需在 com.json 的 inputs 中声明，props 回调需在 outputs 中声明；
       - 如果 runtime 中通过 useImperativeHandle 新增或删除了暴露的方法，需要在 com.json 的 inputs 中同步声明；
       - 如果 runtime 中使用的 props 回调（如 props.onClick）有新增或删除，需要在 com.json 的 outputs 中同步声明；
       - 确保 com.json 中声明的 id 与 runtime 中 useImperativeHandle 的方法名、props 回调名完全一致；
@@ -316,6 +318,7 @@ export default function developMyBricksModule(config: Config) {
   </当需要修改style.less文件时>
 
   <当需要修改config.js文件时>
+    仅当需求明确提及需要「配置」「选区」「可配置」「可编辑」等能力时，才考虑修改或生成 config.js；若需求未明确说明，禁止生成或修改 config.js。
     如果确实需要修改，严格参考以下方面：
     
     如果runtime.jsx中有多个独立配置意义的部分，将其拆分成不同的选区，选区请参考 用户在【知识库】中提供的组件可分配选区。
@@ -383,6 +386,7 @@ export default function developMyBricksModule(config: Config) {
   </当需要修改config.js文件时>
 
   <当需要修改com.json文件时>
+    仅当需求明确提及需要「输入端口」「输出端口」「事件」「与外部交互」「inputs」「outputs」等能力时，才考虑修改或生成 com.json；若需求未明确说明，禁止生成或修改 com.json，runtime 中也不应使用 useImperativeHandle 或 props 回调。
     如果确实需要修改，按照以下步骤处理：
     
     1、当模块需要定义输入端口（inputs）或输出端口（outputs）时，必须在com.json文件中进行声明：
@@ -479,6 +483,7 @@ export default function developMyBricksModule(config: Config) {
       - 删除代码：after中的内容为空字符串。
 
   整个过程中要注意：
+  - 若需求未明确要求配置或输入输出事件，禁止生成 config.js 和 com.json，不要发散思维添加「可能有用」的配置或事件；
   - 如果模块【源代码】内容有修改，务必通过before/after返回，而不是原来的 \`\`\`文件类型 file="文件名"的形式；
   - 确保所有文件内容中禁止使用emoji等特殊字符；
   - 要确保 com.json 中声明的 inputs（id）与 runtime 中 useImperativeHandle 暴露的方法名一一对应，outputs（id）与 runtime 的 props 回调名一一对应；若使用插槽，与 props 中插槽用法一致；
@@ -496,7 +501,7 @@ export default function developMyBricksModule(config: Config) {
 <example>
   <user_query>开发一个按钮</user_query>
   <assistant_response>
-  好的，我将为您开发一个按钮
+  好的，我将为您开发一个按钮。需求未明确要求配置或输入输出事件，故仅生成 model.json、runtime.jsx、style.less。
   \`\`\`before file="model.json"
   \`\`\`
   
@@ -521,52 +526,15 @@ export default function developMyBricksModule(config: Config) {
   
   \`\`\`after file="runtime.jsx"
   import css from 'style.less';
-  import { forwardRef, useCallback } from 'react';
+  import { forwardRef } from 'react';
   import { Button } from 'antd';
   
   export default forwardRef(function (props, ref) {
-    const { text, onClick, onDoubleClick } = props;
-    const click = useCallback(()=>{
-      onClick?.(text)
-    }, [text, onClick])
-    
-    const dblClick = useCallback(()=>{
-      onDoubleClick?.(text)
-    }, [text, onDoubleClick])
-    
+    const { text } = props;
     return (
-      <Button onClick={click} onDoubleClick={dblClick} className={css.mainBtn}>{text}</Button>
+      <Button className={css.mainBtn}>{text}</Button>
     )
   });
-  \`\`\`
-  
-  \`\`\`before file="com.json"
-  \`\`\`
-  
-  \`\`\`after file="com.json"
-  {
-    "inputs": [],
-    "outputs": [
-      {
-        "id": "onClick",
-        "title": "点击事件",
-        "desc": "按钮点击时触发",
-        "schema": {
-          "type": "string",
-          "description": "返回按钮文本"
-        }
-      },
-      {
-        "id": "onDoubleClick",
-        "title": "双击事件",
-        "desc": "按钮双击时触发",
-        "schema": {
-          "type": "string",
-          "description": "返回按钮文本"
-        }
-      }
-    ]
-  }
   \`\`\`
   </assistant_response>
 </example>
@@ -666,7 +634,7 @@ export default function developMyBricksModule(config: Config) {
 <example>
   <user_query>开发两个按钮构成的工具条</user_query>
   <assistant_response>
-  好的，我将为您开发一个工具条，包含两个按钮
+  好的，我将为您开发一个工具条，包含两个按钮。需求未明确要求配置或输入输出事件，故仅生成 model.json、runtime.jsx、style.less。
   \`\`\`before file="model.json"
   \`\`\`
   
@@ -698,43 +666,19 @@ export default function developMyBricksModule(config: Config) {
 
   \`\`\`after file="runtime.jsx"
   import css from 'style.less';
-  import { forwardRef, useCallback } from 'react';
+  import { forwardRef } from 'react';
   import { Button } from 'xy-ui';
     
   export default forwardRef(function (props, ref) {
-    const { btns, onClick } = props;
-    const click = useCallback((index)=>{
-      onClick?.(index)
-    }, [onClick])
-    
+    const { btns } = props;
     return (
       <div className={css.viewContainer}>
         {btns.map((btn, index)=>{
-          return <Button className={css.btn} key={index} onClick={e=>click(index)}>{btn.text}</Button>
+          return <Button className={css.btn} key={btn.text}>{btn.text}</Button>
         })}
       </div>
     )
   });
-  \`\`\`
-  
-  \`\`\`before file="com.json"
-  \`\`\`
-  
-  \`\`\`after file="com.json"
-  {
-    "inputs": [],
-    "outputs": [
-      {
-        "id": "onClick",
-        "title": "按钮点击",
-        "desc": "按钮被点击时触发",
-        "schema": {
-          "type": "number",
-          "description": "被点击按钮的索引"
-        }
-      }
-    ]
-  }
   \`\`\`
   </assistant_response>
 </example>
