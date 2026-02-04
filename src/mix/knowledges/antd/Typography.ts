@@ -1,7 +1,7 @@
 export default {
   description: `文本段落`,
   editors: {
-    '.ant-typography': {
+    ':root': {
       title: '文本段落',
       style: [
         {
