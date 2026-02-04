@@ -169,9 +169,7 @@ export default function developMyBricksModule(config: Config) {
   
   <技术栈和类库声明>
     仅可以基于 ${libTitles} 技术栈进行开发，同时，可以使用下面声明的类库，根据场景做合理的技术方案设计、不要超出声明的类库范围。
-    1. 默认类库
-      - mybricks：提供 Container 组件。Container 可完全替代 div：其接收的 props 与 div 一致（如 className、style、onClick 等），用法相同。使用 Container 而非 div 的原因在于：便于平台识别布局容器、识别三方依赖组件、并支持诸多个性化配置。因此，**所有需要块级容器的地方一律使用 Container，禁止使用 div**。布局通过 Container 包裹区块并配合 CSS（如 flex）实现。
-    2. 三方类库：*项目信息*中<允许使用的类库/>中声明的类库；
+    1. 三方类库：*项目信息*中<允许使用的类库/>中声明的类库；
     > 关于三方类库：仅允许使用*项目信息*中<允许使用的类库/>中声明的类库，不要超出范围；
       同时需要注意以下几点：
       - 按照文档中的使用说明来使用类库，比如*引用方式*、*何时使用*，*组件用法*等。
