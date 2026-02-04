@@ -31,8 +31,6 @@ export default function({ constituency }) {
           const classNameAttr = node.openingElement.attributes.find((a) => a.name.name === "className");
           const classNameExpr = classNameAttr?.value?.type === "JSXExpressionContainer" ? classNameAttr.value.expression : null;
           const cnList = [...new Set(extractCssClassNames(classNameExpr))];
-  
-          console.log("[@cnList]", cnList)
 
           if (cnList.length > 0) {
             dataLocValueObject.cn = cnList
@@ -82,7 +80,7 @@ export default function({ constituency }) {
         Program: {
           exit() {
             // 解析/遍历结束：整棵 AST 已访问完，importRecord 等已收集完毕
-            console.log("[@importRelyMap]", { importRelyMap })
+            // console.log("[@importRelyMap]", { importRelyMap })
           }
         }
       }
