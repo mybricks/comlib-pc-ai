@@ -101,7 +101,6 @@ export default function (props) {
     data.runtimeJsxConstituency.forEach(({ className, component, source }) => {
 
       if (!component) {
-        console.error("[@依赖分析错误]", data.runtimeJsxConstituency)
         return;
       }
 
