@@ -69,6 +69,8 @@ interface AIJsxProps {
   outputs: any;
 }
 
+const STYLE_REPLACE_ID = '__mybricks_ai_module_id__'
+
 export const AIJsxRuntime = ({ id, env, styleCode, renderCode, data, inputs, outputs, errorInfo, placeholder = 'AI组件', dependencies = {}, inMybricksGeoWebview } : any) => {
   const ref = useRef<any>(null);
   const appendCssApi = useMemo<CssApi>(() => {
@@ -76,7 +78,7 @@ export const AIJsxRuntime = ({ id, env, styleCode, renderCode, data, inputs, out
       const cssAPI = env.canvas.css
       return {
         set(id: string, content: string) {
-          const myContent = content.replaceAll('__id__', id)//替换模版
+          const myContent = content.replaceAll(STYLE_REPLACE_ID, id)//替换模版
           cssAPI.set(id, myContent)
         },
         remove() {
@@ -89,12 +91,12 @@ export const AIJsxRuntime = ({ id, env, styleCode, renderCode, data, inputs, out
       set: (id: string, content: string) => {
         const el = document.getElementById(id);
         if (el) {
-          el.innerText = content.replaceAll('__id__', id)//替换模版
+          el.innerText = content.replaceAll(STYLE_REPLACE_ID, id)//替换模版
           return
         }
         const styleEle = document.createElement('style')
         styleEle.id = id;
-        const myContent = content.replaceAll('__id__', id)//替换模版
+        const myContent = content.replaceAll(STYLE_REPLACE_ID, id)//替换模版
         styleEle.innerText = myContent
         document.head.appendChild(styleEle);
       },
