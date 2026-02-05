@@ -35,6 +35,7 @@ export default function ({ context }) {
 <选区信息>
 HTML Element: ${cloneEl.outerHTML}
 Focus Area Code: ${runtimeJsxSource.slice(loc.jsx.start, loc.tag.end)}
+Selector: ${focus.focusArea.selector}
 </选区信息>
         `
       }
