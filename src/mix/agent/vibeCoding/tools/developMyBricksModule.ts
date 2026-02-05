@@ -159,9 +159,14 @@ if (enabledBatch) {
     }
     \`\`\`
   
-  5、com.json文件，为当前模块的输入端口（inputs）和输出端口（outputs）的声明文件。inputs 对应 runtime 中 useImperativeHandle(ref, () => ({ ... })) 暴露的方法名；outputs 对应 runtime 的 props 上的回调名（如 onClick）。例如：
+  5、com.json文件，为当前模块的元信息及端口声明文件，包含：
+    - title：模块名称，描述模块内容的标题，开发模块时应始终设置；
+    - inputs：输入端口声明，对应 runtime 中 useImperativeHandle(ref, () => ({ ... })) 暴露的方法名；
+    - outputs：输出端口声明，对应 runtime 的 props 上的回调名（如 onClick）。
+  例如：
     \`\`\`json file="com.json"
     {
+      "title": "按钮",
       "inputs": [
         {
           "id": "setTitle",
@@ -188,6 +193,7 @@ if (enabledBatch) {
     \`\`\`
     
     注意：
+    - title 为必填字段，当前模块名称；
     - inputs和outputs都是数组类型，每个元素包含以下字段：
       - id：唯一标识符，必须语义化，不要使用任何前缀（例如不要用"u_"、"o_"等），直接使用语义化的英文标识，例如修改标题的input其id可以是setTitle，组件点击事件的output其id可以是onClick；
       - title：标题，用于在MyBricks平台中显示，使用中文；
@@ -320,8 +326,9 @@ if (enabledBatch) {
     5、判断是否需要修改style.less文件；
     
     6、判断是否需要修改com.json文件：
-      - 若需求未明确要求输入端口或输出端口，不要修改 com.json，runtime 中也不要使用 useImperativeHandle 或 props 回调；
-      - 若需求明确要求，则：runtime 中通过 useImperativeHandle 暴露的方法需在 com.json 的 inputs 中声明，props 回调需在 outputs 中声明；
+      - title 字段：新开发模块，或模块内容与原标题语义不符时，新建或修改；
+      - inputs 与 outputs：若需求未明确要求输入端口或输出端口，不要修改 com.json 中的 inputs 和 outputs，runtime 中也不要使用 useImperativeHandle 或 props 回调；
+      - 若需求明确要求输入或输出端口，则：runtime 中通过 useImperativeHandle 暴露的方法需在 com.json 的 inputs 中声明，props 回调需在 outputs 中声明；
       - 如果 runtime 中通过 useImperativeHandle 新增或删除了暴露的方法，需要在 com.json 的 inputs 中同步声明；
       - 如果 runtime 中使用的 props 回调（如 props.onClick）有新增或删除，需要在 com.json 的 outputs 中同步声明；
       - 确保 com.json 中声明的 id 与 runtime 中 useImperativeHandle 的方法名、props 回调名完全一致；
@@ -418,15 +425,16 @@ if (enabledBatch) {
   </当需要修改config.js文件时>
 
   <当需要修改com.json文件时>
-    仅当需求明确提及需要「输入端口」「输出端口」「事件」「与外部交互」「inputs」「outputs」等能力时，才考虑修改或生成 com.json；若需求未明确说明，禁止生成或修改 com.json，runtime 中也不应使用 useImperativeHandle 或 props 回调。
     如果确实需要修改，按照以下步骤处理：
     
-    1、当模块需要定义输入端口（inputs）或输出端口（outputs）时，必须在com.json文件中进行声明：
+    1、根据模块内容，设置 title 字段，用于表达模块名称；
+    
+    2、当模块需要定义输入端口（inputs）或输出端口（outputs）时，必须在com.json文件中进行声明：
       1）如果 runtime 中通过 useImperativeHandle 暴露了方法，必须在 com.json 的 inputs 数组中声明对应的输入端口，id 与方法名一致；
       2）如果 runtime 中使用了 props 上的事件回调（如 props.onClick），必须在 com.json 的 outputs 数组中声明对应的输出端口，id 与回调名一致；
       3）确保 com.json 中声明的 id 与 runtime 中 useImperativeHandle 的方法名、props 回调名完全一致；
     
-    2、对于inputs数组中的每个元素，按照以下格式定义：
+    3、对于inputs数组中的每个元素，按照以下格式定义：
       {
         "id": "setTitle",
         "title": "设置标题",
@@ -441,7 +449,7 @@ if (enabledBatch) {
       - title和desc使用中文，简洁明了地描述端口的作用；
       - schema使用JSON Schema格式，准确描述输入数据的类型和结构；
     
-    3、对于outputs数组中的每个元素，按照以下格式定义：
+    4、对于outputs数组中的每个元素，按照以下格式定义：
       {
         "id": "onClick",
         "title": "点击事件",
@@ -456,9 +464,9 @@ if (enabledBatch) {
       - title和desc使用中文，简洁明了地描述端口的作用；
       - schema使用JSON Schema格式，准确描述输出数据的类型和结构；
     
-    4、如果模块没有inputs或outputs，对应的数组设置为空数组[]，但不能省略该字段；
+    5、如果模块没有inputs或outputs，对应的数组设置为空数组[]，但不能省略该字段；
     
-    5、当修改com.json时，需要审视runtime.jsx文件，确保：
+    6、当修改com.json时，需要审视runtime.jsx文件，确保：
       - runtime 中 useImperativeHandle 暴露的所有方法、使用的所有 props 回调都在 com.json 中有对应声明；
       - com.json 中声明的所有 inputs、outputs 都在 runtime 中有对应使用（除非是预留的端口）；
   </当需要修改com.json文件时>
@@ -515,7 +523,7 @@ if (enabledBatch) {
       - 删除代码：after中的内容为空字符串。
 
   整个过程中要注意：
-  - 若需求未明确要求配置或输入输出事件，禁止生成 config.js 和 com.json，不要发散思维添加「可能有用」的配置或事件；
+  - 若需求未明确要求输入输出事件，禁止在 com.json 中修改 inputs 和 outputs；但开发或新建模块时，com.json 的 title 字段（模块名称）应始终设置；
   - 如果模块【源代码】内容有修改，务必通过before/after返回，而不是原来的 \`\`\`文件类型 file="文件名"的形式；
   - 确保所有文件内容中禁止使用emoji等特殊字符；
   - 要确保 com.json 中声明的 inputs（id）与 runtime 中 useImperativeHandle 暴露的方法名一一对应，outputs（id）与 runtime 的 props 回调名一一对应；若使用插槽，与 props 中插槽用法一致；
@@ -533,8 +541,9 @@ if (enabledBatch) {
 <example>
   <user_query>开发一个按钮</user_query>
   <assistant_response>
-  好的，我将为您开发一个按钮。需求未明确要求配置或输入输出事件，故仅生成 model.json、runtime.jsx、style.less。
+  好的，我将为您开发一个按钮。
   \`\`\`before file="model.json"
+  {}
   \`\`\`
   
   \`\`\`after file="model.json"
@@ -567,6 +576,18 @@ if (enabledBatch) {
       <Button className={css.mainBtn}>{text}</Button>
     )
   });
+  \`\`\`
+  
+  \`\`\`before file="com.json"
+  {}
+  \`\`\`
+  
+  \`\`\`after file="com.json"
+  {
+    "title": "按钮",
+    "inputs": [],
+    "outputs": []
+  }
   \`\`\`
   </assistant_response>
 </example>
@@ -666,8 +687,9 @@ if (enabledBatch) {
 <example>
   <user_query>开发两个按钮构成的工具条</user_query>
   <assistant_response>
-  好的，我将为您开发一个工具条，包含两个按钮。需求未明确要求配置或输入输出事件，故仅生成 model.json、runtime.jsx、style.less。
+  好的，我将为您开发一个工具条，包含两个按钮。
   \`\`\`before file="model.json"
+  {}
   \`\`\`
   
   \`\`\`after file="model.json"
@@ -712,6 +734,18 @@ if (enabledBatch) {
     )
   });
   \`\`\`
+  
+  \`\`\`before file="com.json"
+  {}
+  \`\`\`
+  
+  \`\`\`after file="com.json"
+  {
+    "title": "工具条",
+    "inputs": [],
+    "outputs": []
+  }
+  \`\`\`
   </assistant_response>
 </example>
 
@@ -735,6 +769,7 @@ if (enabledBatch) {
   \`\`\`
   
   \`\`\`before file="model.json"
+  {}
   \`\`\`
   
   \`\`\`after file="model.json"
@@ -754,7 +789,7 @@ if (enabledBatch) {
   import { Button } from 'xy-ui';
   
   export default forwardRef(function (props, ref) {
-    const { btns: initialBtns, onClick, logger } = props;
+    const { btns: initialBtns, logger } = props;
     const [btns, setBtns] = useState(initialBtns || []);
     useImperativeHandle(ref, () => ({
       setBtns: (val) => setBtns(val)
@@ -762,8 +797,7 @@ if (enabledBatch) {
     
     const click = useCallback((index)=>{
       logger?.info('传入的值', index)
-      onClick?.(index)
-    }, [onClick, logger])
+    }, [logger])
   
     return (
       <div className={css.btnView}>
@@ -776,10 +810,12 @@ if (enabledBatch) {
   \`\`\`
   
   \`\`\`before file="com.json"
+  {}
   \`\`\`
   
   \`\`\`after file="com.json"
   {
+    "title": "工具条",
     "inputs": [
       {
         "id": "setBtns",
@@ -804,17 +840,7 @@ if (enabledBatch) {
         }
       }
     ],
-    "outputs": [
-      {
-        "id": "onClick",
-        "title": "按钮点击",
-        "desc": "按钮被点击时触发",
-        "schema": {
-          "type": "number",
-          "description": "返回被点击按钮的索引"
-        }
-      }
-    ]
+    "outputs": []
   }
   \`\`\`
   </assistant_response>

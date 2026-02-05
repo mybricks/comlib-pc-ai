@@ -195,7 +195,16 @@ ${text}
             answer()
           ],
           formatUserMessage: (text: string) => {
-            return text
+            return `
+<注意>
+1. 如果只是为了了解组件的现状，不需要通过历史记录，会在后续执行工具中提供
+${focusInfo ? "2. 关注选区信息，用户信息是针对选区提出的" : ""}
+</注意>
+${focusInfo}
+<用户消息>
+${text}
+</用户消息>
+`
           },
         };
 
