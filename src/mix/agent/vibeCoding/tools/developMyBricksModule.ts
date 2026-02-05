@@ -103,12 +103,12 @@ export default function developMyBricksModule(config: Config) {
    - 不要使用如下形式的代码 \${data.title}，因为在MyBricks平台中，不支持这种形式的代码；
    - 不能使用 @import引入其他的less文件、不要使用less的混合、函数、变量等；
 
-  4、config.js文件，模块中所有选区声明及配置项的声明文件，例如：
+  4、config.js文件，模块中所有选区声明及配置项的声明文件。对于每个选区，可配置 items（用于编辑 model 数据）和 style（用于配置该选区支持的样式编辑能力），两者均为可选项，按需配置。例如：
     \`\`\`js file = "config.js"
     export default {
       '.logo': {
         title: 'logo',
-        items: [//定义配置项
+        items: [//定义配置项，用于编辑 model 数据，可选，按需
           {
             title: '标题',
             type: 'text',
@@ -120,6 +120,15 @@ export default function developMyBricksModule(config: Config) {
                 data.logo = val
               }
             }
+          }
+        ],
+        style: [//定义该选区支持的样式配置，可选，按需
+          {
+            items: [
+              {
+                options: ['border'] // 支持的样式配置包括 font、border、background、padding、margin、size、cursor、boxshadow、overflow、opacity，按需配置
+              }
+            ]
           }
         ]
       }
@@ -323,11 +332,14 @@ export default function developMyBricksModule(config: Config) {
     
     对于具体的selector，按照以下步骤：
     1、为每个selector分配实际的值，注意以下方面：
+      - selector 本质上是 CSS 选择器，用于锁定具体的区域；
+      - 对于三方库组件的局部或区域编辑，优先使用组件的唯一 className + 三方库自身支持的选择器（如组件内部子区域的类名）拼接成一个合法的css选择器来定位；
       - 如果用户明确要求模块存在变体，使用'@variants'作为selector的key，强制改变变体的配置项以select类型给出；
       - 整体的选区请用:root、不要为最外层的dom分配选区；
       - 按照就近原则为选区定义配置项，禁止出现重复定义的情况（例如在:root与其他selector中声明相同的配置项）；
-    2、仅需关注相关的标题、文案的配置项，无需添加对于样式（背景、颜色、边框等等）的配置；
-    3、对于selector中的config（配置项），按照以下步骤处理：
+    2、仅需关注相关的标题、文案的配置项；若需求明确提及需要「样式配置」「样式编辑」「边框」「背景」「字体」等能力时，可通过 style 配置该选区支持的样式选项；
+    3、对于 selector 的 style 配置（样式配置），按需添加，格式为 style: [{ items: [{ options: ['font', 'border', ...] }] }]，支持的 options 包括：font、border、background、padding、margin、size、cursor、boxshadow、overflow、opacity，按需配置；
+    4、对于selector中的config（配置项），按照以下步骤处理：
       1）如果配置项的类型是从多个选项中进行选择，类型使用select，按照以下格式添加：
         {
           title:'配置项标题',

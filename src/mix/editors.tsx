@@ -40,8 +40,6 @@ export default function (props) {
 
     Object.entries(configs).forEach(([key, value]: any) => {
       const items: any[] = [];
-      // [TODO] 样式编辑
-      // const style: any[] = [];
 
       value.items?.forEach((item) => {
         items.push({
@@ -60,14 +58,34 @@ export default function (props) {
         })
       })
 
+      value.style?.forEach((style) => {
+        style.items?.forEach((item) => {
+          item.valueProxy = {
+            set(params, value) {
+              const comId = props.model?.runtime?.id || props.id;
+              const aiComParams = context.getAiComParams(comId);
+              const cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
+              const selector = params.selector;
+
+              if (!cssObj[selector]) {
+                cssObj[selector] = {};
+              }
+
+              Object.entries(value).forEach(([key, value]) => {
+                cssObj[selector][key] = value;
+              })
+
+              const cssStr = stringifyLess(cssObj);
+              context.updateFile(comId, { fileName: 'style.less', content: cssStr })
+            }
+          }
+        })
+      })
+
       focusAreaConfigs[key] = {
         ...value,
         items,
       }
-
-      // value.style?.forEach((item) => {
-
-      // })
     })
   } catch {}
 
@@ -97,122 +115,122 @@ export default function (props) {
     }
   } catch {}
 
-  if (data.runtimeJsxConstituency) {
-    data.runtimeJsxConstituency.forEach(({ className, component, source }) => {
+  // if (data.runtimeJsxConstituency) {
+  //   data.runtimeJsxConstituency.forEach(({ className, component, source }) => {
 
-      if (!component) {
-        return;
-      }
+  //     if (!component) {
+  //       return;
+  //     }
 
-      if (typeof className === 'string') {
-        // [TODO] 兼容，后续去除
-        className = [className]
-      }
-      let knowledge: any = null;
+  //     if (typeof className === 'string') {
+  //       // [TODO] 兼容，后续去除
+  //       className = [className]
+  //     }
+  //     let knowledge: any = null;
 
-      if (source === "antd") {
-        knowledge = ANTD_KNOWLEDGES_MAP[component.toUpperCase()];
-      } else if (source === "mybricks") {
-        knowledge = MYBRICKS_KNOWLEDGES_MAP[component.toUpperCase()];
-      } else if (source === "html") {
-        knowledge = HTML_KNOWLEDGES_MAP[component.toUpperCase()];
-      }
+  //     if (source === "antd") {
+  //       knowledge = ANTD_KNOWLEDGES_MAP[component.toUpperCase()];
+  //     } else if (source === "mybricks") {
+  //       knowledge = MYBRICKS_KNOWLEDGES_MAP[component.toUpperCase()];
+  //     } else if (source === "html") {
+  //       knowledge = HTML_KNOWLEDGES_MAP[component.toUpperCase()];
+  //     }
 
-      if (knowledge?.editors) {
-        Object.entries(knowledge.editors).forEach(([key, oriValue]: any) => {
-          const value = deepClone(oriValue);
-          if (value.style?.length) {
-            value.style.forEach((style) => {
-              const styleItems: any[] = style.items;
-              const items: any = [];
-              styleItems?.forEach((item) => {
-                className.forEach((className) => {
-                  const selector = key === ":root" ? `.${className}` : `.${className} ${key}`;
-                  items.push({
-                    ...item,
-                    valueProxy: {
-                      set(params, value) {
-                        const comId = props.model?.runtime?.id || props.id;
-                        const aiComParams = context.getAiComParams(comId);
-                        const cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
-                        const selector = params.selector;
+  //     if (knowledge?.editors) {
+  //       Object.entries(knowledge.editors).forEach(([key, oriValue]: any) => {
+  //         const value = deepClone(oriValue);
+  //         if (value.style?.length) {
+  //           value.style.forEach((style) => {
+  //             const styleItems: any[] = style.items;
+  //             const items: any = [];
+  //             styleItems?.forEach((item) => {
+  //               className.forEach((className) => {
+  //                 const selector = key === ":root" ? `.${className}` : `.${className} ${key}`;
+  //                 items.push({
+  //                   ...item,
+  //                   valueProxy: {
+  //                     set(params, value) {
+  //                       const comId = props.model?.runtime?.id || props.id;
+  //                       const aiComParams = context.getAiComParams(comId);
+  //                       const cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
+  //                       const selector = params.selector;
     
-                        if (!cssObj[selector]) {
-                          cssObj[selector] = {};
-                        }
+  //                       if (!cssObj[selector]) {
+  //                         cssObj[selector] = {};
+  //                       }
     
-                        Object.entries(value).forEach(([key, value]) => {
-                          cssObj[selector][key] = value;
-                        })
+  //                       Object.entries(value).forEach(([key, value]) => {
+  //                         cssObj[selector][key] = value;
+  //                       })
     
-                        const cssStr = stringifyLess(cssObj);
-                        context.updateFile(comId, { fileName: 'style.less', content: cssStr })
-                      }
-                    },
-                    target: `${selector}${item.target || ""}`,
-                    domTarget: `${selector}`
-                  })
-                })
-              })
-              style.items = items;
-            })
-          }
+  //                       const cssStr = stringifyLess(cssObj);
+  //                       context.updateFile(comId, { fileName: 'style.less', content: cssStr })
+  //                     }
+  //                   },
+  //                   target: `${selector}${item.target || ""}`,
+  //                   domTarget: `${selector}`
+  //                 })
+  //               })
+  //             })
+  //             style.items = items;
+  //           })
+  //         }
 
-          const mergeItems: any = [];
+  //         const mergeItems: any = [];
 
-          if (value.items?.length) {
-            value.items.forEach((item) => {
-              if (item.type === '_resizer') {
-                let cssObj = {};
-                let cssObjKey = ""
-                mergeItems.push({
-                  ...item,
-                  value: {
-                    get() {
-                      console.log("[@_resizer -get]");
-                    },
-                    set(params, value, status) {
-                      if (status.state === 'start') {
-                        let { cn } = JSON.parse(params.focusArea.dataset.loc);
-                        if (typeof cn === 'string') {
-                          // [TODO] 兼容，后续去除
-                          cn = [cn]
-                        }
-                        cn = cn[0]
-                        const aiComParams = context.getAiComParams(params.id);
-                        cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
-                        cssObjKey = `.${cn}`;
-                      } else if (status.state === 'ing') {
-                        Object.entries(value).forEach(([key, value]) => {
-                          cssObj[cssObjKey][key] = `${value}px`;
-                        })
-                        const cssStr = stringifyLess(cssObj);
-                        context.updateFile(params.id, { fileName: 'style.less', content: cssStr })
-                      }
-                    }
-                  }
-                })
-              }
-            })
-            value.items = [];
-          }
+  //         if (value.items?.length) {
+  //           value.items.forEach((item) => {
+  //             if (item.type === '_resizer') {
+  //               let cssObj = {};
+  //               let cssObjKey = ""
+  //               mergeItems.push({
+  //                 ...item,
+  //                 value: {
+  //                   get() {
+  //                     console.log("[@_resizer -get]");
+  //                   },
+  //                   set(params, value, status) {
+  //                     if (status.state === 'start') {
+  //                       let { cn } = JSON.parse(params.focusArea.dataset.loc);
+  //                       if (typeof cn === 'string') {
+  //                         // [TODO] 兼容，后续去除
+  //                         cn = [cn]
+  //                       }
+  //                       cn = cn[0]
+  //                       const aiComParams = context.getAiComParams(params.id);
+  //                       cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
+  //                       cssObjKey = `.${cn}`;
+  //                     } else if (status.state === 'ing') {
+  //                       Object.entries(value).forEach(([key, value]) => {
+  //                         cssObj[cssObjKey][key] = `${value}px`;
+  //                       })
+  //                       const cssStr = stringifyLess(cssObj);
+  //                       context.updateFile(params.id, { fileName: 'style.less', content: cssStr })
+  //                     }
+  //                   }
+  //                 }
+  //               })
+  //             }
+  //           })
+  //           value.items = [];
+  //         }
 
-          const selector = key === ":root" ? `.${className[0]}` : `.${className[0]} ${key}`;
-          const config = focusAreaConfigs[selector] ?? (focusAreaConfigs[selector] = value);
+  //         const selector = key === ":root" ? `.${className[0]}` : `.${className[0]} ${key}`;
+  //         const config = focusAreaConfigs[selector] ?? (focusAreaConfigs[selector] = value);
 
-          if (config !== value) config.style = value.style;
+  //         if (config !== value) config.style = value.style;
 
-          // 没有配置项且没有 style 时，添加默认空 style 编辑，保证是一个选区
-          if (!config.items && !config.style?.length) {
-            config.style = [{ items: [] }];
-          }
+  //         // 没有配置项且没有 style 时，添加默认空 style 编辑，保证是一个选区
+  //         if (!config.items && !config.style?.length) {
+  //           config.style = [{ items: [] }];
+  //         }
 
-          config.title ??= selector;
-          config.items = config.items ? [...config.items, ...mergeItems] : mergeItems;
-        })
-      }
-    })
-  }
+  //         config.title ??= selector;
+  //         config.items = config.items ? [...config.items, ...mergeItems] : mergeItems;
+  //       })
+  //     }
+  //   })
+  // }
 
   context.setAiComParams(props.id, props);
 
