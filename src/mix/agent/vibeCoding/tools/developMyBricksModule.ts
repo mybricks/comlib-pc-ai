@@ -20,6 +20,8 @@ export default function developMyBricksModule(config: Config) {
 作用：清空当前MyBricks模块的所有内容，重新开发；
 
 注意：建议开发前查询下是否有需要的类库信息；
+
+所有文件的修改都必须使用该工具；
 `,
     getPrompts: () => {
       return `
@@ -103,12 +105,12 @@ export default function developMyBricksModule(config: Config) {
    - 不要使用如下形式的代码 \${data.title}，因为在MyBricks平台中，不支持这种形式的代码；
    - 不能使用 @import引入其他的less文件、不要使用less的混合、函数、变量等；
 
-  4、config.js文件，模块中所有选区声明及配置项的声明文件。对于每个选区，可配置 items（用于编辑 model 数据）和 style（用于配置该选区支持的样式编辑能力），两者均为可选项，按需配置。例如：
+  4、config.js文件，模块中所有选区声明及配置项的声明文件。**重要**：对于每个选区的 items（用于编辑 model 数据）和 style（用于配置该选区支持的样式编辑能力），必须严格按需编写，用户需求中未明确提及对应能力时，禁止生成。例如：
     \`\`\`js file = "config.js"
     export default {
       '.logo': {
         title: 'logo',
-        items: [//定义配置项，用于编辑 model 数据，可选，按需
+        items: [//定义配置项，用于编辑 model 数据；仅当用户明确要求「配置」「可编辑」等能力时添加，否则禁止
           {
             title: '标题',
             type: 'text',
@@ -122,7 +124,7 @@ export default function developMyBricksModule(config: Config) {
             }
           }
         ],
-        style: [//定义该选区支持的样式配置，可选，按需
+        style: [//定义该选区支持的样式配置；仅当用户明确要求「样式配置」「样式编辑」等能力时添加，否则禁止
           {
             items: [
               {
@@ -337,8 +339,8 @@ export default function developMyBricksModule(config: Config) {
       - 如果用户明确要求模块存在变体，使用'@variants'作为selector的key，强制改变变体的配置项以select类型给出；
       - 整体的选区请用:root、不要为最外层的dom分配选区；
       - 按照就近原则为选区定义配置项，禁止出现重复定义的情况（例如在:root与其他selector中声明相同的配置项）；
-    2、仅需关注相关的标题、文案的配置项；若需求明确提及需要「样式配置」「样式编辑」「边框」「背景」「字体」等能力时，可通过 style 配置该选区支持的样式选项；
-    3、对于 selector 的 style 配置（样式配置），按需添加，格式为 style: [{ items: [{ options: ['font', 'border', ...] }] }]，支持的 options 包括：font、border、background、padding、margin、size、cursor、boxshadow、overflow、opacity，按需配置；
+    2、items 配置项：仅当用户明确要求该选区可配置内容或数据时添加，禁止发散添加「可能有用」的配置；
+    3、style 配置：仅当用户明确提及需要「样式配置」「样式编辑」「边框」「背景」「字体」等能力时添加，格式为 style: [{ items: [{ options: ['font', 'border', ...] }] }]，支持的 options 包括：font、border、background、padding、margin、size、cursor、boxshadow、overflow、opacity，按用户明确需求配置，禁止预添加；
     4、对于selector中的config（配置项），按照以下步骤处理：
       1）如果配置项的类型是从多个选项中进行选择，类型使用select，按照以下格式添加：
         {

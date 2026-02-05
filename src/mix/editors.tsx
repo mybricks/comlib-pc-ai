@@ -28,12 +28,24 @@ function detectJsonIndent(jsonStr: string): string | number {
   return 2;
 }
 
-export default function (props) {
+interface Props {
+  /** 组件数据源 */
+  data: any;
+  /** 是否为编码模式，该模式下，展示默认选区 */
+  isLowCodeMode: boolean;
+  /** 组件id */
+  id: string;
+  model?: any;
+  /** 选区 */
+  focusArea: any;
+}
+
+export default function (props: Props) {
   if (!props?.data) {
     return {};
   }
 
-  const { data } = props;
+  const { data, isLowCodeMode } = props;
   const focusAreaConfigs: any = {};
   try {
     const configs = evalConfigJsCompiled(decodeURIComponent(data.configJsCompiled));
@@ -114,6 +126,48 @@ export default function (props) {
       }
     }
   } catch {}
+
+  if (data.runtimeJsxConstituency) {
+    data.runtimeJsxConstituency.forEach(({ className, component, source }) => {
+      if (!component) {
+        // [TODO] 通常是未处理到的标签，case by case 处理
+        return;
+      }
+      if (typeof className === 'string') {
+        // [TODO] 兼容，后续去除
+        className = [className]
+      }
+
+      let knowledge: any = null;
+
+      if (source === "antd") {
+        knowledge = ANTD_KNOWLEDGES_MAP[component.toUpperCase()];
+      } else if (source === "mybricks") {
+        knowledge = MYBRICKS_KNOWLEDGES_MAP[component.toUpperCase()];
+      } else if (source === "html") {
+        knowledge = HTML_KNOWLEDGES_MAP[component.toUpperCase()];
+      }
+
+      if (isLowCodeMode && knowledge?.editors) {
+        Object.keys(knowledge.editors).forEach((key) => {
+          const editor = knowledge.editors[key];
+          const cn = `.${className[0]}`;
+          const selector = key === ":root" ? cn : `${cn} ${key}`;
+          if (!focusAreaConfigs[selector]) {
+            focusAreaConfigs[selector] = {
+              title: editor.title || cn,
+              items: [],
+              style: [
+                {
+                  items: []
+                }
+              ]
+            }
+          }
+        })
+      }
+    })
+  }
 
   // if (data.runtimeJsxConstituency) {
   //   data.runtimeJsxConstituency.forEach(({ className, component, source }) => {
@@ -233,8 +287,6 @@ export default function (props) {
   // }
 
   context.setAiComParams(props.id, props);
-
-  console.log("[@focusAreaConfigs]", focusAreaConfigs)
 
   return {
     ...focusAreaConfigs,

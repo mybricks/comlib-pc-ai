@@ -19,6 +19,25 @@ export default function ({ context }) {
 
       params?.onProgress?.("start");
 
+
+      const { focusArea } = aiComParams;
+
+      let focusInfo = "";
+
+      if (focusArea) {
+        const cloneEl = focusArea.ele.cloneNode(true);
+        cloneEl.innerHTML = '';
+        cloneEl.innerText = focusArea.ele.innerText;
+        const loc = JSON.parse(focusArea.ele.closest(`[data-loc]`).dataset.loc);
+        const runtimeJsxSource = decodeURIComponent(aiComParams.data.runtimeJsxSource).replace(/import css from ['"][^'"]*style.less['"]/, 'const css = new Proxy({}, { get(target, key) { return key } })');
+
+        focusInfo = `
+<选区信息>
+HTML Element: ${cloneEl.outerHTML}
+Focus Area Code: ${runtimeJsxSource.slice(loc.jsx.start, loc.tag.end)}
+</选区信息>
+        `
+      }
       // 创建workspace实例
       const workspace = createWorkspace({
         comId: focus.comId,
@@ -101,14 +120,11 @@ export default function ({ context }) {
                         });
                       }
 
-                      current = current.replace(before.content, after.content)
-
-                      console.log("[@updateFile]", {
-                        fileName,
-                        current,
-                        after: after.content,
-                        before: before.content,
-                      })
+                      if (before.content === "") {
+                        current = after.content;
+                      } else {
+                        current = current.replace(before.content, after.content)
+                      }
                     }
                     context.updateFile(focus.comId, { fileName, content: current })
                   }
@@ -118,18 +134,21 @@ export default function ({ context }) {
             answer()
           ],
           formatUserMessage: (text: string) => {
-            const style = aiComParams?.style ?? {};
-            const wUnit = typeof style.width === 'number' ? 'px' : '';
-            const hUnit = typeof style.height === 'number' ? 'px' : '';
-            const componentInfo =
-              style.widthFact != null && style.heightFact != null
-                ? `宽度为${style.width ?? ''}${wUnit}，实际渲染宽度为${style.widthFact}px；高度为${style.height ?? ''}${hUnit}，实际渲染高度为${style.heightFact}px`
-                : '暂无尺寸信息';
+            // const style = aiComParams?.style ?? {};
+            // const wUnit = typeof style.width === 'number' ? 'px' : '';
+            // const hUnit = typeof style.height === 'number' ? 'px' : '';
+            // const componentInfo =
+            //   style.widthFact != null && style.heightFact != null
+            //     ? `宽度为${style.width ?? ''}${wUnit}，实际渲染宽度为${style.widthFact}px；高度为${style.height ?? ''}${hUnit}，实际渲染高度为${style.heightFact}px`
+            //     : '暂无尺寸信息';
+            // 组件信息：${componentInfo}
 
-            return `<当前组件的信息>
-组件信息：${componentInfo}
-
-</当前组件的信息>
+            return `
+<注意>
+1. 如果只是为了了解组件的现状，不需要通过历史记录，会在后续执行工具中提供
+${focusInfo ? "2. 关注选区信息，用户信息是针对选区提出的" : ""}
+</注意>
+${focusInfo}
 <用户消息>
 ${text}
 </用户消息>
