@@ -194,6 +194,7 @@ export default function (props) {
                 })
               }
             })
+            value.items = [];
           }
 
           const selector = key === ":root" ? `.${className[0]}` : `.${className[0]} ${key}`;

@@ -4,6 +4,7 @@ import {genAIRuntime} from './../utils/ai-code'
 import echartsForReact from './../utils/echarts-for-react'
 import {StyleProvider} from '@ant-design/cssinjs'
 import {ConfigProvider} from "antd";
+import zhCN from 'antd/locale/zh_CN'
 
 
 export default genAIRuntime({
@@ -17,6 +18,7 @@ export default genAIRuntime({
   dependencies: {
     antd,
     'echarts-for-react': echartsForReact,
+    'antd/locale/zh_CN': zhCN,
     // '@dnd-kit/core': dndCore,
     // '@dnd-kit/modifiers': dndModifiers,
     // '@dnd-kit/sortable': dndSortable,
