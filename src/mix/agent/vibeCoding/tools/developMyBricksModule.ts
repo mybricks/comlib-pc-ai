@@ -921,7 +921,7 @@ if (enabledBatch) {
     },
     aiRole: ({ params }) => {
       const mode = params?.mode ?? 'generate';
-      return mode === 'generate' ? 'expert' : 'architect'
+      return mode === 'generate' ? 'junior' : 'architect'
     },
   };
 }
