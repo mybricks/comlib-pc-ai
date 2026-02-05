@@ -48,7 +48,7 @@ class Context {
         aiComParams.data.componentConfig = encodeURIComponent(content);
         const oriInputs = aiComParams.input.get();
         const oriOutputs = aiComParams.output.get();
-        const { inputs, outputs } = JSON.parse(content);
+        const { title, inputs, outputs } = JSON.parse(content);
 
         inputs.forEach(({ id, title, desc, schema }) => {
           const oriInputIndex = oriInputs.findIndex((input) => input.id === id);
@@ -95,6 +95,10 @@ class Context {
         oriOutputs.forEach((output) => {
           aiComParams.output.remove(output.id);
         })
+
+        if (title) {
+          aiComParams.setTitle(title);
+        }
         break;
       default:
         break;
