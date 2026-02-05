@@ -3,6 +3,7 @@ developMyBricksModule.toolName = NAME
 
 interface Config {
   execute: (params: any) => void;
+  enabledBatch?: boolean;
 }
 
 export default function developMyBricksModule(config: Config) {
@@ -14,19 +15,40 @@ export default function developMyBricksModule(config: Config) {
   return {
     name: NAME,
     displayName: "编写组件",
-    description: `根据用户需求，以及类库选型，开发MyBricks模块。
-参数：无
+    description: `根据用户需求，以及类库选型，编写代码开发MyBricks模块。
+参数(mode)：模式，可选择的值有还原和生成两大类，具体是 generate、restore 两种：
+  其中：
+    - generate：生成模式，常用语根据自然语言描述生成代码的场景；
+    - restore：还原模式，从图片/设计稿/原型文件等各类附件中还原需求，常用于生成时严格还原设计稿的场景；
 工具分类：操作执行类；
-作用：清空当前MyBricks模块的所有内容，重新开发；
+作用：根据用户需求，编写代码开发MyBricks模块；
 
 注意：建议开发前查询下是否有需要的类库信息；
 `,
     getPrompts: () => {
-      return `
+const { enabledBatch } = config;
+let definePrompt = ``
+if (enabledBatch) {
+  definePrompt = `
+<你的角色与任务>
+  你是MyBricks开发专家，技术资深、逻辑严谨、实事求是，同时具备专业的审美和设计能力。
+  你的主要任务根据知识库信息，设计开发MyBricks模块（以下简称模块、或MyBricks组件）。
+
+  重点：批量开发所有MyBricks模块，并最后按顺序一次性返回每个MyBricks模块的代码。
+  注意：必须一次性返回所有模块，不要遗漏。
+</你的角色与任务>
+
+<返回格式要求>
+按顺序返回每个MyBricks模块的代码，每个模块的文件名和后缀之间添加组件ID，例如 file="model.json" -> file="model@uuid.json"。；
+</返回格式要求>`
+} else {
+  definePrompt = `
 <你的角色与任务>
   你是MyBricks开发专家，技术资深、逻辑严谨、实事求是，同时具备专业的审美和设计能力。
   你的主要任务是设计开发MyBricks模块（以下简称模块、或MyBricks组件），同时，你也可以根据用户的需求，对模块进行修改、优化、升级等。
-</你的角色与任务>
+</你的角色与任务>`
+}
+      return `${definePrompt}
 
 <MyBricks模块定义及文件说明>
   MyBricks模块基于MVVM(Model–view–viewmodel)与响应式，以及特定的变体（variants）形态，支持外部通过输入端口(inputs)接收外部数据，或者通过输出端口(outputs)与外界进行互动，
@@ -165,23 +187,20 @@ export default function developMyBricksModule(config: Config) {
 </MyBricks模块定义及文件说明>
 
 <模块开发要求>
-  在设计开发MyBricks模块时，可以采用的技术方案来自：
+  在设计开发MyBricks模块时
   
-  <技术栈和类库声明>
-    仅可以基于 ${libTitles} 技术栈进行开发，同时，可以使用下面声明的类库，根据场景做合理的技术方案设计、不要超出声明的类库范围。
-    1. 默认类库
-      - mybricks：提供 Container 组件。Container 可完全替代 div：其接收的 props 与 div 一致（如 className、style、onClick 等），用法相同。使用 Container 而非 div 的原因在于：便于平台识别布局容器、识别三方依赖组件、并支持诸多个性化配置。因此，**所有需要块级容器的地方一律使用 Container，禁止使用 div**。布局通过 Container 包裹区块并配合 CSS（如 flex）实现。
-    2. 三方类库：*项目信息*中<允许使用的类库/>中声明的类库；
+  <技术栈和类库使用说明>
+    仅可以基于 ${libTitles} 技术栈进行开发，同时，可以使用*项目信息*中<允许使用的类库/>中声明类库，根据场景做合理的技术方案设计、不要超出声明的类库范围。
+    三方类库：*项目信息*中<允许使用的类库/>中声明的类库；
     > 关于三方类库：仅允许使用*项目信息*中<允许使用的类库/>中声明的类库，不要超出范围；
       同时需要注意以下几点：
       - 按照文档中的使用说明来使用类库，比如*引用方式*、*何时使用*，*组件用法*等。
       - 所有来自三方库的组件必须带有语义化且唯一的 className，以便通过 CSS 选择器选中，无论是否需要设置样式；
-  </技术栈和类库声明>
+  </技术栈和类库使用说明>
 
   注意：
-  1、在runtime文件中，要严格参考 <技术栈及类库声明/> 中的内容，除其中允许使用的框架及类库之外、不允许使用其他任何库或框架；
-  2、不允许对上述可以使用的库做假设、例如主观臆造不存在的组件等，只能基于事实上提供的组件及知识库中的属性、API说明进行开发；
-  3、你要完成的是中文场景下的开发任务，请仔细斟酌文案、用语，在各类文案表达中尽量使用中文，但是对于代码、技术术语等，可以使用英文。
+  1、要严格参考 <技术栈和类库使用说明/> 来开发；
+  2、你要完成的是中文场景下的开发任务，请仔细斟酌文案、用语，在各类文案表达中尽量使用中文，但是对于代码、技术术语等，可以使用英文。
 </模块开发要求>
 
 <按照以下情况分别处理>
@@ -198,7 +217,6 @@ export default function developMyBricksModule(config: Config) {
     当用户提供了附件图片，要将附件中的图片作为重要参考，根据以下步骤处理：
     1、确定图片对应模块的部分，如果不是【当前选区】则以图片中的内容为准，如果图片与模块完全无关，忽略本次任务，返回提示；
     2、结合用户提出的问题，对图片中的各类要素进行分析，给出修改方案；
-    3、需要特别留意图片中的\`\`\`Text\`\`\`文本，如果是另起一行，需要通过css将其转为块级元素，比如添加\`\`\`display:block;\`\`\`。
   </当存在附件图片时>
   
   如果确实要修改模块，按照以下步骤处理：
@@ -236,7 +254,7 @@ export default function developMyBricksModule(config: Config) {
       - https://ai.mybricks.world/image-search?term=searchWord&w=20&h=20，可以配置一个高质量的摄影图片；
       对于海报/写实图片：我们建议使用高质量的摄影图片；
       对于品牌/Logo：我们建议使用色块占位图片；
-      对于插画/装饰性图形：我们优先推荐使用图标来点缀；如果确实需要图片，也可以使用色块占位图片，防止摄影图片过于跳脱；
+      对于插画/装饰性图形：我们优先推荐使用简单的svg来占位，避免使用图片过于跳脱；
 
   5、详细分析各个区块的技术方案，按照以下要点展开：
     - 变体分析：如果用户明确要求模块存在变体，分析变体的内容、以及在model.json中对应的强制改变变体的字段、configs.js中对于强制改变变体的配置项等；
@@ -894,91 +912,6 @@ export default function developMyBricksModule(config: Config) {
 </example>
 
 <example>
-  <user_query>(注意，当前选择了:  搜索(selector=.search) 上)</user_query>
-  <user_query>
-    <input-output-slot>
-      {
-        cmd:'output-add',
-        description:'当前搜索值变化时，输出当前值'
-      }
-    </input-output-slot>
-  </user_query>
-  <assistant_response>
-  OK，没问题，让我来分析【源代码】中的runtime.jsx文件和com.json文件,我将在com.json中添加一个输出端口声明，并在runtime.jsx中增加onChange事件，以通过该输出端口输出当前的搜索框的值。
-  本次更新需要修改runtime.jsx和com.json文件：
-
-  \`\`\`before file="runtime.jsx"
-  export default forwardRef(function (props, ref) {
-  \`\`\`
-  
-  \`\`\`after file="runtime.jsx"
-  import { forwardRef, useCallback } from 'react';
-  export default forwardRef(function (props, ref) {
-    const { onSearch } = props;
-    const search = useCallback((e)=>{
-      onSearch?.(e.target.value)
-    }, [onSearch])
-  \`\`\`
-  
-  \`\`\`before file="runtime.jsx"
-    <div className={css.searchWrap}>
-      <Search className={css.search}/>
-    </div>
-  \`\`\`
-  
-  \`\`\`after file="runtime.jsx"
-    <div className={css.searchWrap}>
-      <Search className={css.search} onSearch={search}/>
-    </div>
-  \`\`\`
-  
-  \`\`\`before file="com.json"
-  {
-    "inputs": [],
-    "outputs": []
-  }
-  \`\`\`
-  
-  \`\`\`after file="com.json"
-  {
-    "inputs": [],
-    "outputs": [
-      {
-        "id": "onSearch",
-        "title": "搜索",
-        "desc": "当前搜索值变化时，输出当前值",
-        "schema": {
-          "type": "string",
-          "description": "搜索框的值"
-        }
-      }
-    ]
-  }
-  \`\`\`
-  </assistant_response>
-</example>
-
-<example>
-  <user_query>【当前选区】( 第二个按钮(selector=.btn) )</user_query>
-  <user_query>修改文案为ABC</user_query>
-  <assistant_response>
-  明白，经过对【源代码】中的model.json文件的分析,我将当前按钮的标题修改成ABC：
-
-  \`\`\`before file="model.json"
-  "btn1":{
-    "text":"按钮1"
-  },
-  \`\`\`
-  
-  \`\`\`after file="model.json"
-  "btn1":{
-    "text":"ABCD"
-  },
-  \`\`\`
-  </assistant_response>
-</example>
-
-<example>
   <user_query>(注意，当前选择了: (selector=.banner) )</user_query>
   <user_query>这里我要能配置文案</user_query>
   <assistant_response>
@@ -1021,21 +954,6 @@ export default function developMyBricksModule(config: Config) {
   </assistant_response>
 </example>
 
-<example>
-  <user_query>【当前选区】(第二个按钮(selector=.btn))</user_query>
-  <user_query>？</user_query>
-  <assistant_response>
-  这是工具条中的第二个按钮，可以点击通过输出端口（按钮点击）输出一个随机数.
-  技术实现上，这里使用了xx库中的Button组件作为实现，根据（知识库）中的说明，该组件可配置的属性如下：
-
-| 属性 | 说明 | 类型 | 默认值
-| --- | --- | --- | --- |
-| autoInsertSpace | 我们默认提供两个汉字之间的空格，可以设置 \`autoInsertSpace\` 为 \`false\` 关闭 | boolean | \`true\` |
-| block | 将按钮宽度调整为其父宽度的选项 | boolean | false |
-
-  </assistant_response>
-</example>
-
 </examples>
 `
     },
@@ -1043,7 +961,9 @@ export default function developMyBricksModule(config: Config) {
       config.execute(params);
       return "编写完成"
     },
-    // aiRole: "expert",
-    aiRole: "architect",
+    aiRole: ({ params }) => {
+      const mode = params?.mode ?? 'generate';
+      return mode === 'generate' ? 'expert' : 'architect'
+    },
   };
 }

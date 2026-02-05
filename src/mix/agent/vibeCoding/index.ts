@@ -3,6 +3,66 @@ import developMyBricksModule from "./tools/developMyBricksModule";
 import answer from "./tools/answer";
 import { createWorkspace } from "./workspace";
 
+/**
+ * 更新组件文件
+ * @param files 文件数组，每个文件包含 fileName 和 content
+ * @param comId 组件ID
+ * @param context 上下文对象，包含 updateFile 和 getAiComParams 方法
+ */
+function updateComponentFiles(files: Array<{ fileName: string; content: string }>, comId: string, context: any) {
+  const aiComParams = context.getAiComParams(comId);
+  
+  const fileToDataKey: Array<{ fileName: string; dataKey: string }> = [
+    {
+      fileName: 'model.json', dataKey: 'modelConfig'
+    },
+    {
+      fileName: 'runtime.jsx', dataKey: 'runtimeJsxSource'
+    },
+    {
+      fileName: 'style.less', dataKey: 'styleSource'
+    },
+    {
+      fileName: 'config.js', dataKey: 'configJsSource'
+    },
+    {
+      fileName: 'com.json', dataKey: 'componentConfig'
+    },
+  ];
+
+  fileToDataKey.forEach(({ fileName, dataKey }) => {
+    const matchedFiles = files.filter((file: any) => file.fileName === fileName);
+    if (matchedFiles.length === 1) {
+      context.updateFile(comId, { fileName, content: matchedFiles[0].content })
+    } else if (matchedFiles.length > 1) {
+      let current = decodeURIComponent(aiComParams.data[dataKey] || '');
+      for (let i = 0; i < matchedFiles.length; i += 2) {
+        const before = matchedFiles[i];
+        const after = matchedFiles[i + 1];
+
+        const index = current.indexOf(before.content);
+        if (index === -1) {
+          console.error(`[@开发模块 - 文件${fileName}替换失败]`, {
+            current,
+            before: before.content,
+            after: after.content,
+          });
+        }
+
+        current = current.replace(before.content, after.content)
+
+        console.log("[@updateFile]", {
+          fileName,
+          current,
+          after: after.content,
+          before: before.content,
+        })
+      }
+      context.updateFile(comId, { fileName, content: current })
+    }
+  });
+}
+
 export default function ({ context }) {
   console.log("[@vibeCoding - context]", context);
 
@@ -17,6 +77,9 @@ export default function ({ context }) {
       console.log("[@request - focus]", focus);
       console.log("[aiComParams]", aiComParams);
 
+      // 判断是否为开发模式（被上级agent调用）
+      const isDevelopMode = params.mode === 'develop';
+
       // 创建workspace实例
       const workspace = createWorkspace({
         comId: focus.comId,
@@ -24,129 +87,101 @@ export default function ({ context }) {
         libraryDocs: [] // 备用的类库文档（可选）
       });
 
-      const extraParams = aiComParams.data.document ? {
-        message: `参考图片一比一还原这个局部区域，当前组件需要完成的内容为页面中的局部部分，具体要还原的区域可以参考
-<需求文档>
-  ${aiComParams.data.document}
-</需求文档>`,
-        attachments: (window as any).myai_attachments ?? [],
-      } : {}
-
-      return new Promise((resolve, reject) => {
-        rxai.requestAI({
-          ...params,
-          ...extraParams,
-          emits: {
-            write: () => { },
-            complete: () => {
-              resolve('complete');
-              params?.onProgress?.("complete");
-            },
-            error: (error: any) => {
-              reject(error);
-              params?.onProgress?.("error");
-            },
-            cancel: () => { },
+      // 基础配置
+      const baseConfig = {
+        ...params,
+        emits: {
+          write: () => { },
+          complete: () => {
+            resolve('complete');
+            params?.onProgress?.("complete");
           },
-          // 需求分析、重构（从0-1）、修改
-          tools: [
-            // classLibrarySelection({
-            //   librarySummaryDoc: workspace.getAvailableLibraryInfo() || '',
-            //   fileFormat: context.plugins.aiService.fileFormat,
-            //   onOpenLibraryDoc: (libs) => {
-            //     workspace.openLibraryDoc(libs)
-            //   }
-            // }),
-            developMyBricksModule({
-              execute(params) {
-                console.log("[@开发模块 - execute]", params);
-                const { files } = params;
+          error: (error: any) => {
+            reject(error);
+            params?.onProgress?.("error");
+          },
+          cancel: () => { },
+        },
+        presetMessages: async () => {
+          const content = await workspace.exportToMessage()
+          return [
+            {
+              role: 'user',
+              content
+            },
+            {
+              role: 'assistant',
+              content: '感谢您提供的知识，我会参考这些知识进行开发。'
+            },
+          ]
+        },
+      };
 
-                const fileToDataKey: Array<{ fileName: string; dataKey: string;}> = [
-                  {
-                    fileName: 'model.json', dataKey: 'modelConfig'
-                  },
-                  {
-                    fileName: 'runtime.jsx', dataKey: 'runtimeJsxSource'
-                  },
-                  {
-                    fileName: 'style.less', dataKey: 'styleSource'
-                  },
-                  {
-                    fileName: 'config.js', dataKey: 'configJsSource'
-                  },
-                  {
-                    fileName: 'com.json', dataKey: 'componentConfig'
-                  },
-                ];
-
-                fileToDataKey.forEach(({ fileName, dataKey }) => {
-                  const matchedFiles = files.filter((file: any) => file.fileName === fileName);
-                  if (matchedFiles.length === 1) {
-                    context.updateFile(focus.comId, { fileName, content: matchedFiles[0].content })
-                  } else if (matchedFiles.length > 1) {
-                    let current = decodeURIComponent(aiComParams.data[dataKey] || '');
-                    for (let i = 0; i < matchedFiles.length; i+=2) {
-                      const before = matchedFiles[i];
-                      const after = matchedFiles[i + 1];
-
-                      const index = current.indexOf(before.content);
-                      if (index === -1) {
-                        console.error(`[@开发模块 - 文件${fileName}替换失败]`, {
-                          current,
-                          before: before.content,
-                          after: after.content,
-                        });
-                      }
-
-                      current = current.replace(before.content, after.content)
-
-                      console.log("[@updateFile]", {
-                        fileName,
-                        current,
-                        after: after.content,
-                        before: before.content,
-                      })
-                    }
-                    context.updateFile(focus.comId, { fileName, content: current })
-                  }
-                });
+      // 开发模式，直接被上级agent调用
+      const developModeConfig = {
+        ...baseConfig,
+        planList: [`${developMyBricksModule.toolName} -mode restore`],
+        tools: [
+          developMyBricksModule({
+            enabledBatch: true,
+            execute(p) {
+              // 兼容旧的调用方式
+              if (params.onDevelopModule) {
+                return params.onDevelopModule(p, (comId, files) => updateComponentFiles(files, comId, context));
               }
-            }),
-            answer()
-          ],
-          formatUserMessage: (text: string) => {
-            const style = aiComParams?.style ?? {};
-            const wUnit = typeof style.width === 'number' ? 'px' : '';
-            const hUnit = typeof style.height === 'number' ? 'px' : '';
-            const componentInfo =
-              style.widthFact != null && style.heightFact != null
-                ? `宽度为${style.width ?? ''}${wUnit}，实际渲染宽度为${style.widthFact}px；高度为${style.height ?? ''}${hUnit}，实际渲染高度为${style.heightFact}px`
-                : '暂无尺寸信息';
+            }
+          }),
+          answer()
+        ],
+        formatUserMessage: (text: string) => {
+          const style = aiComParams?.style ?? {};
+          const wUnit = typeof style.width === 'number' ? 'px' : '';
+          const hUnit = typeof style.height === 'number' ? 'px' : '';
+          const componentInfo =
+            style.widthFact != null && style.heightFact != null
+              ? `宽度为${style.width ?? ''}${wUnit}，实际渲染宽度为${style.widthFact}px；高度为${style.height ?? ''}${hUnit}，实际渲染高度为${style.heightFact}px`
+              : '暂无尺寸信息';
 
-            return `<当前组件的信息>
-组件信息：${componentInfo}
-
+          return `<当前组件的信息>
+${componentInfo}
 </当前组件的信息>
 <用户消息>
 ${text}
 </用户消息>
-`
-          },
-          presetMessages: async () => {
-            const content = await workspace.exportToMessage()
-            return [
-              {
-                role: 'user',
-                content
-              },
-              {
-                role: 'assistant',
-                content: '感谢您提供的知识，我会参考这些知识进行开发。'
-              },
-            ]
-          },
-        });
+`;
+        },
+      };
+
+      // 默认模式配置
+      const defaultModeConfig = {
+        ...baseConfig,
+        tools: [
+          // classLibrarySelection({
+          //   librarySummaryDoc: workspace.getAvailableLibraryInfo() || '',
+          //   fileFormat: context.plugins.aiService.fileFormat,
+          //   onOpenLibraryDoc: (libs) => {
+          //     workspace.openLibraryDoc(libs)
+          //   }
+          // }),
+          developMyBricksModule({
+            execute(p) { 
+              // 默认模式：直接更新组件文件
+              console.log("[@开发模块 - execute]", p);
+              const { files } = p;
+
+              updateComponentFiles(files, focus.comId, context);
+            }
+          }),
+          answer()
+        ],
+        formatUserMessage: (text: string) => {
+          return text
+        },
+      };
+
+      return new Promise((resolve, reject) => {
+        const config = isDevelopMode ? developModeConfig : defaultModeConfig;
+        rxai.requestAI(config);
       })
     }
   }
