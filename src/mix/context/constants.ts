@@ -44,17 +44,32 @@ export const MYBRICKS_KNOWLEDGES_MAP = {
   }
 }
 
-export const HTML_KNOWLEDGES_MAP = {
-  DIV: {
-    editors: {
-      ":root": {
-        style: [
-          {
-            title: '样式',
-            options: ['background', 'border', 'padding', 'margin']
-          }
-        ]
+export const HTML_KNOWLEDGES_MAP = new Proxy({}, {
+  get() {
+    return {
+      editors: {
+        ":root": {}
       }
     }
   }
-}
+})
+
+// export const HTML_KNOWLEDGES_MAP = {
+//   DIV: {
+//     editors: {
+//       ":root": {
+//         style: [
+//           {
+//             items: [
+//               {
+//                 title: '样式',
+//                 autoOptions: true,
+//                 // options: ['background', 'border', 'padding', 'margin']
+//               }
+//             ]
+//           }
+//         ]
+//       }
+//     }
+//   }
+// }

@@ -36,7 +36,7 @@ function updateComponentFiles(files: Array<{ fileName: string; content: string }
       context.updateFile(comId, { fileName, content: matchedFiles[0].content })
     } else if (matchedFiles.length > 1) {
       let current = decodeURIComponent(aiComParams.data[dataKey] || '');
-      for (let i = 0; i < matchedFiles.length; i += 2) {
+      for (let i = 0; i < matchedFiles.length; i+=2) {
         const before = matchedFiles[i];
         const after = matchedFiles[i + 1];
 
@@ -49,14 +49,11 @@ function updateComponentFiles(files: Array<{ fileName: string; content: string }
           });
         }
 
-        current = current.replace(before.content, after.content)
-
-        console.log("[@updateFile]", {
-          fileName,
-          current,
-          after: after.content,
-          before: before.content,
-        })
+        if (before.content === "") {
+          current = after.content;
+        } else {
+          current = current.replace(before.content, after.content)
+        }
       }
       context.updateFile(comId, { fileName, content: current })
     }
@@ -80,6 +77,28 @@ export default function ({ context }) {
       // 判断是否为开发模式（被上级agent调用）
       const isDevelopMode = params.mode === 'develop';
 
+      params?.onProgress?.("start");
+
+
+      const { focusArea } = aiComParams;
+
+      let focusInfo = "";
+
+      if (focusArea) {
+        const cloneEl = focusArea.ele.cloneNode(true);
+        cloneEl.innerHTML = '';
+        cloneEl.innerText = focusArea.ele.innerText;
+        const loc = JSON.parse(focusArea.ele.closest(`[data-loc]`).dataset.loc);
+        const runtimeJsxSource = decodeURIComponent(aiComParams.data.runtimeJsxSource).replace(/import css from ['"][^'"]*style.less['"]/, 'const css = new Proxy({}, { get(target, key) { return key } })');
+
+        focusInfo = `
+<选区信息>
+HTML Element: ${cloneEl.outerHTML}
+Focus Area Code: ${runtimeJsxSource.slice(loc.jsx.start, loc.tag.end)}
+Selector: ${focus.focusArea.selector}
+</选区信息>
+        `
+      }
       // 创建workspace实例
       const workspace = createWorkspace({
         comId: focus.comId,
@@ -87,38 +106,39 @@ export default function ({ context }) {
         libraryDocs: [] // 备用的类库文档（可选）
       });
 
-      // 基础配置
-      const baseConfig = {
-        ...params,
-        emits: {
-          write: () => { },
-          complete: () => {
-            resolve('complete');
-            params?.onProgress?.("complete");
-          },
-          error: (error: any) => {
-            reject(error);
-            params?.onProgress?.("error");
-          },
-          cancel: () => { },
-        },
-        presetMessages: async () => {
-          const content = await workspace.exportToMessage()
-          return [
-            {
-              role: 'user',
-              content
+      return new Promise((resolve, reject) => {
+        // 基础配置（放在 Promise 内，以便 emits 能正确使用 resolve/reject）
+        const baseConfig = {
+          ...params,
+          emits: {
+            write: () => { },
+            complete: () => {
+              resolve('complete');
+              params?.onProgress?.("complete");
             },
-            {
-              role: 'assistant',
-              content: '感谢您提供的知识，我会参考这些知识进行开发。'
+            error: (error: any) => {
+              reject(error);
+              params?.onProgress?.("error");
             },
-          ]
-        },
-      };
+            cancel: () => { },
+          },
+          presetMessages: async () => {
+            const content = await workspace.exportToMessage()
+            return [
+              {
+                role: 'user',
+                content
+              },
+              {
+                role: 'assistant',
+                content: '感谢您提供的知识，我会参考这些知识进行开发。'
+              },
+            ]
+          },
+        };
 
-      // 开发模式，直接被上级agent调用
-      const developModeConfig = {
+        // 开发模式，直接被上级agent调用
+        const developModeConfig = {
         ...baseConfig,
         planList: [`${developMyBricksModule.toolName} -mode restore`],
         tools: [
@@ -150,39 +170,38 @@ ${text}
 </用户消息>
 `;
         },
-      };
+        };
 
-      // 默认模式配置
-      const defaultModeConfig = {
-        ...baseConfig,
-        tools: [
-          // classLibrarySelection({
-          //   librarySummaryDoc: workspace.getAvailableLibraryInfo() || '',
-          //   fileFormat: context.plugins.aiService.fileFormat,
-          //   onOpenLibraryDoc: (libs) => {
-          //     workspace.openLibraryDoc(libs)
-          //   }
-          // }),
-          developMyBricksModule({
-            execute(p) { 
-              // 默认模式：直接更新组件文件
-              console.log("[@开发模块 - execute]", p);
-              const { files } = p;
+        // 默认模式配置
+        const defaultModeConfig = {
+          ...baseConfig,
+          tools: [
+            // classLibrarySelection({
+            //   librarySummaryDoc: workspace.getAvailableLibraryInfo() || '',
+            //   fileFormat: context.plugins.aiService.fileFormat,
+            //   onOpenLibraryDoc: (libs) => {
+            //     workspace.openLibraryDoc(libs)
+            //   }
+            // }),
+            developMyBricksModule({
+              execute(p) {
+                // 默认模式：直接更新组件文件
+                console.log("[@开发模块 - execute]", p);
+                const { files } = p;
 
-              updateComponentFiles(files, focus.comId, context);
-            }
-          }),
-          answer()
-        ],
-        formatUserMessage: (text: string) => {
-          return text
-        },
-      };
+                updateComponentFiles(files, focus.comId, context);
+              }
+            }),
+            answer()
+          ],
+          formatUserMessage: (text: string) => {
+            return text
+          },
+        };
 
-      return new Promise((resolve, reject) => {
         const config = isDevelopMode ? developModeConfig : defaultModeConfig;
         rxai.requestAI(config);
-      })
+      });
     }
   }
 }

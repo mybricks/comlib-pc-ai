@@ -4,23 +4,17 @@ export default {
   description: `按钮组件`,
   editors: {
     ':root': {
+      items: [
+        {
+          type: '_resizer',
+        },
+      ],
       style: [
         {
           items: [
             {
-              type: '_resizer',
-              value: {
-                get() {
-                  debugger
-                },
-                set(ctx, val,status) {
-                  console.log(val,status)
-                }
-              }
-            },
-            {
               title: '样式',
-              options: ['background', 'border'],
+              options: ['font', 'background', 'border'],
             }
           ]
         }

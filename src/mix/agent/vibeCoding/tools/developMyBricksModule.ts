@@ -24,6 +24,8 @@ export default function developMyBricksModule(config: Config) {
 作用：根据用户需求，编写代码开发MyBricks模块；
 
 注意：建议开发前查询下是否有需要的类库信息；
+
+所有文件的修改都必须使用该工具；
 `,
     getPrompts: () => {
 const { enabledBatch } = config;
@@ -125,12 +127,12 @@ if (enabledBatch) {
    - 不要使用如下形式的代码 \${data.title}，因为在MyBricks平台中，不支持这种形式的代码；
    - 不能使用 @import引入其他的less文件、不要使用less的混合、函数、变量等；
 
-  4、config.js文件，模块中所有选区声明及配置项的声明文件，例如：
+  4、config.js文件，模块中所有选区声明及配置项的声明文件。**重要**：对于每个选区的 items（用于编辑 model 数据）和 style（用于配置该选区支持的样式编辑能力），必须严格按需编写，用户需求中未明确提及对应能力时，禁止生成。例如：
     \`\`\`js file = "config.js"
     export default {
       '.logo': {
         title: 'logo',
-        items: [//定义配置项
+        items: [//定义配置项，用于编辑 model 数据；仅当用户明确要求「配置」「可编辑」等能力时添加，否则禁止
           {
             title: '标题',
             type: 'text',
@@ -142,6 +144,15 @@ if (enabledBatch) {
                 data.logo = val
               }
             }
+          }
+        ],
+        style: [//定义该选区支持的样式配置；仅当用户明确要求「样式配置」「样式编辑」等能力时添加，否则禁止
+          {
+            items: [
+              {
+                options: ['border'] // 支持的样式配置包括 font、border、background、padding、margin、size、cursor、boxshadow、overflow、opacity，按需配置
+              }
+            ]
           }
         ]
       }
@@ -309,6 +320,8 @@ if (enabledBatch) {
     5、判断是否需要修改style.less文件；
     
     6、判断是否需要修改com.json文件：
+      - 若需求未明确要求输入端口或输出端口，不要修改 com.json，runtime 中也不要使用 useImperativeHandle 或 props 回调；
+      - 若需求明确要求，则：runtime 中通过 useImperativeHandle 暴露的方法需在 com.json 的 inputs 中声明，props 回调需在 outputs 中声明；
       - 如果 runtime 中通过 useImperativeHandle 新增或删除了暴露的方法，需要在 com.json 的 inputs 中同步声明；
       - 如果 runtime 中使用的 props 回调（如 props.onClick）有新增或删除，需要在 com.json 的 outputs 中同步声明；
       - 确保 com.json 中声明的 id 与 runtime 中 useImperativeHandle 的方法名、props 回调名完全一致；
@@ -334,17 +347,21 @@ if (enabledBatch) {
   </当需要修改style.less文件时>
 
   <当需要修改config.js文件时>
+    仅当需求明确提及需要「配置」「选区」「可配置」「可编辑」等能力时，才考虑修改或生成 config.js；若需求未明确说明，禁止生成或修改 config.js。
     如果确实需要修改，严格参考以下方面：
     
     如果runtime.jsx中有多个独立配置意义的部分，将其拆分成不同的选区，选区请参考 用户在【知识库】中提供的组件可分配选区。
     
     对于具体的selector，按照以下步骤：
     1、为每个selector分配实际的值，注意以下方面：
+      - selector 本质上是 CSS 选择器，用于锁定具体的区域；
+      - 对于三方库组件的局部或区域编辑，优先使用组件的唯一 className + 三方库自身支持的选择器（如组件内部子区域的类名）拼接成一个合法的css选择器来定位；
       - 如果用户明确要求模块存在变体，使用'@variants'作为selector的key，强制改变变体的配置项以select类型给出；
       - 整体的选区请用:root、不要为最外层的dom分配选区；
       - 按照就近原则为选区定义配置项，禁止出现重复定义的情况（例如在:root与其他selector中声明相同的配置项）；
-    2、仅需关注相关的标题、文案的配置项，无需添加对于样式（背景、颜色、边框等等）的配置；
-    3、对于selector中的config（配置项），按照以下步骤处理：
+    2、items 配置项：仅当用户明确要求该选区可配置内容或数据时添加，禁止发散添加「可能有用」的配置；
+    3、style 配置：仅当用户明确提及需要「样式配置」「样式编辑」「边框」「背景」「字体」等能力时添加，格式为 style: [{ items: [{ options: ['font', 'border', ...] }] }]，支持的 options 包括：font、border、background、padding、margin、size、cursor、boxshadow、overflow、opacity，按用户明确需求配置，禁止预添加；
+    4、对于selector中的config（配置项），按照以下步骤处理：
       1）如果配置项的类型是从多个选项中进行选择，类型使用select，按照以下格式添加：
         {
           title:'配置项标题',
@@ -401,6 +418,7 @@ if (enabledBatch) {
   </当需要修改config.js文件时>
 
   <当需要修改com.json文件时>
+    仅当需求明确提及需要「输入端口」「输出端口」「事件」「与外部交互」「inputs」「outputs」等能力时，才考虑修改或生成 com.json；若需求未明确说明，禁止生成或修改 com.json，runtime 中也不应使用 useImperativeHandle 或 props 回调。
     如果确实需要修改，按照以下步骤处理：
     
     1、当模块需要定义输入端口（inputs）或输出端口（outputs）时，必须在com.json文件中进行声明：
@@ -497,6 +515,7 @@ if (enabledBatch) {
       - 删除代码：after中的内容为空字符串。
 
   整个过程中要注意：
+  - 若需求未明确要求配置或输入输出事件，禁止生成 config.js 和 com.json，不要发散思维添加「可能有用」的配置或事件；
   - 如果模块【源代码】内容有修改，务必通过before/after返回，而不是原来的 \`\`\`文件类型 file="文件名"的形式；
   - 确保所有文件内容中禁止使用emoji等特殊字符；
   - 要确保 com.json 中声明的 inputs（id）与 runtime 中 useImperativeHandle 暴露的方法名一一对应，outputs（id）与 runtime 的 props 回调名一一对应；若使用插槽，与 props 中插槽用法一致；
@@ -514,7 +533,7 @@ if (enabledBatch) {
 <example>
   <user_query>开发一个按钮</user_query>
   <assistant_response>
-  好的，我将为您开发一个按钮
+  好的，我将为您开发一个按钮。需求未明确要求配置或输入输出事件，故仅生成 model.json、runtime.jsx、style.less。
   \`\`\`before file="model.json"
   \`\`\`
   
@@ -539,52 +558,15 @@ if (enabledBatch) {
   
   \`\`\`after file="runtime.jsx"
   import css from 'style.less';
-  import { forwardRef, useCallback } from 'react';
+  import { forwardRef } from 'react';
   import { Button } from 'antd';
   
   export default forwardRef(function (props, ref) {
-    const { text, onClick, onDoubleClick } = props;
-    const click = useCallback(()=>{
-      onClick?.(text)
-    }, [text, onClick])
-    
-    const dblClick = useCallback(()=>{
-      onDoubleClick?.(text)
-    }, [text, onDoubleClick])
-    
+    const { text } = props;
     return (
-      <Button onClick={click} onDoubleClick={dblClick} className={css.mainBtn}>{text}</Button>
+      <Button className={css.mainBtn}>{text}</Button>
     )
   });
-  \`\`\`
-  
-  \`\`\`before file="com.json"
-  \`\`\`
-  
-  \`\`\`after file="com.json"
-  {
-    "inputs": [],
-    "outputs": [
-      {
-        "id": "onClick",
-        "title": "点击事件",
-        "desc": "按钮点击时触发",
-        "schema": {
-          "type": "string",
-          "description": "返回按钮文本"
-        }
-      },
-      {
-        "id": "onDoubleClick",
-        "title": "双击事件",
-        "desc": "按钮双击时触发",
-        "schema": {
-          "type": "string",
-          "description": "返回按钮文本"
-        }
-      }
-    ]
-  }
   \`\`\`
   </assistant_response>
 </example>
@@ -684,7 +666,7 @@ if (enabledBatch) {
 <example>
   <user_query>开发两个按钮构成的工具条</user_query>
   <assistant_response>
-  好的，我将为您开发一个工具条，包含两个按钮
+  好的，我将为您开发一个工具条，包含两个按钮。需求未明确要求配置或输入输出事件，故仅生成 model.json、runtime.jsx、style.less。
   \`\`\`before file="model.json"
   \`\`\`
   
@@ -716,43 +698,19 @@ if (enabledBatch) {
 
   \`\`\`after file="runtime.jsx"
   import css from 'style.less';
-  import { forwardRef, useCallback } from 'react';
+  import { forwardRef } from 'react';
   import { Button } from 'xy-ui';
     
   export default forwardRef(function (props, ref) {
-    const { btns, onClick } = props;
-    const click = useCallback((index)=>{
-      onClick?.(index)
-    }, [onClick])
-    
+    const { btns } = props;
     return (
       <div className={css.viewContainer}>
         {btns.map((btn, index)=>{
-          return <Button className={css.btn} key={index} onClick={e=>click(index)}>{btn.text}</Button>
+          return <Button className={css.btn} key={btn.text}>{btn.text}</Button>
         })}
       </div>
     )
   });
-  \`\`\`
-  
-  \`\`\`before file="com.json"
-  \`\`\`
-  
-  \`\`\`after file="com.json"
-  {
-    "inputs": [],
-    "outputs": [
-      {
-        "id": "onClick",
-        "title": "按钮点击",
-        "desc": "按钮被点击时触发",
-        "schema": {
-          "type": "number",
-          "description": "被点击按钮的索引"
-        }
-      }
-    ]
-  }
   \`\`\`
   </assistant_response>
 </example>

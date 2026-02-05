@@ -27,7 +27,7 @@ export default {
         }
       ]
     },
-    '.ant-badge-count': {
+    '.ant-scroll-number': {
       title:'滚动数字',
       style: [
         {
