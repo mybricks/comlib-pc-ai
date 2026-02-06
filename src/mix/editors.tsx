@@ -40,6 +40,28 @@ interface Props {
   focusArea: any;
 }
 
+const genStyleValue = (params) => {
+  const { comId } = params;
+  return {
+    set(params, value) {
+      const aiComParams = context.getAiComParams(comId);
+      const cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
+      const selector = params.selector;
+  
+      if (!cssObj[selector]) {
+        cssObj[selector] = {};
+      }
+  
+      Object.entries(value).forEach(([key, value]) => {
+        cssObj[selector][key] = value;
+      })
+  
+      const cssStr = stringifyLess(cssObj);
+      context.updateFile(comId, { fileName: 'style.less', content: cssStr })
+    }
+  }
+}
+
 export default function (props: Props) {
   if (!props?.data) {
     return {};
@@ -72,25 +94,7 @@ export default function (props: Props) {
 
       value.style?.forEach((style) => {
         style.items?.forEach((item) => {
-          item.valueProxy = {
-            set(params, value) {
-              const comId = props.model?.runtime?.id || props.id;
-              const aiComParams = context.getAiComParams(comId);
-              const cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
-              const selector = params.selector;
-
-              if (!cssObj[selector]) {
-                cssObj[selector] = {};
-              }
-
-              Object.entries(value).forEach(([key, value]) => {
-                cssObj[selector][key] = value;
-              })
-
-              const cssStr = stringifyLess(cssObj);
-              context.updateFile(comId, { fileName: 'style.less', content: cssStr })
-            }
-          }
+          item.valueProxy = genStyleValue({ comId: props.model?.runtime?.id || props.id });
         })
       })
 
@@ -165,6 +169,7 @@ export default function (props: Props) {
                     {
                       title: '样式',
                       autoOptions: true,
+                      valueProxy: genStyleValue({ comId: props.model?.runtime?.id || props.id })
                     }
                   ]
                 }
@@ -177,6 +182,7 @@ export default function (props: Props) {
                   {
                     title: '样式',
                     autoOptions: true,
+                    valueProxy: genStyleValue({ comId: props.model?.runtime?.id || props.id })
                   }
                 ]
               }
