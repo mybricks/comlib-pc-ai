@@ -222,15 +222,17 @@ export default function (props: Props) {
             ]
           }
 
-          if (!focusAreaConfigs[selector].items) {
-            focusAreaConfigs[selector].items = [
-              genResizer()
-            ]
-          } else {
-            focusAreaConfigs[selector].items.push(genResizer())
+          if (key === ":root") {
+            if (!focusAreaConfigs[selector].items) {
+              focusAreaConfigs[selector].items = [
+                genResizer()
+              ]
+            } else {
+              focusAreaConfigs[selector].items.push(genResizer())
+            }
+  
+            focusAreaConfigs[selector].style.push(genResizer())
           }
-
-          focusAreaConfigs[selector].style.push(genResizer())
         })
       }
 
