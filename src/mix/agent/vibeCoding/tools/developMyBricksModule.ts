@@ -15,7 +15,7 @@ export default function developMyBricksModule(config: Config) {
   return {
     name: NAME,
     displayName: "编写组件",
-    description: `根据用户需求，以及类库选型，编写代码开发MyBricks模块。
+    description: `根据用户需求，以及类库知识，一次性编写/修改模块中的所有代码，开发MyBricks模块。
 参数：包含mode参数
   - mode，可选择的值有还原和生成两大类，具体是 generate、restore 两种：
     - generate：生成模式，常用语根据自然语言描述生成代码的场景；
@@ -23,11 +23,11 @@ export default function developMyBricksModule(config: Config) {
 
 工具分类：操作执行类；
 
-作用：编写代码开发MyBricks模块；
+作用：编写/修改模块中的所有代码，开发MyBricks模块；
 
 前置：开发前考虑是否需要查看现有代码。
 
-!IMPORTANT: 所有文件的修改都必须使用该工具；
+!IMPORTANT: 所有文件的修改都必须使用该工具，一次调用即可完成修改；
 `,
     getPrompts: () => {
 const { enabledBatch } = config;
