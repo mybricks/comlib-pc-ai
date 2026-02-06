@@ -16,12 +16,14 @@ export default function developMyBricksModule(config: Config) {
     name: NAME,
     displayName: "编写组件",
     description: `根据用户需求，以及类库选型，编写代码开发MyBricks模块。
-参数(mode)：模式，可选择的值有还原和生成两大类，具体是 generate、restore 两种：
-  其中：
+参数：包含mode参数
+  - mode，可选择的值有还原和生成两大类，具体是 generate、restore 两种：
     - generate：生成模式，常用语根据自然语言描述生成代码的场景；
     - restore：还原模式，从图片/设计稿/原型文件等各类附件中还原需求，常用于生成时严格还原设计稿的场景；
+
 工具分类：操作执行类；
-作用：根据用户需求，编写代码开发MyBricks模块；
+
+作用：编写代码开发MyBricks模块；
 
 注意：建议开发前查询下是否有需要的类库信息；
 
