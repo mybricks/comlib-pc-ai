@@ -3,6 +3,7 @@ developMyBricksModule.toolName = NAME
 
 interface Config {
   execute: (params: any) => void;
+  onOpenCodes: () => void;
   enabledBatch?: boolean;
   hasAttachments?: boolean;
 }
@@ -950,9 +951,14 @@ if (enabledBatch) {
       config.execute(params);
       return "编写完成"
     },
-    aiRole: ({ params }) => {
+    aiRole: ({ params, hasAttachments }) => {
       const mode = params?.mode ?? 'generate';
-      return mode === 'generate' ? 'junior' : 'architect'
+      return (mode === 'generate' && !hasAttachments) ? 'junior' : 'architect'
     },
+    hooks: {
+      before: () => {
+        config.onOpenCodes?.()
+      }
+    }
   };
 }

@@ -147,6 +147,9 @@ Selector: ${focus.focusArea.selector}
           developMyBricksModule({
             enabledBatch: true,
             hasAttachments,
+            onOpenCodes: () => {
+              workspace.openModuleCodes()
+            },
             execute(p) {
               // 兼容旧的调用方式
               if (params.onDevelopModule) {
@@ -193,6 +196,9 @@ ${text}
             }),
             developMyBricksModule({
               hasAttachments,
+              onOpenCodes: () => {
+                workspace.openModuleCodes()
+              },
               execute(p) {
                 // 默认模式：直接更新组件文件
                 console.log("[@开发模块 - execute]", p);
