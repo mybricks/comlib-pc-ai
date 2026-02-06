@@ -2,7 +2,7 @@ import React from 'react';
 import LowcodeView from "./lowcodeView";
 import lowcodeViewCss from "./lowcodeView/index.lazy.less";
 import context from "./context";
-import { ANTD_KNOWLEDGES_MAP } from "./knowledges";
+import { ANTD_KNOWLEDGES_MAP, ANTD_ICONS_KNOWLEDGES_MAP } from "./knowledges";
 import { parseLess, stringifyLess } from "./utils/transform/less";
 import { deepClone } from "./utils/normal";
 import { MYBRICKS_KNOWLEDGES_MAP, HTML_KNOWLEDGES_MAP } from "./context/constants";
@@ -146,9 +146,11 @@ export default function (props: Props) {
         knowledge = MYBRICKS_KNOWLEDGES_MAP[component.toUpperCase()];
       } else if (source === "html") {
         knowledge = HTML_KNOWLEDGES_MAP[component.toUpperCase()];
+      } else if (source === "@ant-design/icons") {
+        knowledge = ANTD_ICONS_KNOWLEDGES_MAP[component.toUpperCase()];
       }
 
-      if (isLowCodeMode && knowledge?.editors) {
+      if (knowledge?.editors) {
         Object.keys(knowledge.editors).forEach((key) => {
           const editor = knowledge.editors[key];
           const cn = `.${className[0]}`;
@@ -159,13 +161,48 @@ export default function (props: Props) {
               items: [],
               style: [
                 {
-                  items: []
+                  items: [
+                    {
+                      title: '样式',
+                      autoOptions: true,
+                    }
+                  ]
                 }
               ]
             }
+          } else {
+            focusAreaConfigs[selector].style = [
+              {
+                items: [
+                  {
+                    title: '样式',
+                    autoOptions: true,
+                  }
+                ]
+              }
+            ]
           }
         })
       }
+
+      // if (isLowCodeMode && knowledge?.editors) {
+      //   Object.keys(knowledge.editors).forEach((key) => {
+      //     const editor = knowledge.editors[key];
+      //     const cn = `.${className[0]}`;
+      //     const selector = key === ":root" ? cn : `${cn} ${key}`;
+      //     if (!focusAreaConfigs[selector]) {
+      //       focusAreaConfigs[selector] = {
+      //         title: editor.title || cn,
+      //         items: [],
+      //         style: [
+      //           {
+      //             items: []
+      //           }
+      //         ]
+      //       }
+      //     }
+      //   })
+      // }
     })
   }
 

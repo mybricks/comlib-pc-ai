@@ -33,3 +33,24 @@ export const DNDKIT_KNOWLEDGES_MAP: Record<string, string> = (function () {
     return modules
   }, {})
 })()
+
+export const ANTD_ICONS_KNOWLEDGES_MAP = new Proxy({}, {
+  get() {
+    return {
+      editors: {
+        ":root": {
+          style: [
+            {
+              items: [
+                {
+                  title: '样式',
+                  options: ['font']
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
+})
