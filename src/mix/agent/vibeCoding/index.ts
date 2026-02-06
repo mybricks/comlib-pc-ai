@@ -74,8 +74,8 @@ export default function ({ context }) {
       console.log("[@request - focus]", focus);
       console.log("[aiComParams]", aiComParams);
 
-      // 判断是否为开发模式（被上级agent调用）
-      const isDevelopMode = params.mode === 'develop';
+      // 判断是否作为工具被调用（被上级agent调用）
+      const asSubAgentTool = !!params.asTool;
 
       params?.onProgress?.("start");
 
@@ -137,8 +137,8 @@ Selector: ${focus.focusArea.selector}
           },
         };
 
-        // 开发模式，直接被上级agent调用
-        const developModeConfig = {
+        // asTool模式，直接被上级agent调用
+        const AsToolModeConfig = {
         ...baseConfig,
         planList: [`${developMyBricksModule.toolName} -mode restore`],
         tools: [
@@ -172,8 +172,8 @@ ${text}
         },
         };
 
-        // 默认模式配置
-        const defaultModeConfig = {
+        // agent模式配置
+        const AgentModeConfig = {
           ...baseConfig,
           tools: [
             // classLibrarySelection({
@@ -208,7 +208,7 @@ ${text}
           },
         };
 
-        const config = isDevelopMode ? developModeConfig : defaultModeConfig;
+        const config = asSubAgentTool ? AsToolModeConfig : AgentModeConfig;
         rxai.requestAI(config);
       });
     }
