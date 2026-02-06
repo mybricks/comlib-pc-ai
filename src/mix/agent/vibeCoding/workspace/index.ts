@@ -300,6 +300,7 @@ export class Workspace {
         await this.knowledgeBase.openFile(`component-code/${fileName}`);
       });
     } catch (error) {
+      console.error('[Workspace.openModuleCodes] 打开模块代码失败:', error);
     }
   }
 

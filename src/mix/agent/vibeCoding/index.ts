@@ -106,6 +106,8 @@ Selector: ${focus.focusArea.selector}
         libraryDocs: [] // 备用的类库文档（可选）
       });
 
+      const hasAttachments = Array.isArray(params.attachments) && params.attachments?.length > 0;
+
       return new Promise((resolve, reject) => {
         // 基础配置（放在 Promise 内，以便 emits 能正确使用 resolve/reject）
         const baseConfig = {
@@ -144,6 +146,7 @@ Selector: ${focus.focusArea.selector}
         tools: [
           developMyBricksModule({
             enabledBatch: true,
+            hasAttachments,
             execute(p) {
               // 兼容旧的调用方式
               if (params.onDevelopModule) {
@@ -189,6 +192,7 @@ ${text}
               }
             }),
             developMyBricksModule({
+              hasAttachments,
               execute(p) {
                 // 默认模式：直接更新组件文件
                 console.log("[@开发模块 - execute]", p);

@@ -4,7 +4,13 @@ developMyBricksModule.toolName = NAME
 interface Config {
   execute: (params: any) => void;
   enabledBatch?: boolean;
+  hasAttachments?: boolean;
 }
+
+// 参数：包含mode参数
+//   - mode，可选择的值有还原和生成两大类，具体是 generate、restore 两种：
+//     - generate：生成模式，常用于仅根据自然语言描述生成/修改代码的场景，如果需要参考附件，还是选用restore模式；
+//     - restore：还原模式，从图片/设计稿/原型文件等各类附件中还原需求，常用于还原设计稿进行生产、根据图片进行修改等等场景；
 
 export default function developMyBricksModule(config: Config) {
   // const {langs,prompts} = comSystemPrompts
@@ -16,18 +22,15 @@ export default function developMyBricksModule(config: Config) {
     name: NAME,
     displayName: "编写组件",
     description: `根据用户需求，以及类库知识，一次性编写/修改模块中的所有代码，开发MyBricks模块。
-参数：包含mode参数
-  - mode，可选择的值有还原和生成两大类，具体是 generate、restore 两种：
-    - generate：生成模式，常用语根据自然语言描述生成代码的场景；
-    - restore：还原模式，从图片/设计稿/原型文件等各类附件中还原需求，常用于生成时严格还原设计稿的场景；
+参数：无
 
 工具分类：操作执行类；
 
 作用：编写/修改模块中的所有代码，开发MyBricks模块；
 
-前置：开发前考虑是否需要查看现有代码。
+前置：做任何修改前，必须先查看现有代码的情况。
 
-!IMPORTANT: 所有文件的修改都必须使用该工具，一次调用即可完成修改；
+!IMPORTANT: 所有涉及模块代码的生成/修改都必须使用该工具，一次调用即可完成修改；
 `,
     getPrompts: () => {
 const { enabledBatch } = config;
