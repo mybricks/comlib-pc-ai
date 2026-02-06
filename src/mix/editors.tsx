@@ -324,8 +324,6 @@ export default function (props: Props) {
   // }
 
   context.setAiComParams(props.id, props);
-  console.log("[@runtimeJsxConstituency]", data.runtimeJsxConstituency)
-  console.log("[@focusAreaConfigs]", focusAreaConfigs)
 
   return {
     ...focusAreaConfigs,
