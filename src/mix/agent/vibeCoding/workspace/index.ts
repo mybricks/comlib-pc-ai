@@ -268,11 +268,7 @@ export class Workspace {
     }
   }
 
-  /**
-   * 默认打开组件代码文件
-   * 优先打开必需文件，然后打开其他有内容的文件
-   */
-  private async openDefaultFiles() {
+  openModuleCodes() {
     try {
       const { aiComParams } = this.config;
       const data = aiComParams?.data || {};
@@ -305,7 +301,13 @@ export class Workspace {
       });
     } catch (error) {
     }
+  }
 
+  /**
+   * 默认打开类库文档
+   * 优先打开必需文件，然后打开其他有内容的文件
+   */
+  private async openDefaultFiles() {
     try {
       await this.openLibraryDoc(['antd', '@ant-design/icons', 'dayjs'])
     } catch (error) {

@@ -25,9 +25,9 @@ export default function developMyBricksModule(config: Config) {
 
 作用：编写代码开发MyBricks模块；
 
-注意：建议开发前查询下是否有需要的类库信息；
+前置：开发前考虑是否需要查看现有代码。
 
-所有文件的修改都必须使用该工具；
+!IMPORTANT: 所有文件的修改都必须使用该工具；
 `,
     getPrompts: () => {
 const { enabledBatch } = config;

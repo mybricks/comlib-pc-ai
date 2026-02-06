@@ -1,5 +1,6 @@
 import classLibrarySelection from "./tools/loadExtraComponentDocs"
 import developMyBricksModule from "./tools/developMyBricksModule";
+import readModuleCode from "./tools/read-module-code";
 import answer from "./tools/answer";
 import { createWorkspace } from "./workspace";
 
@@ -78,7 +79,6 @@ export default function ({ context }) {
       const asSubAgentTool = !!params.asTool;
 
       params?.onProgress?.("start");
-
 
       const { focusArea } = aiComParams;
 
@@ -183,6 +183,11 @@ ${text}
             //     workspace.openLibraryDoc(libs)
             //   }
             // }),
+            readModuleCode({
+              onOpenCodes: () => {
+                workspace.openModuleCodes()
+              }
+            }),
             developMyBricksModule({
               execute(p) {
                 // 默认模式：直接更新组件文件
