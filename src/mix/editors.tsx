@@ -62,6 +62,39 @@ const genStyleValue = (params) => {
   }
 }
 
+const genResizer = () => {
+  let cssObj = {};
+  let cssObjKey = ""
+
+  return  {
+    type: '_resizer',
+    value: {
+      get() {
+        console.log("[@_resizer -get]");
+      },
+      set(params, value, status) {
+        if (status.state === 'start') {
+          let { cn } = JSON.parse(params.focusArea.dataset.loc);
+          if (typeof cn === 'string') {
+            // [TODO] 兼容，后续去除
+            cn = [cn]
+          }
+          cn = cn[0]
+          const aiComParams = context.getAiComParams(params.id);
+          cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
+          cssObjKey = `.${cn}`;
+        } else if (status.state === 'ing') {
+          Object.entries(value).forEach(([key, value]) => {
+            cssObj[cssObjKey][key] = `${value}px`;
+          })
+          const cssStr = stringifyLess(cssObj);
+          context.updateFile(params.id, { fileName: 'style.less', content: cssStr })
+        }
+      }
+    }
+  }
+}
+
 export default function (props: Props) {
   if (!props?.data) {
     return {};
@@ -188,6 +221,16 @@ export default function (props: Props) {
               }
             ]
           }
+
+          if (!focusAreaConfigs[selector].items) {
+            focusAreaConfigs[selector].items = [
+              genResizer()
+            ]
+          } else {
+            focusAreaConfigs[selector].items.push(genResizer())
+          }
+
+          focusAreaConfigs[selector].style.push(genResizer())
         })
       }
 
