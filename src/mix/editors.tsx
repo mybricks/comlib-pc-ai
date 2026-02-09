@@ -40,6 +40,62 @@ interface Props {
   focusArea: any;
 }
 
+const genStyleValue = (params) => {
+  const { comId } = params;
+  return {
+    set(params, value) {
+      const aiComParams = context.getAiComParams(comId);
+      const cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
+      const selector = params.selector;
+  
+      if (!cssObj[selector]) {
+        cssObj[selector] = {};
+      }
+  
+      Object.entries(value).forEach(([key, value]) => {
+        cssObj[selector][key] = value;
+      })
+  
+      const cssStr = stringifyLess(cssObj);
+      context.updateFile(comId, { fileName: 'style.less', content: cssStr })
+    }
+  }
+}
+
+const genResizer = () => {
+  let cssObj = {};
+  let cssObjKey = ""
+
+  return  {
+    type: '_resizer',
+    value: {
+      get() {
+        console.log("[@_resizer -get]");
+      },
+      set(params, value, status) {
+        if (status.state === 'start') {
+          let { cn } = JSON.parse(params.focusArea.dataset.loc);
+          if (typeof cn === 'string') {
+            // [TODO] 兼容，后续去除
+            cn = [cn]
+          }
+          cn = cn[0]
+          const aiComParams = context.getAiComParams(params.id);
+          cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
+          const className = `.${cn}`;
+          cssObjKey = Object.keys(cssObj).find(key => key.endsWith(className)) || className;
+        } else if (status.state === 'ing') {
+          Object.entries(value).forEach(([key, value]) => {
+            cssObj[cssObjKey][key] = `${value}px`;
+          })
+          const cssStr = stringifyLess(cssObj);
+          context.updateFile(params.id, { fileName: 'style.less', content: cssStr })
+        }
+      }
+    }
+  }
+}
+
 export default function (props: Props) {
   if (!props?.data) {
     return {};
@@ -72,25 +128,7 @@ export default function (props: Props) {
 
       value.style?.forEach((style) => {
         style.items?.forEach((item) => {
-          item.valueProxy = {
-            set(params, value) {
-              const comId = props.model?.runtime?.id || props.id;
-              const aiComParams = context.getAiComParams(comId);
-              const cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
-              const selector = params.selector;
-
-              if (!cssObj[selector]) {
-                cssObj[selector] = {};
-              }
-
-              Object.entries(value).forEach(([key, value]) => {
-                cssObj[selector][key] = value;
-              })
-
-              const cssStr = stringifyLess(cssObj);
-              context.updateFile(comId, { fileName: 'style.less', content: cssStr })
-            }
-          }
+          item.valueProxy = genStyleValue({ comId: props.model?.runtime?.id || props.id });
         })
       })
 
@@ -165,6 +203,7 @@ export default function (props: Props) {
                     {
                       title: '样式',
                       autoOptions: true,
+                      valueProxy: genStyleValue({ comId: props.model?.runtime?.id || props.id })
                     }
                   ]
                 }
@@ -177,10 +216,23 @@ export default function (props: Props) {
                   {
                     title: '样式',
                     autoOptions: true,
+                    valueProxy: genStyleValue({ comId: props.model?.runtime?.id || props.id })
                   }
                 ]
               }
             ]
+          }
+
+          if (key === ":root") {
+            if (!focusAreaConfigs[selector].items) {
+              focusAreaConfigs[selector].items = [
+                genResizer()
+              ]
+            } else {
+              focusAreaConfigs[selector].items.push(genResizer())
+            }
+  
+            focusAreaConfigs[selector].style.push(genResizer())
           }
         })
       }

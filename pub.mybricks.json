@@ -4,6 +4,7 @@
   "commitInfo": "init",
   "comAry": [
     "./src/mix/com.json",
+    "./src/mixjs/com.json",
     {
       "title": "组件库",
       "visible": false,
