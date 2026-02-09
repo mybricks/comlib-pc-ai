@@ -82,7 +82,8 @@ const genResizer = () => {
           cn = cn[0]
           const aiComParams = context.getAiComParams(params.id);
           cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
-          cssObjKey = `.${cn}`;
+          const className = `.${cn}`;
+          cssObjKey = Object.keys(cssObj).find(key => key.endsWith(className)) || className;
         } else if (status.state === 'ing') {
           Object.entries(value).forEach(([key, value]) => {
             cssObj[cssObjKey][key] = `${value}px`;
