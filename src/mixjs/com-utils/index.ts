@@ -27,12 +27,12 @@ export function runJs(scriptText: string | any, model?: any[], props?: Props) {
     env.extractFns[scriptText](...model)
     return
   }
-  if (typeof scriptText === 'object' && scriptText !== null) {
-    scriptText = scriptText?.transformCode ?? scriptText?.code;
-  }
-  if (!scriptText?.includes('var%20_RTFN_')) {
-    scriptText = transform(scriptText)
-  }
+  // if (typeof scriptText === 'object' && scriptText !== null) {
+  //   scriptText = scriptText?.transformCode ?? scriptText?.code;
+  // }
+  // if (!scriptText?.includes('var%20_RTFN_')) {
+  //   scriptText = transform(scriptText)
+  // }
   let fn: { run: Function }, sandbox: Sandbox;
   if (model && model.length) {
     sandbox = new Sandbox({ module: true });
@@ -60,13 +60,20 @@ export const transform = (scriptText: string): string => {
     if (!window.Babel) {
       throw Error('Babel was not found in window');
     }
-    let { code } = window.Babel.transform(`_RTFN_ = ${scriptText} `, {
-      presets: ['env', 'typescript'],
-      parserOpts: { strictMode: false },
-      comments: false,
-      filename: 'types.d.ts',
+    let { code } = window.Babel.transform(scriptText, {
+      presets: [
+        [
+          "env",
+          {
+            "modules": "commonjs"//umd->commonjs
+          }
+        ],
+      ],
+      plugins: [
+        ['proposal-decorators', {legacy: true}],
+        'proposal-class-properties',
+      ]
     })
-    code = `(function() { var _RTFN_; \n${code}\n return _RTFN_; })()`
     return safeEncoder(code);
   } catch (error) {
     console.error(error)

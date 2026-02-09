@@ -1,3 +1,14 @@
+import * as antd from "antd";
+import dayjs from "dayjs";
+
+const dependencies = {
+  antd,
+  dayjs
+}
+const runRequire = (packageName) => {
+  return dependencies[packageName]
+}
+
 const rawWindowInterval = window.setInterval
 const rawWindowClearInterval = window.clearInterval
 const rawWindowTimeout = window.setTimeout
@@ -73,11 +84,11 @@ function removeSemicolon(text: string):string {
   return text
 }
 function getModuleScript(scriptText: string) {
-  scriptText = removeSemicolon(scriptText)
   return `(
-                function(window, params, cb) {
+                function(exports, require, window, params) {
+                    ${scriptText}
                     with(window) {
-                        return (${scriptText})(...params, cb)
+                        return exports.default(params)
                     }
                 }
             )`
@@ -203,7 +214,7 @@ class Sandbox {
       has: (target, key) => {
         // @ts-ignore
         if (this.options.module) {   //参数允许逃逸到函数局部变量
-          if (key === 'params' || key === 'cb') {
+          if (key === 'params' || key === 'cb' || key === 'exports' || key === 'require') {
             return false;
           }
         }
@@ -270,7 +281,7 @@ class Sandbox {
       scriptTextWithSandbox = getScript(scriptText);
     }
 
-    const fn = originWindow.eval(`${scriptTextWithSandbox};//@ sourceURL=sandbox-code.js`);
+    const fn = originWindow.eval(`${scriptTextWithSandbox.replace('"use strict";', "")};//@ sourceURL=sandbox-code.js`);
 
     return {
       // @ts-ignore
@@ -278,7 +289,7 @@ class Sandbox {
         try {
           if (isModule) {
             // @ts-ignore
-            return fn(window.proxy, model, cb);
+            return fn({}, runRequire, window.proxy, model[0]);
           } else {
             // @ts-ignore
             return fn(window.proxy);
