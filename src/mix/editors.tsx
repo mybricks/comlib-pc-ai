@@ -6,6 +6,7 @@ import { ANTD_KNOWLEDGES_MAP, ANTD_ICONS_KNOWLEDGES_MAP } from "./knowledges";
 import { parseLess, stringifyLess } from "./utils/transform/less";
 import { deepClone } from "./utils/normal";
 import { MYBRICKS_KNOWLEDGES_MAP, HTML_KNOWLEDGES_MAP } from "./context/constants";
+import "../utils/antd";
 
 function evalConfigJsCompiled(code: string) {
   const evalStr = `

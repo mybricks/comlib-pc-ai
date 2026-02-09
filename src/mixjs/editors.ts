@@ -1,6 +1,7 @@
 import { CODE_TEMPLATE, COMMENTS, Data, IMMEDIATE_CODE_TEMPLATE } from './constants';
 import { setInputSchema, genLibTypes, getIoOrder } from './util';
 import { transform } from './com-utils';
+import "../utils/antd";
 
 export default {
   '@init': ({ data, setAutoRun, isAutoRun, output }: EditorResult<Data>) => {
