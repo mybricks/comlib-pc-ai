@@ -22,6 +22,7 @@ interface ToReactParams {
     _jsxErr?: string;
   };
   style?: ToReactStyleInput;
+  events?: any;
 }
 
 interface FileItem {
@@ -111,7 +112,7 @@ function decodeConfig(configStr?: string): any {
   }
 }
 
-export default function toReact({ id, title, data, style }: ToReactParams): ToReactResult {
+export default function toReact({ id, title, data, style, events }: ToReactParams): ToReactResult {
   const files: FileItem[] = [];
 
   // 所有文件内容统一 decode
@@ -187,8 +188,10 @@ ${titleComment}export default forwardRef(function (props, ref) {
       console.error('Failed to parse modelConfig:', e);
     }
   }
-  
-  const jsx = `<${componentName} ${propsArray.join(' ')} />`;
+
+  const jsx = `<${componentName} ref={${id}Ref} ${propsArray.join(' ')} ${componentConfig.outputs?.length ? componentConfig.outputs.reduce((pre, output) => {
+    return pre + events[output.id]
+  }, "") : ""}/>`;
 
   return {
     jsx,
