@@ -378,6 +378,8 @@ export default function (props: Props) {
 
   context.setAiComParams(props.id, props);
 
+  context.createVibeCodingAgent({ register: window._registerAgent_ })
+
   return {
     ...focusAreaConfigs,
     /** 可调整宽高 */
@@ -388,7 +390,6 @@ export default function (props: Props) {
     '@lowcode':{
       render(params, plugins){
         context.plugins = plugins;
-        context.createVibeCodingAgent({ register: plugins.aiService.registerAgent })
 
         return (
           <LowcodeView {...params}/>

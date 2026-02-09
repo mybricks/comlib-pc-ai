@@ -105,6 +105,17 @@ export const genAIRuntime = ({title, orgName, examples, dependencies, wrapper}: 
       return document?.querySelector('#_mybricks-geo-webview_')?.shadowRoot || null;
     }, [])
 
+    // 存在需求文档时只展示文档卡片，不展示组件预览
+    if (data.document) {
+      return (
+        <Wrapper env={env} canvasContainer={canvasContainer}>
+          <div className={css.documentCard}>
+            <div className={css.documentContent}>{data.document}</div>
+          </div>
+        </Wrapper>
+      );
+    }
+
     return (
       <Wrapper env={env} canvasContainer={canvasContainer}>
         <AIJsxRuntime

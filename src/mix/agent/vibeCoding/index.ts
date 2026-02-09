@@ -59,6 +59,9 @@ function updateComponentFiles(files: Array<{ fileName: string; content: string }
       context.updateFile(comId, { fileName, content: current })
     }
   });
+
+  // 清空需求文档
+  aiComParams.data.document = '';
 }
 
 export default function ({ context }) {
@@ -80,7 +83,7 @@ export default function ({ context }) {
 
       params?.onProgress?.("start");
 
-      const { focusArea } = aiComParams;
+      const { focusArea } = aiComParams ?? {};
 
       let focusInfo = "";
 

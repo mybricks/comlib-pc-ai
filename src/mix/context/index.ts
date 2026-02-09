@@ -97,7 +97,7 @@ class Context {
         })
 
         if (title) {
-          aiComParams.setTitle(title);
+          aiComParams?.setTitle?.(title);
         }
         break;
       default:
