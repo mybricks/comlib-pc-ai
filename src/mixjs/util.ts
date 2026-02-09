@@ -95,40 +95,6 @@ export function convertObject2Array(input) {
   return result;
 }
 
-export function updateOutputSchema(output, code) {
-  let sourceCode =
-    typeof code === "object" && code !== null
-      ? code.transformCode
-      : transform(code.code || code);
-  const outputs = {};
-  const inputs = {};
-  output.get().forEach(({ id }) => {
-    outputs[id] = (v: any) => {
-      try {
-        const schema = jsonToSchema(v);
-        output.get(id).setSchema(schema);
-      } catch (error) {
-        // output.get(id).setSchema({ type: 'unknown' });
-      }
-    };
-  });
-
-  setTimeout(() => {
-    try {
-      const sandbox = new Sandbox({ module: true })
-      const fn = sandbox.compile(`${decodeURIComponent(sourceCode)}`)
-      const params = {
-        inputValue: void 0,
-        outputs: convertObject2Array(outputs),
-        inputs: convertObject2Array(inputs)
-      }
-      // fn.run([params], () => { }); // 在失去焦点时不运行 js 代码，避免在编辑器中运行死循环代码等
-    } catch (error) {
-      console.error(error)
-    }
-  })
-}
-
 export const setInputSchema = (pinId: string, schema, data: Data, input) => {
   if (!data.inputSchema) {
     data.inputSchema = {};

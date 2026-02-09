@@ -1,5 +1,6 @@
 import { CODE_TEMPLATE, COMMENTS, Data, IMMEDIATE_CODE_TEMPLATE } from './constants';
-import { setInputSchema, genLibTypes, updateOutputSchema, getIoOrder } from './util';
+import { setInputSchema, genLibTypes, getIoOrder } from './util';
+import { transform } from './com-utils';
 
 export default {
   '@init': ({ data, setAutoRun, isAutoRun, output }: EditorResult<Data>) => {
@@ -10,10 +11,12 @@ export default {
       output.get('output0').setSchema({ type: 'number' });
       data.extraLib = `declare interface IO {outputs: Array<Function>}`
     }
-    data.fns = data.fns || (data.runImmediate ? IMMEDIATE_CODE_TEMPLATE : CODE_TEMPLATE);
+
+    data.sourceCode = data.sourceCode || (data.runImmediate ? IMMEDIATE_CODE_TEMPLATE : CODE_TEMPLATE);
+    data.compiledCode = transform(data.sourceCode);
   },
   async '@inputConnected'({ data, output, input }: EditorResult<Data>, fromPin, toPin) {
-    if (data.fns === CODE_TEMPLATE) {
+    if (data.sourceCode === CODE_TEMPLATE) {
       output.get('output0').setSchema({ type: 'unknown' });
     }
     const schemaList = setInputSchema(toPin.id, fromPin.schema, data, input)
@@ -79,7 +82,6 @@ export default {
       type: 'code',
       options: ({ data, output }) => {
         const option = {
-          babel: true,
           comments: COMMENTS,
           theme: 'light',
           minimap: {
@@ -94,10 +96,7 @@ export default {
           },
           autoSave: false,
           extraLib: data.extraLib,
-          language: 'typescript',
-          onBlur: () => {
-            updateOutputSchema(output, data.fns);
-          }
+          language: 'javascript',
         };
         return option;
       },
@@ -105,11 +104,12 @@ export default {
       description: "编写自定义 JavaScript 代码，请确保代码中实际使用的输入项数量、输出项数量，与已配置/添加的输入项、输出项数量完全匹配。",
       value: {
         get({ data }: EditorResult<Data>) {
-          return data.fns;
+          return data.sourceCode;
         },
-        set({ data }: EditorResult<Data>, fns: any) {
-          if (fns === '') return;
-          data.fns = fns;
+        set({ data }: EditorResult<Data>, sourceCode: any) {
+          if (sourceCode === '') return;
+          data.sourceCode = sourceCode;
+          data.compiledCode = transform(sourceCode);
         }
       }
     }

@@ -10,7 +10,7 @@ if (!window[WindowKey]) {
 
 export default function ({ id, _id, env, data, inputs, outputs, logger, onError, ...other }: RuntimeParams<Data>) {
   const isRuntime = _id && env.runtime && !env.runtime.debug;
-  const { fns, runImmediate } = data;
+  const { compiledCode, runImmediate } = data;
 
   const runJSParams = {
     outputs: convertObject2Array(outputs)
@@ -21,14 +21,13 @@ export default function ({ id, _id, env, data, inputs, outputs, logger, onError,
   try {
     if (runImmediate) {
       if (env.runtime) {
-        // sandbox = runJs(fns, [runJSParams], { env });
         if (isRuntime && window[WindowKey][_id]) {
           window[WindowKey][_id].run([{
             ...runJSParams,
             logger
           }])
         } else {
-          const result = runJs(fns, [{
+          const result = runJs(compiledCode, [{
             ...runJSParams,
             logger
           }], { env });
@@ -43,13 +42,6 @@ export default function ({ id, _id, env, data, inputs, outputs, logger, onError,
     }
     inputs['input']((val) => {
       try {
-        // sandbox = runJs(fns, [
-        //   {
-        //     ...runJSParams,
-        //     inputs: convertObject2Array(val)
-        //   }
-        // ], { env });
-
         if (isRuntime && window[WindowKey][_id]) {
           window[WindowKey][_id].run([
             {
@@ -59,7 +51,7 @@ export default function ({ id, _id, env, data, inputs, outputs, logger, onError,
             }
           ])
         } else {
-          const result = runJs(fns, [
+          const result = runJs(compiledCode, [
             {
               ...runJSParams,
               inputs: convertObject2Array(val),

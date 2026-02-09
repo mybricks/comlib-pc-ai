@@ -43,6 +43,7 @@ interface Env {
   [x: string]: any
 }
 interface RuntimeParams<T> {
+  _id: string
   /** 组件ID **/
   id: string
   name: string
