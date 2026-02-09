@@ -112,7 +112,6 @@ function decodeConfig(configStr?: string): any {
 }
 
 export default function toReact({ id, title, data, style }: ToReactParams): ToReactResult {
-  const componentName = generateComponentName(id);
   const files: FileItem[] = [];
 
   // 所有文件内容统一 decode
@@ -120,6 +119,8 @@ export default function toReact({ id, title, data, style }: ToReactParams): ToRe
   const styleSourceDecoded = safeDecode(data.styleSource || data.styleCompiled || '') || '';
   const configJsSourceRaw = safeDecode(data.configJsSource || '');
   const modelConfigRaw = safeDecode(data.modelConfig || '');
+  const componentConfig = decodeConfig(data.componentConfig || '{}') || {};
+  const componentName = componentConfig.name || generateComponentName(id)
 
   // 1. 处理组件主文件 (index.tsx)
   // 第一步：替换 export default 为内部函数
