@@ -1,11 +1,108 @@
 const NAME = 'developMyBricksModule'
 developMyBricksModule.toolName = NAME
 
+/** 工具 execute/stream 所需的文件（与 type.d.ts 一致） */
+interface RxFile {
+  fileName: string;
+  name: string;
+  extension: string;
+  language: string;
+  content: string;
+  isComplete: boolean;
+}
+
+type RxFiles = Record<string, RxFile | RxFile[]>;
+
+export type ComponentFileItem = { fileName: string; content: string; isComplete?: boolean };
+
 interface Config {
-  execute: (params: any) => void;
   onOpenCodes: () => void;
   enabledBatch?: boolean;
   hasAttachments?: boolean;
+  /** 批量时：按文件维度回调，stream 中 isComplete 时调用 */
+  onComponentUpdate?: (comId: string, fileName: string, content: string) => void;
+  /** 非批量时：execute 时一次性传入完整 files，由 host 直接调 updateComponentFiles(files, comId, context) */
+  execute?: (params: { files: Array<{ fileName: string; content: string }> }) => void;
+  /** 批量时解析 fileName 用；非批量不传 */
+  focusComId?: string;
+}
+
+type NormalizedFileItem = { fileName: string; content: string; isComplete: boolean };
+
+/** 将 files 统一为 Array<{ fileName, content, isComplete }>，兼容 array 与 RxFiles */
+function normalizeFiles(files: Array<ComponentFileItem | NormalizedFileItem> | RxFiles | undefined): NormalizedFileItem[] {
+  if (!files) return [];
+  if (Array.isArray(files)) {
+    return files
+      .map((f) => ({
+        fileName: f.fileName ?? '',
+        content: f.content ?? '',
+        isComplete: (f as NormalizedFileItem).isComplete ?? false,
+      }))
+      .filter((f) => f.fileName);
+  }
+  const list: NormalizedFileItem[] = [];
+  Object.entries(files).forEach(([key, fileOrArr]) => {
+    const arr = Array.isArray(fileOrArr) ? fileOrArr : [fileOrArr];
+    arr.forEach((f) => {
+      const file = f as RxFile;
+      const fileName = file.fileName ?? key;
+      if (fileName) {
+        list.push({
+          fileName,
+          content: file.content ?? '',
+          isComplete: file.isComplete ?? false,
+        });
+      }
+    });
+  });
+  return list;
+}
+
+/** 批量时从 fileName 解析出 comId 和基础文件名，如 model@uuid.json -> { comId: uuid, baseFileName: model.json } */
+function parseBatchFileName(fileName: string): { comId: string; baseFileName: string } | null {
+  const match = fileName.match(/^(.+)@([^.]+)(\..+)$/);
+  if (!match) return null;
+  const [, name, uuid, ext] = match;
+  return { comId: uuid!, baseFileName: `${name}${ext}` };
+}
+
+/** 仅对 isComplete 且未重复的 (comId, baseFileName) 调用 onComponentUpdate，并打印调试参数 */
+function applyFilesToOnComponentUpdate(
+  files: NormalizedFileItem[],
+  config: {
+    enabledBatch?: boolean;
+    focusComId?: string;
+    onComponentUpdate: (comId: string, fileName: string, content: string) => void;
+    updatedKeys?: Set<string>;
+  }
+) {
+  const { enabledBatch, focusComId, onComponentUpdate, updatedKeys } = config;
+  const seen = updatedKeys ?? new Set<string>();
+
+  files.forEach(({ fileName, content, isComplete }) => {
+    if (!isComplete) return;
+
+    let comId: string;
+    let baseFileName: string;
+    if (enabledBatch) {
+      const parsed = parseBatchFileName(fileName);
+      if (!parsed) return;
+      comId = parsed.comId;
+      baseFileName = parsed.baseFileName;
+    } else {
+      comId = focusComId ?? '';
+      baseFileName = fileName;
+    }
+    if (!comId) return;
+
+    const key = `${comId}|${baseFileName}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+
+    console.log('[开发模块 - 文件更新]', { comId, fileName: baseFileName, contentLength: content.length, contentPreview: content.slice(0, 80) + (content.length > 80 ? '...' : '') });
+    onComponentUpdate(comId, baseFileName, content);
+  });
 }
 
 // 参数：包含mode参数
@@ -14,10 +111,10 @@ interface Config {
 //     - restore：还原模式，从图片/设计稿/原型文件等各类附件中还原需求，常用于还原设计稿进行生产、根据图片进行修改等等场景；
 
 export default function developMyBricksModule(config: Config) {
-  // const {langs,prompts} = comSystemPrompts
   const langs = "React、Less"
-  // [TODO] 配置的组件文档
   const libTitles = `${langs}、mybricks`
+  /** 本工具实例内已通过 onComponentUpdate 更新过的 (comId|fileName)，避免 stream 多次调用重复更新 */
+  const updatedKeys = new Set<string>()
 
   return {
     name: NAME,
@@ -956,10 +1053,30 @@ if (enabledBatch) {
 </examples>
 `
     },
-    execute(params: any) {
-      config.execute(params);
-      return "编写完成"
-    },
+    ...(config.enabledBatch && config.onComponentUpdate
+      ? {
+          execute(_params: any) {
+            return '编写完成';
+          },
+          stream({ files, replaceContent }: { files?: Array<ComponentFileItem | NormalizedFileItem> | RxFiles; status?: string; replaceContent?: string }) {
+            const list = normalizeFiles(files);
+            applyFilesToOnComponentUpdate(list, {
+              enabledBatch: true,
+              focusComId: config.focusComId,
+              onComponentUpdate: config.onComponentUpdate!,
+              updatedKeys,
+            });
+            return replaceContent ?? '';
+          },
+        }
+      : {
+          execute(params: any) {
+            // 非批量：由 host 提供的 execute 直接调 updateComponentFiles(files, comId, context)
+            const list = normalizeFiles(params?.files).map(({ fileName, content }) => ({ fileName, content }));
+            config.execute?.({ files: list });
+            return '编写完成';
+          },
+        }),
     aiRole: ({ params, hasAttachments }) => {
       const mode = params?.mode ?? 'generate';
       return (mode === 'generate' && !hasAttachments) ? 'junior' : 'architect'

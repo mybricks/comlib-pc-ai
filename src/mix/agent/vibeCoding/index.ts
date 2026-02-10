@@ -4,43 +4,34 @@ import readModuleCode from "./tools/read-module-code";
 import answer from "./tools/answer";
 import { createWorkspace } from "./workspace";
 
+/** 单文件项：fileName + content */
+export type ComponentFileItem = { fileName: string; content: string };
+
 /**
- * 更新组件文件
- * @param files 文件数组，每个文件包含 fileName 和 content
- * @param comId 组件ID
- * @param context 上下文对象，包含 updateFile 和 getAiComParams 方法
+ * 将指定组件的若干源文件（model.json / runtime.jsx / style.less / config.js / com.json）
+ * 写入 context 并同步到组件 data，支持单文件覆盖或多组 before/after 片段替换；最后清空该组件的需求文档。
  */
-function updateComponentFiles(files: Array<{ fileName: string; content: string }>, comId: string, context: any) {
+function updateComponentFiles(files: Array<ComponentFileItem>, comId: string, context: any) {
   const aiComParams = context.getAiComParams(comId);
-  
+
   const fileToDataKey: Array<{ fileName: string; dataKey: string }> = [
-    {
-      fileName: 'model.json', dataKey: 'modelConfig'
-    },
-    {
-      fileName: 'runtime.jsx', dataKey: 'runtimeJsxSource'
-    },
-    {
-      fileName: 'style.less', dataKey: 'styleSource'
-    },
-    {
-      fileName: 'config.js', dataKey: 'configJsSource'
-    },
-    {
-      fileName: 'com.json', dataKey: 'componentConfig'
-    },
+    { fileName: 'model.json', dataKey: 'modelConfig' },
+    { fileName: 'runtime.jsx', dataKey: 'runtimeJsxSource' },
+    { fileName: 'style.less', dataKey: 'styleSource' },
+    { fileName: 'config.js', dataKey: 'configJsSource' },
+    { fileName: 'com.json', dataKey: 'componentConfig' },
   ];
 
   fileToDataKey.forEach(({ fileName, dataKey }) => {
-    const matchedFiles = files.filter((file: any) => file.fileName === fileName);
+    const matchedFiles = files.filter((f) => f.fileName === fileName);
     if (matchedFiles.length === 1) {
-      context.updateFile(comId, { fileName, content: matchedFiles[0].content })
+      context.updateFile(comId, { fileName, content: matchedFiles[0].content });
     } else if (matchedFiles.length > 1) {
       let current = decodeURIComponent(aiComParams.data[dataKey] || '');
-      for (let i = 0; i < matchedFiles.length; i+=2) {
+      for (let i = 0; i < matchedFiles.length; i += 2) {
         const before = matchedFiles[i];
         const after = matchedFiles[i + 1];
-
+        if (!after) continue;
         const index = current.indexOf(before.content);
         if (index === -1) {
           console.error(`[@开发模块 - 文件${fileName}替换失败]`, {
@@ -49,19 +40,26 @@ function updateComponentFiles(files: Array<{ fileName: string; content: string }
             after: after.content,
           });
         }
-
-        if (before.content === "") {
+        if (before.content === '') {
           current = after.content;
         } else {
-          current = current.replace(before.content, after.content)
+          current = current.replace(before.content, after.content);
         }
       }
-      context.updateFile(comId, { fileName, content: current })
+      context.updateFile(comId, { fileName, content: current });
     }
   });
 
-  // 清空需求文档
   aiComParams.data.document = '';
+}
+
+/**
+ * 按文件维度更新：供 agent 按 (comId, fileName, content) 单文件调用，内部汇总后走 updateComponentFiles。
+ */
+function createOnComponentUpdate(context: any) {
+  return function onComponentUpdate(comId: string, fileName: string, content: string) {
+    updateComponentFiles([{ fileName, content }], comId, context);
+  };
 }
 
 export default function ({ context }) {
@@ -142,6 +140,8 @@ Selector: ${focus.focusArea.selector}
           },
         };
 
+        const onComponentUpdate = createOnComponentUpdate(context);
+
         // asTool模式，直接被上级agent调用
         const AsToolModeConfig = {
         ...baseConfig,
@@ -150,15 +150,10 @@ Selector: ${focus.focusArea.selector}
           developMyBricksModule({
             enabledBatch: true,
             hasAttachments,
+            onComponentUpdate,
             onOpenCodes: () => {
               workspace.openModuleCodes()
             },
-            execute(p) {
-              // 兼容旧的调用方式
-              if (params.onDevelopModule) {
-                return params.onDevelopModule(p, (comId, files) => updateComponentFiles(files, comId, context));
-              }
-            }
           }),
           answer()
         ],
@@ -203,12 +198,8 @@ ${text}
                 workspace.openModuleCodes()
               },
               execute(p) {
-                // 默认模式：直接更新组件文件
-                console.log("[@开发模块 - execute]", p);
-                const { files } = p;
-
-                updateComponentFiles(files, focus.comId, context);
-              }
+                updateComponentFiles(p.files ?? [], focus.comId, context);
+              },
             }),
             answer()
           ],
