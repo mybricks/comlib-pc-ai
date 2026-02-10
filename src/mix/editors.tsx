@@ -48,13 +48,14 @@ const genStyleValue = (params) => {
       const aiComParams = context.getAiComParams(comId);
       const cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
       const selector = params.selector;
+      const cssObjKey = Object.keys(cssObj).find(key => key.endsWith(selector)) || selector;
   
-      if (!cssObj[selector]) {
-        cssObj[selector] = {};
+      if (!cssObj[cssObjKey]) {
+        cssObj[cssObjKey] = {};
       }
   
       Object.entries(value).forEach(([key, value]) => {
-        cssObj[selector][key] = value;
+        cssObj[cssObjKey][key] = value;
       })
   
       const cssStr = stringifyLess(cssObj);
@@ -194,32 +195,49 @@ export default function (props: Props) {
           const editor = knowledge.editors[key];
           const cn = `.${className[0]}`;
           const selector = key === ":root" ? cn : `${cn} ${key}`;
+          const items = className.length === 1 ? [
+            {
+              title: '样式',
+              autoOptions: true,
+              valueProxy: genStyleValue({ comId: props.model?.runtime?.id || props.id })
+            }
+          ] : className.map((className) => {
+            const target = key === ":root" ? `.${className}` : `.${className} ${key}`;
+            return {
+              title: "样式",
+              autoOptions: true,
+              valueProxy: genStyleValue({ comId: props.model?.runtime?.id || props.id }),
+              target,
+            }
+          });
           if (!focusAreaConfigs[selector]) {
             focusAreaConfigs[selector] = {
               title: editor.title || cn,
               items: [],
               style: [
                 {
-                  items: [
-                    {
-                      title: '样式',
-                      autoOptions: true,
-                      valueProxy: genStyleValue({ comId: props.model?.runtime?.id || props.id })
-                    }
-                  ]
+                  // items: [
+                  //   {
+                  //     title: '样式',
+                  //     autoOptions: true,
+                  //     valueProxy: genStyleValue({ comId: props.model?.runtime?.id || props.id })
+                  //   }
+                  // ]
+                  items,
                 }
               ]
             }
           } else {
             focusAreaConfigs[selector].style = [
               {
-                items: [
-                  {
-                    title: '样式',
-                    autoOptions: true,
-                    valueProxy: genStyleValue({ comId: props.model?.runtime?.id || props.id })
-                  }
-                ]
+                items,
+                // items: [
+                //   {
+                //     title: '样式',
+                //     autoOptions: true,
+                //     valueProxy: genStyleValue({ comId: props.model?.runtime?.id || props.id })
+                //   }
+                // ]
               }
             ]
           }
