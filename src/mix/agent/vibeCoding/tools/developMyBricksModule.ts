@@ -35,6 +35,8 @@ export default function developMyBricksModule(config: Config) {
 `,
     getPrompts: () => {
 const { enabledBatch } = config;
+/** enabledBatch 时文件名加 @comId，如 model.json -> model@comId.json */
+const fileIdInfix = enabledBatch ? '@comId' : '';
 let definePrompt = ``
 if (enabledBatch) {
   definePrompt = `
@@ -47,7 +49,7 @@ if (enabledBatch) {
 </你的角色与任务>
 
 <返回格式要求>
-按顺序返回每个MyBricks模块的代码，每个模块的文件名和后缀之间添加组件ID，例如 file="model.json" -> file="model@uuid.json"。；
+按顺序返回每个MyBricks模块的代码，每个模块的文件名和后缀之间添加组件ID，例如 file="model${fileIdInfix}.json" -> file="model@uuid.json"。；
 </返回格式要求>`
 } else {
   definePrompt = `
@@ -65,7 +67,7 @@ if (enabledBatch) {
   当前模块的【源代码】由model.json、runtime.jsx、style.less、config.js、com.json 五个文件构成：
   
   1、model.json文件，为当前模块的 model 声明；config.js 中配置项读写的是 model 数据，平台会将配置项对应的值解构后通过 runtime 的 props 传入，runtime 中直接从 props 上读取（如 props.logo），不再使用 data。例如：
-  \`\`\`json file="model.json"
+  \`\`\`json file="model${fileIdInfix}.json"
   {
     "title":"按钮",
     "items":[
@@ -79,7 +81,7 @@ if (enabledBatch) {
   - 返回的结果严格符合JSON结构，不能使用JSX、不要给出任何注释、不要用...等省略符号，如果数据为空，请返回{};
   
  2、runtime.jsx文件，为模块的渲染逻辑，需使用 React.forwardRef 包裹，接收 (props, ref)。props 由平台传入：配置项对应的值（原 config 中 get 的字段）会解构到 props 上，直接从 props 读取（如 props.logo）；输出端口以回调形式传入（如 props.onClick）；插槽若由平台提供则通过 props 传入（如 props.slots）。输入端口通过 useImperativeHandle(ref, () => ({ 方法名: 实现 }), []) 暴露给外部。例如，下面是一个基于 React 与 antd 的模块：
-  \`\`\`jsx file="runtime.jsx"
+  \`\`\`jsx file="runtime${fileIdInfix}.jsx"
     import { forwardRef, useImperativeHandle } from 'react';
     import { Card, Button } from 'antd';
     import css from 'style.less';//style.less为返回的less代码
@@ -121,7 +123,7 @@ if (enabledBatch) {
   - 输入端口（原 inputs）：不再通过 props 接收，改用 React 标准写法 useImperativeHandle(ref, () => ({ 方法名: 实现 }), [])，方法名与 com.json 中 inputs 的 id 一致（如 setTitle），外部通过 ref.current.setTitle(val) 调用。
   
   3、style.less文件，为当前模块的样式代码。**重要**：style.less 在构建后最终不会被做 CSS Module 处理，类名会按原样输出到最终 CSS，因此无需、也不应使用 CSS Module 相关写法。例如：
-  \`\`\`less file="style.less"
+  \`\`\`less file="style${fileIdInfix}.less"
     //style.less文件中的样式代码
   \`\`\`
   
@@ -134,7 +136,7 @@ if (enabledBatch) {
    - 不能使用 @import引入其他的less文件、不要使用less的混合、函数、变量等；
 
   4、config.js文件，模块中所有选区声明及配置项的声明文件。**重要**：对于每个选区的 items（用于编辑 model 数据）和 style（用于配置该选区支持的样式编辑能力），必须严格按需编写，用户需求中未明确提及对应能力时，禁止生成。例如：
-    \`\`\`js file = "config.js"
+    \`\`\`js file = "config${fileIdInfix}.js"
     export default {
       '.logo': {
         title: 'logo',
@@ -171,7 +173,7 @@ if (enabledBatch) {
     - inputs：输入端口声明，对应 runtime 中 useImperativeHandle(ref, () => ({ ... })) 暴露的方法名；
     - outputs：输出端口声明，对应 runtime 的 props 上的回调名（如 onClick）。
   例如：
-    \`\`\`json file="com.json"
+    \`\`\`json file="com${fileIdInfix}.json"
     {
       "title": "按钮",
       "name": "Button",
@@ -498,7 +500,7 @@ if (enabledBatch) {
       - 包括原代码行中所有的空格、缩进、注释、换行符、文档字符串等一切内容;
       - 不允许出现...等省略符号;
         【例如】下述格式是错误的（因为出现了...等省略符号）：
-          \`\`\`before file="model.json"
+          \`\`\`before file="model${fileIdInfix}.json"
           {
             "title": "销售类目占比",
             "stores": [
@@ -511,7 +513,7 @@ if (enabledBatch) {
       - 注意对应before结尾处的情况，例如有,或;等符号作为代码的一部分，after中也需要包含;
       - 不允许出现...等省略符号;
         【例如】下述格式是错误的，因为出现了...等省略符号：
-          \`\`\`after file="model.json"
+          \`\`\`after file="model${fileIdInfix}.json"
           {
             "title": "销售类目占比",
             "selectedStore": "store1",
@@ -552,30 +554,30 @@ if (enabledBatch) {
   <user_query>开发一个按钮</user_query>
   <assistant_response>
   好的，我将为您开发一个按钮。
-  \`\`\`before file="model.json"
+  \`\`\`before file="model${fileIdInfix}.json"
   {}
   \`\`\`
   
-  \`\`\`after file="model.json"
+  \`\`\`after file="model${fileIdInfix}.json"
   {
     "text":"按钮"
   }
   \`\`\`
   
-  \`\`\`before file="style.less"
+  \`\`\`before file="style${fileIdInfix}.less"
   \`\`\`
   
-  \`\`\`after file="style.less"
+  \`\`\`after file="style${fileIdInfix}.less"
   .mainBtn{
     width:100%;
     height:100%;
   }
   \`\`\`
   
-  \`\`\`before file="runtime.jsx"
+  \`\`\`before file="runtime${fileIdInfix}.jsx"
   \`\`\`
   
-  \`\`\`after file="runtime.jsx"
+  \`\`\`after file="runtime${fileIdInfix}.jsx"
   import css from 'style.less';
   import { forwardRef } from 'react';
   import { Button } from 'antd';
@@ -588,11 +590,11 @@ if (enabledBatch) {
   });
   \`\`\`
   
-  \`\`\`before file="com.json"
+  \`\`\`before file="com${fileIdInfix}.json"
   {}
   \`\`\`
   
-  \`\`\`after file="com.json"
+  \`\`\`after file="com${fileIdInfix}.json"
   {
     "title": "按钮",
     "name": "Button",
@@ -607,13 +609,13 @@ if (enabledBatch) {
   <user_query>增加一个变体，用于商品下架状态</user_query>
   <assistant_response>
   好的，我将为当前模块增加一个“商品下架”的变体
-  \`\`\`before file="model.json"
+  \`\`\`before file="model${fileIdInfix}.json"
   {
     "text":"普通商品"
   }
   \`\`\`
   
-  \`\`\`after file="model.json"
+  \`\`\`after file="model${fileIdInfix}.json"
   {
     "text":"普通商品",
     "text1":"下架商品"
@@ -621,14 +623,14 @@ if (enabledBatch) {
   }
   \`\`\`
   
-  \`\`\`before file="style.less"
+  \`\`\`before file="style${fileIdInfix}.less"
   .product{
     width:100%;
     height:100%;
   }
   \`\`\`
   
-  \`\`\`after file="style.less"
+  \`\`\`after file="style${fileIdInfix}.less"
   .product{
     width:100%;
     height:100%;
@@ -641,13 +643,13 @@ if (enabledBatch) {
   }
   \`\`\`
   
-  \`\`\`before file="runtime.jsx"
+  \`\`\`before file="runtime${fileIdInfix}.jsx"
     return (
       <Product onClick={click} className={css.product} image={"https://placehold.co/50x50/orange/ffffff?text=product"}>{data.text}</Button>
     )
   \`\`\`
   
-  \`\`\`after file="runtime.jsx"
+  \`\`\`after file="runtime${fileIdInfix}.jsx"
     const { state, text, text1 } = props;
     if(state==='off'){
       return (
@@ -669,11 +671,11 @@ if (enabledBatch) {
   \`\`\`
   
   
-  \`\`\`before file="config.js"
+  \`\`\`before file="config${fileIdInfix}.js"
   export default {
   \`\`\`
   
-  \`\`\`after file="config.js"
+  \`\`\`after file="config${fileIdInfix}.js"
   export default {
     '@variants':{
         title: '变体',
@@ -699,11 +701,11 @@ if (enabledBatch) {
   <user_query>开发两个按钮构成的工具条</user_query>
   <assistant_response>
   好的，我将为您开发一个工具条，包含两个按钮。
-  \`\`\`before file="model.json"
+  \`\`\`before file="model${fileIdInfix}.json"
   {}
   \`\`\`
   
-  \`\`\`after file="model.json"
+  \`\`\`after file="model${fileIdInfix}.json"
   {
     "btns":[
       {"text":"按钮1"},
@@ -712,10 +714,10 @@ if (enabledBatch) {
   }
   \`\`\`
 
-  \`\`\`before file="style.less"
+  \`\`\`before file="style${fileIdInfix}.less"
   \`\`\`
   
-  \`\`\`after file="style.less"
+  \`\`\`after file="style${fileIdInfix}.less"
   .viewContainer{
     position:relative;
     width:100%;
@@ -726,10 +728,10 @@ if (enabledBatch) {
   }
 \`\`\`
 
-  \`\`\`before file="runtime.jsx"
+  \`\`\`before file="runtime${fileIdInfix}.jsx"
   \`\`\`
 
-  \`\`\`after file="runtime.jsx"
+  \`\`\`after file="runtime${fileIdInfix}.jsx"
   import css from 'style.less';
   import { forwardRef } from 'react';
   import { Button } from 'xy-ui';
@@ -746,11 +748,11 @@ if (enabledBatch) {
   });
   \`\`\`
   
-  \`\`\`before file="com.json"
+  \`\`\`before file="com${fileIdInfix}.json"
   {}
   \`\`\`
   
-  \`\`\`after file="com.json"
+  \`\`\`after file="com${fileIdInfix}.json"
   {
     "title": "工具条",
     "name": "ToolBar",
@@ -765,10 +767,10 @@ if (enabledBatch) {
   <user_query>工具条，按钮由输入端口决定</user_query>
   <assistant_response>
   好的，我将为您开发一个工具条，同时定义一个输入端口，用于给到按钮数据，初始状态有1个按钮
-  \`\`\`before file="style.less"
+  \`\`\`before file="style${fileIdInfix}.less"
   \`\`\`
   
-  \`\`\`after file="style.less"
+  \`\`\`after file="style${fileIdInfix}.less"
   .btnView{
     width:100%;
     height:100%;
@@ -780,11 +782,11 @@ if (enabledBatch) {
   }
   \`\`\`
   
-  \`\`\`before file="model.json"
+  \`\`\`before file="model${fileIdInfix}.json"
   {}
   \`\`\`
   
-  \`\`\`after file="model.json"
+  \`\`\`after file="model${fileIdInfix}.json"
   {
     "btns":[
       {"id":"btn0","text":"按钮1"},
@@ -792,10 +794,10 @@ if (enabledBatch) {
   }
   \`\`\`
   
-  \`\`\`before file="runtime.jsx"
+  \`\`\`before file="runtime${fileIdInfix}.jsx"
   \`\`\`
   
-  \`\`\`after file="runtime.jsx"
+  \`\`\`after file="runtime${fileIdInfix}.jsx"
   import { forwardRef, useImperativeHandle, useCallback, useState } from 'react';
   import css from 'style.less';
   import { Button } from 'xy-ui';
@@ -821,11 +823,11 @@ if (enabledBatch) {
   });
   \`\`\`
   
-  \`\`\`before file="com.json"
+  \`\`\`before file="com${fileIdInfix}.json"
   {}
   \`\`\`
   
-  \`\`\`after file="com.json"
+  \`\`\`after file="com${fileIdInfix}.json"
   {
     "title": "工具条",
     "name": "ToolBar",
@@ -866,13 +868,13 @@ if (enabledBatch) {
   好的，我将为您在logo区域的样式上修改背景色。
   让我来分析【源代码】中的style.less文件并进行修改:
 
-  \`\`\`before file="style.less"
+  \`\`\`before file="style${fileIdInfix}.less"
   .logo{
     background-color:#FF0000;
   }
   \`\`\`
   
-  \`\`\`after file="style.less"
+  \`\`\`after file="style${fileIdInfix}.less"
   .logo{
     background-color:#000;
   }
@@ -887,21 +889,21 @@ if (enabledBatch) {
   好的，接下来我将该区域改为按钮。
   让我来分析【源代码】中的runtime.jsx文件，由于没有加载Button，所以我先加载Button组件。
   
-  \`\`\`before file="runtime.jsx"
+  \`\`\`before file="runtime${fileIdInfix}.jsx"
   import {Div} from 'xy-ui';
   \`\`\`
   
-  \`\`\`after file="runtime.jsx"
+  \`\`\`after file="runtime${fileIdInfix}.jsx"
   import {Div,Button} from 'xy-ui';
   \`\`\`
   
   然后将div改为Button组件
   
-  \`\`\`before file="runtime.jsx" type="before"
+  \`\`\`before file="runtime${fileIdInfix}.jsx" type="before"
   <Div className={css.div}>
   \`\`\`
   
-    \`\`\`after file="runtime.jsx" type="after"
+    \`\`\`after file="runtime${fileIdInfix}.jsx" type="after"
   <Button className={css.div}>
   \`\`\`
   
@@ -915,23 +917,23 @@ if (enabledBatch) {
   好的，接下来我将为该区域添加一个配置项，类型为文本。
   让我来分析【源代码】中的model.json文件，由于没有对应的字段，所以我先添加一个用于衔接config与runtime的model字段。
   
-  \`\`\`before file="model.json"
+  \`\`\`before file="model${fileIdInfix}.json"
   "banner":{
   \`\`\`
   
-  \`\`\`after file="model.json"
+  \`\`\`after file="model${fileIdInfix}.json"
   "banner":{
     "text":"文案"
   \`\`\`
   
   然后在config.js文件中添加一个配置项
   
-  \`\`\`before file="config.js" type="before"
+  \`\`\`before file="config${fileIdInfix}.js" type="before"
   }
     }
   \`\`\`
   
-    \`\`\`after file="config.js" type="after"
+    \`\`\`after file="config${fileIdInfix}.js" type="after"
   }
     }，
     {
