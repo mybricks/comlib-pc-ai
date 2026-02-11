@@ -107,6 +107,8 @@ export default function (props: Props) {
   const focusAreaConfigs: any = {};
   try {
     const configs = evalConfigJsCompiled(decodeURIComponent(data.configJsCompiled));
+    const rawConfig = decodeURIComponent(data.modelConfig);
+    const model = JSON.parse(rawConfig);
 
     Object.entries(configs).forEach(([key, value]: any) => {
       const items: any[] = [];
@@ -115,13 +117,11 @@ export default function (props: Props) {
         items.push({
           ...item,
           value: {
-            get({ data }) {
-              return item.value.get({ data: JSON.parse(decodeURIComponent(data.modelConfig)) });
+            get({ focusArea }) {
+              return item.value.get({ data: model, index: Number(focusArea.dataset.mapIndex) });
             },
-            set({ data }, value) {
-              const rawConfig = decodeURIComponent(data.modelConfig);
-              const model = JSON.parse(rawConfig);
-              item.value.set({ data: model }, value);
+            set({ data, focusArea }, value) {
+              item.value.set({ data: model, index: Number(focusArea.dataset.mapIndex) }, value);
               data.modelConfig = encodeURIComponent(JSON.stringify(model, null, detectJsonIndent(rawConfig)));
             }
           }

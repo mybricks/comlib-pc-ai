@@ -1,4 +1,5 @@
 import * as types from "./types";
+import { getMapCallbackIndexParam } from "./utils";
 
 export default function ({ constituency }) {
   return function () {
@@ -47,21 +48,33 @@ export default function ({ constituency }) {
                 source,
               })
 
-              node.openingElement.attributes.push({
-                type: 'JSXAttribute',
-                name: {
-                  type: 'JSXIdentifier',
-                  name: 'data-cn',
-                },
-                value: {
-                  type: 'StringLiteral',
-                  value: cnList.join(' '),
-                  extra: {
-                    raw: `"${cnList.join(' ')}"`,
-                    rawValue: cnList.join(' ')
-                  }
-                }
-              })
+              // node.openingElement.attributes.push({
+              //   type: 'JSXAttribute',
+              //   name: {
+              //     type: 'JSXIdentifier',
+              //     name: 'data-cn',
+              //   },
+              //   value: {
+              //     type: 'StringLiteral',
+              //     value: cnList.join(' '),
+              //     extra: {
+              //       raw: `"${cnList.join(' ')}"`,
+              //       rawValue: cnList.join(' ')
+              //     }
+              //   }
+              // })
+
+              const mapIndexParam = getMapCallbackIndexParam(path);
+              if (mapIndexParam != null) {
+                node.openingElement.attributes.push({
+                  type: 'JSXAttribute',
+                  name: { type: 'JSXIdentifier', name: 'data-map-index' },
+                  value: {
+                    type: 'JSXExpressionContainer',
+                    expression: { type: 'Identifier', name: mapIndexParam },
+                  },
+                });
+              }
             }
 
             const dataLocValue = JSON.stringify(dataLocValueObject)
