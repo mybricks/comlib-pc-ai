@@ -4,6 +4,7 @@ import lowcodeViewCss from "./lowcodeView/index.lazy.less";
 import context from "./context";
 import { ANTD_KNOWLEDGES_MAP, ANTD_ICONS_KNOWLEDGES_MAP } from "./knowledges";
 import { parseLess, stringifyLess } from "./utils/transform/less";
+import { convertHyphenToCamel } from "../utils/string";
 import { deepClone } from "./utils/normal";
 import { MYBRICKS_KNOWLEDGES_MAP, HTML_KNOWLEDGES_MAP } from "./context/constants";
 import "../utils/antd";
@@ -277,6 +278,143 @@ export default function (props: Props) {
     })
   }
 
+  const figmaCategoryConfig = {
+    title: "Figma",
+    items: [
+      {
+        title: "导出到 Figma 插件",
+        type: "Button",
+        value: {
+          set(params: { id?: string; focusArea?: any; data?: any }, value: any) {
+            const comId = params?.id;
+            const fn = (window as any).comToMybricksJson;
+            if (typeof fn !== 'function') {
+              console.warn("[导出] window.comToMybricksJson 未定义");
+              return;
+            }
+            const result = fn(comId);
+            const jsonStr = typeof result === 'object' && result !== null
+              ? JSON.stringify(result, null, 2)
+              : String(result);
+            navigator.clipboard.writeText(jsonStr).then(
+              () => console.log("[导出] 已复制到剪切板"),
+              (err) => console.error("[导出] 复制失败", err)
+            );
+          }
+        }
+      },
+      {
+        title: "从 Figma 插件同步",
+        type: "Button",
+        value: {
+          set(params: { id?: string; focusArea?: any; data?: any }, value: any) {
+            const comId = params?.id;
+            if (!comId) {
+              console.warn("[从 Figma 同步] 无组件 ID");
+              return;
+            }
+            navigator.clipboard.readText().then(
+              (text) => {
+                try {
+                  const parsed = JSON.parse(text);
+                  const figmaItems: FigmaImportItem[] = Array.isArray(parsed) ? parsed : [parsed];
+                  syncStylesFromFigmaJson(comId, figmaItems);
+                } catch (e) {
+                  console.error("[从 Figma 同步] 剪切板内容不是合法 JSON", e);
+                }
+              },
+              (err) => console.error("[从 Figma 同步] 读取剪切板失败", err)
+            );
+          }
+        }
+      }
+    ]
+  };
+
+  /** Figma 导入项：selectors 与 parseLess 的 key 一致，value 为样式键值 */
+  type FigmaImportItem = { selectors: string[]; value: Record<string, string> };
+
+  /** 去掉 Figma 选择器前可能带的组件 ID classname，便于与组件 less 的 key 匹配 */
+  const normalizeFigmaSelector = (selector: string, comId: string): string => {
+    if (!comId || !selector.startsWith('.')) return selector;
+    const escaped = comId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const re = new RegExp(`^\\.${escaped}(\\.|\\s+)?`);
+    return selector.replace(re, (_, suffix) => (suffix === '.' ? '.' : '')).trim();
+  };
+
+  /** 从 Figma JSON（含 selectors）同步样式到组件 style.less，只同步有差异的部分 */
+  const syncStylesFromFigmaJson = (comId: string, figmaItems: FigmaImportItem[]) => {
+    const aiComParams = context.getAiComParams(comId);
+    if (!aiComParams?.data?.styleSource) {
+      console.warn("[从 Figma 同步] 组件无 styleSource，跳过同步");
+      return;
+    }
+    const cssObj = parseLess(decodeURIComponent(aiComParams.data.styleSource));
+    const componentSelectors = Object.keys(cssObj);
+    let hasChange = false;
+    const matched: string[] = [];
+    const skipped: string[] = [];
+    const diffs: { selector: string; key: string; from: string; to: string }[] = [];
+
+    console.log("[从 Figma 同步] 收到 Figma 条目数:", figmaItems.length, "组件现有选择器数:", componentSelectors.length);
+
+    figmaItems.forEach((item) => {
+      const { selectors, value: styles } = item;
+      if (!Array.isArray(selectors) || selectors.length === 0 || !styles || typeof styles !== 'object') {
+        skipped.push(String(selectors?.[0] ?? '(无 selectors)'));
+        return;
+      }
+      const rawSelector = selectors[0];
+      const selector = normalizeFigmaSelector(rawSelector, comId);
+      if (!selector) {
+        skipped.push(rawSelector);
+        return;
+      }
+      const cssObjKey = Object.keys(cssObj).find(
+        (key) => key === selector || key.endsWith(' ' + selector)
+      ) ?? null;
+      if (!cssObjKey || !cssObj[cssObjKey]) {
+        skipped.push(selector);
+        return;
+      }
+      matched.push(cssObjKey);
+      Object.entries(styles).forEach(([cssKey, figmaValue]) => {
+        const camelKey = convertHyphenToCamel(cssKey);
+        const currentValue = cssObj[cssObjKey][camelKey];
+        if (currentValue !== figmaValue) {
+          diffs.push({ selector: cssObjKey, key: camelKey, from: String(currentValue ?? ''), to: figmaValue });
+          cssObj[cssObjKey][camelKey] = figmaValue;
+          hasChange = true;
+        }
+      });
+    });
+
+    if (skipped.length > 0) {
+      console.log("[从 Figma 同步] 未命中的选择器（组件 less 中不存在）:", skipped.length, "个", skipped.slice(0, 20), skipped.length > 20 ? "..." : "");
+    }
+    console.log("[从 Figma 同步] 命中的选择器:", matched.length, "个", matched.slice(0, 30), matched.length > 30 ? "..." : "");
+    if (diffs.length > 0) {
+      console.log("[从 Figma 同步] 有差异并已同步的样式:", diffs.length, "条");
+      diffs.forEach((d) => console.log("  -", d.selector, d.key, d.from, "->", d.to));
+    }
+
+    if (hasChange) {
+      const cssStr = stringifyLess(cssObj);
+      context.updateFile(comId, { fileName: 'style.less', content: cssStr });
+      console.log("[从 Figma 同步] 已写入 style.less，共更新", diffs.length, "条样式");
+    } else {
+      console.log("[从 Figma 同步] 无差异，未写入文件");
+    }
+  };
+
+  // if (!focusAreaConfigs[':root']) {
+  //   focusAreaConfigs[':root'] = {
+  //     items: [figmaCategoryConfig]
+  //   };
+  // } else {
+  //   focusAreaConfigs[':root'].items.push(figmaCategoryConfig);
+  // }
+
   // if (data.runtimeJsxConstituency) {
   //   data.runtimeJsxConstituency.forEach(({ className, component, source }) => {
 
@@ -395,6 +533,8 @@ export default function (props: Props) {
   // }
 
   context.setAiComParams(props.id, props);
+
+  console.log("[@lowcode - render] props", props);
 
   context.createVibeCodingAgent({ register: window._registerAgent_ })
 
